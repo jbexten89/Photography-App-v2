@@ -263,7 +263,7 @@ async function cloudSyncPull(mergeFromLocal) {
   if (!supa || !supaUser) return;
   setSyncStatus("syncing", "◐ Syncing…");
   try {
-    const { data, error } = await supa.from("app_state")
+    const { data, error } = await supa.from("app_state_v2")
       .select("data, updated_at")
       .eq("user_id", supaUser.id)
       .maybeSingle();
@@ -304,7 +304,7 @@ async function cloudSyncPush() {
   const localIsEmpty = !Array.isArray(state.transactions) || state.transactions.length === 0;
   if (localIsEmpty) {
     try {
-      const { data } = await supa.from("app_state")
+      const { data } = await supa.from("app_state_v2")
         .select("data")
         .eq("user_id", supaUser.id)
         .maybeSingle();
@@ -325,7 +325,7 @@ async function cloudSyncPush() {
   setSyncStatus("syncing", "◐ Syncing…");
   try {
     const now = new Date().toISOString();
-    const { error } = await supa.from("app_state")
+    const { error } = await supa.from("app_state_v2")
       .upsert({ user_id: supaUser.id, data: state, updated_at: now });
     if (error) throw error;
     cloudSyncLastAt = new Date(now);
