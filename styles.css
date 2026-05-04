@@ -5874,6 +5874,11 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .mileage-add-row .btn { grid-column: 1 / -1; }
   .mileage-total-display { width: 100%; }
 
+  /* New Job: keep Open Jobs + Complete side-by-side on mobile */
+  #newjob .toolbar { flex-wrap: wrap; gap: 8px; }
+  #newjob .toolbar > span[style*="flex:1"] { display: none; }
+  #newjob .toolbar .mileage-total-display { width: auto; flex: 1; }
+
   /* --- Bigger touch targets on pills and buttons --- */
   .year-pill, .trend-payee-pill, .subtab-btn, .report-picker-btn {
     min-height: 36px;
