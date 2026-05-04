@@ -1,0 +1,19 @@
+{
+  "name": "Jamie Bexten Photography Bookkeeping",
+  "short_name": "Photography",
+  "description": "Photography business bookkeeping — transactions, invoices, reports, mileage, schedule",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f1419",
+  "theme_color": "#0f1419",
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

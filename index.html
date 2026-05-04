@@ -1,0 +1,2799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Photography" />
+<meta name="theme-color" content="#0f1419" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" type="image/png" href="apple-touch-icon.png" />
+<title>Photography Bookkeeping</title>
+<link rel="stylesheet" href="styles.css?v=275" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<!-- d3 + d3-sankey for the Breakdown view -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+</head>
+<body>
+  <button id="mobile-menu-btn" class="mobile-menu-btn" type="button" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div id="mobile-backdrop" class="mobile-backdrop"></div>
+
+  <!-- MOBILE BOTTOM NAV (visible only when Settings → Mobile Navigation = Bottom Bar) -->
+  <nav id="bottom-nav" class="bottom-nav" aria-label="Primary">
+    <button class="bottom-nav-btn tab-btn" data-tab="dashboard">
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Overview</span>
+    </button>
+    <button class="bottom-nav-btn tab-btn" data-tab="transactions">
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span>Transactions</span>
+    </button>
+    <button class="bottom-nav-btn tab-btn" data-tab="schedule">
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Calendar</span>
+    </button>
+    <button class="bottom-nav-btn tab-btn" data-tab="jobs">
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+      <span>Analytics</span>
+    </button>
+    <button class="bottom-nav-btn" id="btn-mobile-more" type="button" aria-label="More">
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+      <span>More</span>
+    </button>
+  </nav>
+
+  <!-- RIGHT FLYOUT (used by Bottom Bar nav's "More" button) -->
+  <div id="right-flyout-backdrop" class="right-flyout-backdrop"></div>
+  <aside id="right-flyout" class="right-flyout" aria-label="More menu">
+    <img src="logo.png" alt="Jamie Bexten Photography" class="right-flyout-logo" onerror="this.style.display='none'" />
+    <div id="flyout-cloud-status" class="sidebar-cloud-status" hidden>
+      <span class="sidebar-cloud-dot" aria-hidden="true"></span>
+      <span class="sidebar-cloud-text">Signed in</span>
+    </div>
+    <nav class="right-flyout-tabs">
+      <button class="tab-btn" data-tab="dashboard"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span class="tab-label">Overview</span></button>
+      <button class="tab-btn" data-tab="jobs"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span><span class="tab-label">Analytics</span></button>
+      <button class="tab-btn" data-tab="schedule"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="tab-label">Calendar</span></button>
+      <button class="tab-btn" data-tab="transactions"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><span class="tab-label">All Transactions</span></button>
+      <button class="tab-btn" data-tab="invoices"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span class="tab-label">Invoices</span></button>
+      <button class="tab-btn" data-tab="mileage"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg></span><span class="tab-label">Mileage</span></button>
+      <button class="tab-btn" data-tab="reports"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13v5"/><path d="M12 11v7"/><path d="M16 15v3"/></svg></span><span class="tab-label">Reports</span></button>
+    </nav>
+    <div class="right-flyout-bottom">
+      <button id="btn-theme-flyout" class="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+        <span class="theme-icon">&#9790;</span>
+      </button>
+      <button class="tab-btn settings-gear" data-tab="settings" title="Settings" aria-label="Settings">
+        <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-wrap">
+      <img src="logo.png" alt="Jamie Bexten Photography" class="logo" onerror="this.style.display='none'" />
+      <span class="logo-watermark">TEST</span>
+    </div>
+    <div id="sidebar-cloud-status" class="sidebar-cloud-status" hidden>
+      <span class="sidebar-cloud-dot" aria-hidden="true"></span>
+      <span class="sidebar-cloud-text">Signed in</span>
+    </div>
+    <nav class="tabs">
+      <button class="tab-btn" data-tab="dashboard"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span class="tab-label">Overview</span></button>
+      <button class="tab-btn" data-tab="schedule"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="tab-label">Calendar</span></button>
+      <button class="tab-btn" data-tab="newjob"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span><span class="tab-label">New Job</span></button>
+      <button class="tab-btn" data-tab="jobs"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span><span class="tab-label">Analytics</span></button>
+      <button class="tab-btn active" data-tab="transactions"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><span class="tab-label">All Transactions</span></button>
+      <button class="tab-btn" data-tab="invoices"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span class="tab-label">Invoices</span></button>
+      <button class="tab-btn" data-tab="mileage"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg></span><span class="tab-label">Mileage</span></button>
+      <button class="tab-btn" data-tab="reports"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13v5"/><path d="M12 11v7"/><path d="M16 15v3"/></svg></span><span class="tab-label">Reports</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button id="btn-theme" class="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+        <span class="theme-icon">&#9790;</span>
+      </button>
+      <button class="tab-btn settings-gear" data-tab="settings" title="Settings" aria-label="Settings">
+        <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="tab-panel">
+      <div class="page-heading-mobile">
+        <h1 class="page-title-mobile">Overview</h1>
+        <p class="page-subtitle-mobile muted">Year-over-year income, savings, and spending at a glance</p>
+      </div>
+      <div class="dashboard-toolbar">
+        <div id="dashboard-year-pills" class="year-pills"></div>
+        <select id="dashboard-year" hidden><option value="">All Years</option></select>
+      </div>
+
+      <div class="dashboard-charts">
+        <div class="dashboard-income-chart-card">
+          <h3>Income by Job</h3>
+          <div class="donut-with-legend">
+            <div id="dashboard-jobs-donut" class="donut-wrap"></div>
+            <ul id="dashboard-jobs-legend" class="donut-key"></ul>
+          </div>
+        </div>
+
+        <div class="savings-goal-vertical">
+          <h3>Savings Goal</h3>
+          <div class="savings-vbar">
+            <div class="savings-vbar-fill" id="savings-vbar-fill"></div>
+            <div class="savings-vbar-target-line"></div>
+          </div>
+          <div class="savings-vbar-stats">
+            <div class="savings-vbar-current" id="savings-vbar-current">$0.00</div>
+            <div class="savings-vbar-pct" id="savings-vbar-pct">0%</div>
+            <div class="savings-vbar-target" id="savings-vbar-target">of $12,000</div>
+            <div class="savings-vbar-remaining" id="savings-vbar-remaining">$12,000.00 to go</div>
+          </div>
+        </div>
+
+        <div class="dashboard-income-chart-card">
+          <div class="trends-income-header">
+            <h3>Total Income by Year</h3>
+            <div class="income-year-nav">
+              <button type="button" id="income-year-prev" class="year-pill" aria-label="Show older years">‹</button>
+              <button type="button" id="income-year-next" class="year-pill" aria-label="Show newer years">›</button>
+            </div>
+            <div class="trends-income-toggle" id="dashboard-income-toggle">
+              <button type="button" class="year-pill active" data-mode="full">Full Year</button>
+              <button type="button" class="year-pill" data-mode="ytd">To Date</button>
+            </div>
+          </div>
+          <svg id="dashboard-income-chart" viewBox="0 0 900 360"></svg>
+        </div>
+      </div>
+
+      <div class="summary-cards">
+        <div class="card income"><h3>Total Income</h3><p id="sum-income">$0.00</p></div>
+        <div class="card expense"><h3>Total Expenses</h3><p id="sum-expense">$0.00</p></div>
+        <div class="card savings"><h3>Total Savings</h3><p id="sum-savings">$0.00</p></div>
+        <div class="card net"><h3>Net</h3><p id="sum-net">$0.00</p></div>
+        <div class="card count"><h3>Transactions</h3><p id="sum-count">0</p></div>
+        <div class="card count sum-jobs-card">
+          <h3>Jobs Open / Paid</h3>
+          <p class="sum-jobs-line">
+            <span id="sum-open-jobs">0</span>
+            <span class="sum-jobs-divider">/</span>
+            <span id="sum-complete-jobs">0</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Year-over-year deltas — visible only when a specific year is selected. -->
+      <div class="summary-cards yoy-cards" id="yoy-cards" hidden>
+        <div class="card yoy-card"><h3>Income vs <span class="yoy-prev-label">last year</span></h3><p class="yoy-value" id="yoy-income">—</p><p class="yoy-prev muted" id="yoy-income-prev">—</p></div>
+        <div class="card yoy-card"><h3>Expenses vs <span class="yoy-prev-label">last year</span></h3><p class="yoy-value" id="yoy-expense">—</p><p class="yoy-prev muted" id="yoy-expense-prev">—</p></div>
+        <div class="card yoy-card"><h3>Net vs <span class="yoy-prev-label">last year</span></h3><p class="yoy-value" id="yoy-net">—</p><p class="yoy-prev muted" id="yoy-net-prev">—</p></div>
+      </div>
+
+
+      <div class="table-wrap">
+        <table id="job-summary-table" class="fixed-cols">
+          <colgroup>
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+          </colgroup>
+          <thead>
+            <tr><th>Job</th><th>Income</th><th>Expenses</th><th>Net</th><th>Count</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <table id="expense-summary-table" class="fixed-cols">
+          <colgroup>
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+          </colgroup>
+          <thead>
+            <tr><th>Category</th><th>Expenses</th><th>Income</th><th>Net</th><th>Count</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <table id="account-summary-table" class="fixed-cols">
+          <colgroup>
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+            <col style="width: 20%">
+          </colgroup>
+          <thead>
+            <tr><th>Account</th><th>Income</th><th>Expenses</th><th>Balance</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section id="transactions" class="tab-panel active">
+      <div class="page-heading-mobile">
+        <h1 class="page-title-mobile">All Transactions</h1>
+        <p class="page-subtitle-mobile muted">Browse, search, and edit every income and expense entry</p>
+      </div>
+      <div class="running-balance">
+        <div class="rb-item" id="rb-selection" hidden>
+          <span class="rb-label">Selected (<span id="rb-sel-count">0</span>)</span>
+          <span class="rb-value" id="rb-sel-total">$0.00</span>
+        </div>
+        <div class="rb-item main">
+          <span class="rb-label">Balance</span>
+          <span class="rb-value" id="rb-balance">$0.00</span>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button id="btn-tx-back" class="btn tx-back-btn" type="button" hidden aria-label="Back to Analytics">‹ Back</button>
+        <button id="btn-new-tx" class="btn primary">+ New Transaction</button>
+        <select id="tx-filter-year"><option value="">All Years</option></select>
+        <select id="tx-filter-category"><option value="">All Categories</option></select>
+        <select id="tx-filter-jobno"><option value="">All Job Nos.</option></select>
+        <select id="tx-filter-type">
+          <option value="">All Types</option>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <button id="btn-tx-drill-clear" type="button" class="tx-drill-clear" hidden title="Clear drill-down filter and show all">
+          <span id="tx-drill-clear-label">Drill: —</span>
+          <span aria-hidden="true">×</span>
+        </button>
+        <div class="tx-find-wrap">
+          <button type="button" id="btn-tx-find" class="btn tx-find-btn" aria-label="Find" title="Find">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+          <input type="search" id="tx-search-all" class="tx-find-input" placeholder="" aria-label="Find..." />
+          <button type="button" id="btn-tx-find-close" class="btn tx-find-close-btn" aria-label="Close search" title="Close search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="tx-more-wrap">
+          <button id="btn-more" class="btn tx-more-btn" type="button" aria-label="More actions" title="More actions">&#8943;</button>
+          <div id="tx-more-menu" class="tx-more-menu" hidden>
+            <button class="tx-more-item" id="btn-select-mode" type="button">
+              <svg class="more-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                <polyline points="8 12 11 15 16 9"></polyline>
+              </svg>
+              <span id="btn-select-label">Select Transactions</span>
+            </button>
+            <button class="tx-more-item" id="btn-reconcile" type="button">
+              <svg class="more-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+              </svg>
+              <span>Reconcile…</span>
+            </button>
+            <button class="tx-more-item" id="btn-toggle-reconciled" type="button">
+              <svg class="more-icon" id="btn-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+                <line class="eye-slash" x1="3" y1="3" x2="21" y2="21"></line>
+              </svg>
+              <span id="btn-toggle-label">Hide Reconciled</span>
+            </button>
+            <button class="tx-more-item" id="btn-export" type="button">
+              <svg class="more-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Export CSV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="tx-table">
+          <thead>
+            <tr>
+              <th class="tx-select-col"><input type="checkbox" id="tx-select-all" aria-label="Select all" /></th>
+              <th data-col="date">Date</th>
+              <th data-col="vendor">Vendor</th>
+              <th data-col="jobno">Job No.</th>
+              <th data-col="customer">Customer</th>
+              <th data-col="payee">Payee</th>
+              <th data-col="category">Category</th>
+              <th data-col="expinc">Expense</th>
+              <th data-col="chart">Chart of Accounts</th>
+              <th data-col="amount">Amount</th>
+              <th data-col="memo">Memo</th>
+              <th data-col="recon" title="Reconciled">R</th>
+              <th data-col="tags" class="tag-col" title="Tags"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ANALYTICS (master shell holding every analytics view) -->
+    <section id="jobs" class="tab-panel analytics-shell">
+      <header class="analytics-header">
+        <div class="analytics-heading-mobile">
+          <h1 class="analytics-title-mobile">Analytics</h1>
+          <p class="analytics-subtitle-mobile muted">Track your finances with detailed reports and charts</p>
+        </div>
+        <nav class="analytics-pills" id="analytics-pills">
+          <button class="analytics-pill active" data-view="by-category">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
+            By Job
+          </button>
+          <button class="analytics-pill" data-view="cash-flow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            Cash Flow
+          </button>
+          <button class="analytics-pill" data-view="trends">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+            By Category
+          </button>
+          <button class="analytics-pill" data-view="spending-trends">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Trends
+          </button>
+          <button class="analytics-pill" data-view="flow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Flow
+          </button>
+          <button class="analytics-pill" data-view="vs-expense">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l3 14h12l3-14"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+            vs Expense
+          </button>
+          <button class="analytics-pill" data-view="breakdown">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l4 12h6"/><path d="M3 18h6l2-6"/></svg>
+            Breakdown
+          </button>
+          <button class="analytics-pill" data-view="savings-rate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Savings Rate
+          </button>
+        </nav>
+        <select id="analytics-view-select" class="analytics-view-select" aria-label="Analytics view" hidden>
+          <option value="by-category">By Job</option>
+          <option value="cash-flow">Cash Flow</option>
+          <option value="trends">By Category</option>
+          <option value="spending-trends">Trends</option>
+          <option value="flow">Flow</option>
+          <option value="vs-expense">vs Expense</option>
+          <option value="breakdown">Breakdown</option>
+          <option value="savings-rate">Savings Rate</option>
+        </select>
+        <!-- Custom mobile view picker (richer styling than native <select>) -->
+        <div class="amvp" id="amvp">
+          <button type="button" class="amvp-trigger" id="amvp-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="amvp-current">
+              <svg class="amvp-icon" id="amvp-current-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
+              <span class="amvp-label" id="amvp-current-label">By Job</span>
+            </span>
+            <svg class="amvp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="amvp-menu" id="amvp-menu" role="listbox" hidden>
+            <button type="button" class="amvp-item active" data-view="by-category" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
+              <span>By Job</span>
+            </button>
+            <button type="button" class="amvp-item" data-view="cash-flow" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              <span>Cash Flow</span>
+            </button>
+            <button type="button" class="amvp-item" data-view="trends" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+              <span>By Category</span>
+            </button>
+            <button type="button" class="amvp-item" data-view="spending-trends" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              <span>Trends</span>
+            </button>
+            <button type="button" class="amvp-item" data-view="flow" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              <span>Flow</span>
+            </button>
+            <button type="button" class="amvp-item" data-view="vs-expense" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l3 14h12l3-14"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+              <span>vs Expense</span>
+            </button>
+            <button type="button" class="amvp-item" data-view="breakdown" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l4 12h6"/><path d="M3 18h6l2-6"/></svg>
+              <span>Breakdown</span>
+            </button>
+            <button type="button" class="amvp-item" data-view="savings-rate" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Savings Rate</span>
+            </button>
+          </div>
+        </div>
+        <div class="analytics-toolbar-row">
+          <div class="analytics-filters-wrap">
+            <button type="button" id="btn-analytics-filters" class="analytics-tool-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filters
+              <span id="filter-count-badge" class="filter-count-badge" hidden>0</span>
+            </button>
+            <div id="analytics-filters-panel" class="analytics-filters-panel" hidden>
+          <div class="filter-field">
+            <span class="filter-field-label">Date Range</span>
+            <button type="button" class="filter-trigger" data-filter="date-range">
+              <span class="filter-summary">All</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <div class="filter-field">
+            <span class="filter-field-label">Customer</span>
+            <button type="button" class="filter-trigger" data-filter="customer">
+              <span class="filter-summary">All</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <div class="filter-field">
+            <span class="filter-field-label">Job</span>
+            <button type="button" class="filter-trigger" data-filter="job">
+              <span class="filter-summary">All</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <div class="filter-field">
+            <span class="filter-field-label">Category</span>
+            <button type="button" class="filter-trigger" data-filter="category">
+              <span class="filter-summary">All</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <div class="filter-field">
+            <span class="filter-field-label">Payee</span>
+            <button type="button" class="filter-trigger" data-filter="payees">
+              <span class="filter-summary">All</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <button type="button" id="btn-analytics-clear-filters" class="analytics-clear-btn">Clear all filters</button>
+            </div>
+            <!-- Floating multi-select popover, anchored to whichever .filter-trigger was clicked -->
+            <div id="filter-popover" class="filter-popover" hidden>
+              <div class="filter-popover-head">
+                <span class="filter-popover-title" id="filter-popover-title">Categories</span>
+                <span class="filter-popover-actions">
+                  <button type="button" data-act="all">All</button>
+                  <span class="muted">·</span>
+                  <button type="button" data-act="none">None</button>
+                </span>
+              </div>
+              <div class="filter-mode-tabs">
+                <button type="button" data-mode="include" class="active">Include</button>
+                <button type="button" data-mode="exclude">Exclude</button>
+              </div>
+              <input type="search" id="filter-popover-search" class="filter-search" placeholder="Search…" autocomplete="off">
+              <ul id="filter-popover-list" class="filter-options"></ul>
+            </div>
+          </div>
+          <div class="analytics-presets-wrap">
+            <button type="button" id="btn-analytics-presets" class="analytics-tool-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              Presets
+            </button>
+            <div id="presets-popover" class="filter-popover presets-popover" hidden>
+              <input type="search" id="presets-search" class="filter-search" placeholder="Search presets…" autocomplete="off">
+              <div class="presets-section-title" id="presets-favorites-title" hidden>Favorites</div>
+              <ul id="presets-favorites-list" class="filter-options"></ul>
+              <div class="presets-section-title">All Presets</div>
+              <ul id="presets-list" class="filter-options"></ul>
+              <button type="button" id="btn-save-current-preset" class="presets-save-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save current filters
+              </button>
+            </div>
+          </div>
+          <button type="button" id="btn-active-preset-chip" class="analytics-tool-btn active-preset-chip" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span id="active-preset-name">Preset</span>
+            <svg class="active-preset-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <span id="analytics-filter-summary" class="analytics-filter-summary muted">Showing: All Years</span>
+        </div>
+      </header>
+
+      <div class="analytics-views">
+        <div class="analytics-view active" data-view="by-category">
+      <div class="jobs-sticky">
+      <select id="jobs-year" hidden><option value="">All Years</option></select>
+
+      <div class="donut-row">
+        <div class="donut-card">
+          <h2>Jobs</h2>
+          <div class="donut-hover-info" id="info-jobs"></div>
+          <div id="donut-jobs" class="donut-wrap"></div>
+        </div>
+        <div class="donut-card">
+          <h2>Expenses</h2>
+          <div class="donut-hover-info" id="info-expenses"></div>
+          <div id="donut-expenses" class="donut-wrap"></div>
+        </div>
+        <div class="donut-card">
+          <h2>Savings</h2>
+          <div class="donut-hover-info" id="info-savings"></div>
+          <div id="donut-savings" class="donut-wrap"></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="jobs-section" data-section="jobs">
+        <div class="donut-card donut-card-mobile">
+          <h2>Jobs</h2>
+          <div class="donut-hover-info" id="info-jobs-m"></div>
+          <div id="donut-jobs-m" class="donut-wrap"></div>
+        </div>
+        <div class="jobs-section-head">
+          <h2>Jobs</h2>
+          <div class="jobs-mode-toggle" id="jobs-group-toggle" style="margin-right:8px">
+            <button type="button" class="year-pill" data-group="customer">By Customer</button>
+            <button type="button" class="year-pill" data-group="category">By Category</button>
+            <button type="button" class="year-pill active" data-group="job">By Job No.</button>
+          </div>
+          <div class="jobs-mode-toggle" id="jobs-mode-toggle">
+            <button type="button" class="year-pill active" data-mode="gross">Gross</button>
+            <button type="button" class="year-pill" data-mode="net">Net</button>
+          </div>
+        </div>
+        <div id="jobs-grid-positive" class="jobs-grid"></div>
+      </div>
+      <div class="jobs-section" data-section="expenses">
+        <div class="donut-card donut-card-mobile">
+          <h2>Expenses</h2>
+          <div class="donut-hover-info" id="info-expenses-m"></div>
+          <div id="donut-expenses-m" class="donut-wrap"></div>
+        </div>
+        <h2>Expenses</h2>
+        <div id="jobs-grid-negative" class="jobs-grid"></div>
+      </div>
+      <div class="jobs-section" data-section="savings">
+        <div class="donut-card donut-card-mobile">
+          <h2>Savings</h2>
+          <div class="donut-hover-info" id="info-savings-m"></div>
+          <div id="donut-savings-m" class="donut-wrap"></div>
+        </div>
+        <h2>Savings</h2>
+        <div id="jobs-grid-savings" class="jobs-grid"></div>
+      </div>
+        </div><!-- /by-category view -->
+
+        <div class="analytics-view" data-view="trends">
+          <div class="bcat-grid">
+            <div class="bcat-main">
+              <div class="bcat-head">
+                <div class="bcat-title-block">
+                  <div class="bcat-eyebrow" id="bcat-eyebrow">Spending by Category</div>
+                  <div class="bcat-total" id="bcat-total">$0.00</div>
+                </div>
+                <div class="bcat-type-switch mode-switch" id="bcat-type-switch" data-mode="spending">
+                  <div class="mode-switch-thumb"></div>
+                  <button type="button" class="mode-switch-option active" data-mode="spending">Spending</button>
+                  <button type="button" class="mode-switch-option" data-mode="income">Income</button>
+                </div>
+                <div class="bcat-amount-switch mode-switch" id="bcat-amount-switch" data-mode="gross">
+                  <div class="mode-switch-thumb"></div>
+                  <button type="button" class="mode-switch-option active" data-mode="gross">Gross</button>
+                  <button type="button" class="mode-switch-option" data-mode="net">Net</button>
+                </div>
+                <div class="bcat-chart-switch mode-switch" id="bcat-chart-switch" data-mode="donut">
+                  <div class="mode-switch-thumb"></div>
+                  <button type="button" class="mode-switch-option active" data-mode="donut">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                    Donut
+                  </button>
+                  <button type="button" class="mode-switch-option" data-mode="columns">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="13" width="3" height="7"/><rect x="10.5" y="9" width="3" height="11"/><rect x="17" y="5" width="3" height="15"/></svg>
+                    Columns
+                  </button>
+                  <button type="button" class="mode-switch-option" data-mode="treemap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="9" height="13"/><rect x="12" y="3" width="9" height="7"/><rect x="12" y="10" width="9" height="11"/><rect x="3" y="16" width="9" height="5"/></svg>
+                    Treemap
+                  </button>
+                  <button type="button" class="mode-switch-option" data-mode="rose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M12 4 L12 10"/><path d="M19 8 L14 11"/><path d="M19 16 L14 13"/><path d="M12 20 L12 14"/><path d="M5 16 L10 13"/><path d="M5 8 L10 11"/></svg>
+                    Rose
+                  </button>
+                </div>
+              </div>
+              <div id="bcat-chart" class="bcat-chart"></div>
+            </div>
+            <aside class="bcat-aside">
+              <div class="bcat-stats">
+                <div class="bcat-stat">
+                  <div class="bcat-stat-label">TOTAL</div>
+                  <div class="bcat-stat-value" id="bcat-stat-total">$0.00</div>
+                </div>
+                <div class="bcat-stat">
+                  <div class="bcat-stat-label">AVG / MONTH</div>
+                  <div class="bcat-stat-value" id="bcat-stat-avg">$0.00</div>
+                </div>
+                <div class="bcat-stat">
+                  <div class="bcat-stat-label">TOP CATEGORY</div>
+                  <div class="bcat-stat-value bcat-stat-top" id="bcat-stat-top">—</div>
+                </div>
+                <div class="bcat-stat">
+                  <div class="bcat-stat-label">CATEGORIES</div>
+                  <div class="bcat-stat-value" id="bcat-stat-count">0</div>
+                </div>
+              </div>
+              <div class="bcat-list-title">CATEGORIES</div>
+              <ul id="bcat-list" class="bcat-list"></ul>
+            </aside>
+          </div>
+        </div><!-- /By Category view -->
+
+        <div class="analytics-view" data-view="flow">
+          <div class="trend-card">
+            <div class="trend-card-head">
+              <h2 id="trend-title">Net Profit by Year</h2>
+              <div class="trend-card-toolbar">
+                <span class="trend-filter-label">View By</span>
+                <div id="trend-mode-pills" class="mode-switch" data-mode="year">
+                  <div class="mode-switch-thumb"></div>
+                  <button type="button" class="mode-switch-option" data-mode="year">All Jobs</button>
+                  <button type="button" class="mode-switch-option" data-mode="job">One Job</button>
+                </div>
+                <label class="trend-job-picker" id="trend-job-picker-wrap" hidden>
+                  <span class="trend-filter-label">Job</span>
+                  <select id="trend-job-picker" class="btn"></select>
+                </label>
+                <div id="trend-amount-pills" class="mode-switch" data-mode="net">
+                  <div class="mode-switch-thumb"></div>
+                  <button type="button" class="mode-switch-option" data-mode="gross">Gross</button>
+                  <button type="button" class="mode-switch-option active" data-mode="net">Net</button>
+                </div>
+              </div>
+            </div>
+            <div id="trend-chart" class="trend-chart"></div>
+          </div>
+        </div><!-- /flow view -->
+
+        <div class="analytics-view analytics-stub" data-view="net-worth">
+          <h2>Net Worth</h2>
+          <p class="muted">Coming soon — track the value of your accounts, equipment, and liabilities over time.</p>
+        </div>
+        <div class="analytics-view" data-view="cash-flow">
+          <div class="cash-flow-grid">
+            <div class="cash-flow-main">
+              <div class="cash-flow-toprow">
+                <div class="cash-flow-header">
+                  <div class="cash-flow-eyebrow">Cash Flow</div>
+                  <div class="cash-flow-total" id="cf-total">$0.00</div>
+                  <div class="cash-flow-subtitle muted" id="cf-subtitle">No data</div>
+                </div>
+                <div class="cash-flow-toggle mode-switch" id="cf-mode" data-mode="flow">
+                  <div class="mode-switch-thumb"></div>
+                  <button type="button" class="mode-switch-option active" data-mode="flow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 9 12 15 6 21 12"/><polyline points="3 18 9 12 15 18 21 12"/></svg>
+                    Flow
+                  </button>
+                  <button type="button" class="mode-switch-option" data-mode="trend">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+                    Trend
+                  </button>
+                </div>
+              </div>
+              <div class="cash-flow-chart" id="cf-chart"></div>
+            </div>
+            <aside class="cash-flow-aside">
+              <div class="cash-flow-stats">
+                <div class="cf-stat">
+                  <div class="cf-stat-label">NET CASH FLOW</div>
+                  <div class="cf-stat-value" id="cf-stat-net">$0</div>
+                </div>
+                <div class="cf-stat">
+                  <div class="cf-stat-label">MONTHLY AVG</div>
+                  <div class="cf-stat-value" id="cf-stat-avg">$0</div>
+                  <div class="cf-stat-sub" id="cf-stat-avg-sub"></div>
+                </div>
+                <div class="cf-stat">
+                  <div class="cf-stat-label">TOTAL INFLOW</div>
+                  <div class="cf-stat-value income" id="cf-stat-in">$0</div>
+                </div>
+                <div class="cf-stat">
+                  <div class="cf-stat-label">TOTAL OUTFLOW</div>
+                  <div class="cf-stat-value expense" id="cf-stat-out">$0</div>
+                </div>
+              </div>
+              <div class="cash-flow-list-title">MONTHLY</div>
+              <ul class="cash-flow-list" id="cf-list"></ul>
+            </aside>
+          </div>
+        </div>
+        <div class="analytics-view" data-view="vs-expense">
+          <div class="vs-expense-card">
+            <div class="vs-expense-head">
+              <h2>Income vs Expense</h2>
+              <button type="button" id="btn-vs-expense-export" class="btn vs-expense-export">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+              </button>
+            </div>
+            <div class="vs-expense-table-wrap">
+              <table id="vs-expense-table" class="vs-expense-table"></table>
+            </div>
+          </div>
+        </div>
+        <div class="analytics-view" data-view="breakdown">
+          <div class="breakdown-card">
+            <div class="breakdown-head">
+              <div>
+                <div class="breakdown-eyebrow" id="breakdown-eyebrow">Customer · Category · Job No. Flow</div>
+                <div class="breakdown-total" id="breakdown-total">$0.00</div>
+              </div>
+              <div class="breakdown-type-switch mode-switch" id="breakdown-type-switch" data-mode="income">
+                <div class="mode-switch-thumb"></div>
+                <button type="button" class="mode-switch-option active" data-mode="income">Income</button>
+                <button type="button" class="mode-switch-option" data-mode="spending">Spending</button>
+              </div>
+            </div>
+            <div class="breakdown-stage-picker" id="breakdown-stage-picker">
+              <span class="breakdown-stage-label">Stages:</span>
+              <div class="breakdown-stage-chips" id="breakdown-stage-chips"></div>
+              <div class="breakdown-stage-add-wrap">
+                <button type="button" id="breakdown-stage-add-btn" class="btn breakdown-stage-add">+ Add stage</button>
+                <div class="breakdown-stage-add-menu" id="breakdown-stage-add-menu" hidden></div>
+              </div>
+            </div>
+            <div id="breakdown-chart" class="breakdown-chart"></div>
+          </div>
+        </div>
+
+        <div class="analytics-view" data-view="savings-rate">
+          <div class="sr-grid">
+            <div class="sr-main">
+              <div class="sr-head">
+                <div>
+                  <div class="sr-eyebrow">Savings Rate</div>
+                  <div class="sr-rate" id="sr-rate">0.0%</div>
+                  <div class="sr-sub muted" id="sr-sub">Of net profit saved into Wealthfront / CiT Bank</div>
+                </div>
+              </div>
+              <div class="sr-chart" id="sr-chart"></div>
+              <div class="sr-deduct">
+                <button type="button" class="sr-deduct-toggle" id="sr-deduct-toggle">
+                  <svg class="sr-deduct-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                  <span>Job Expenses + Cost of Goods</span>
+                  <span class="sr-deduct-total" id="sr-deduct-total">$0.00</span>
+                </button>
+                <div class="sr-deduct-body" id="sr-deduct-body" hidden></div>
+              </div>
+            </div>
+            <aside class="sr-aside">
+              <div class="sr-stats">
+                <div class="sr-stat">
+                  <div class="sr-stat-label">TOTAL INCOME</div>
+                  <div class="sr-stat-value income" id="sr-stat-income">$0.00</div>
+                </div>
+                <div class="sr-stat">
+                  <div class="sr-stat-label">JOB EXP + COGS</div>
+                  <div class="sr-stat-value expense" id="sr-stat-expense" title="Job-category expenses + Cost of Goods">$0.00</div>
+                </div>
+                <div class="sr-stat">
+                  <div class="sr-stat-label">PROFIT BASE</div>
+                  <div class="sr-stat-value" id="sr-stat-net" title="Gross Profit − Job Expenses − Cost of Goods">$0.00</div>
+                </div>
+                <div class="sr-stat">
+                  <div class="sr-stat-label">SAVED</div>
+                  <div class="sr-stat-value income" id="sr-stat-saved">$0.00</div>
+                </div>
+              </div>
+              <div class="sr-list-title">SAVINGS BY CATEGORY</div>
+              <ul id="sr-cat-list" class="sr-list"></ul>
+            </aside>
+          </div>
+        </div>
+
+        <div class="analytics-view" data-view="spending-trends">
+          <div class="spend-trends-grid">
+            <div class="spend-trends-main">
+              <div class="spend-trends-head">
+                <div>
+                  <div class="spend-trends-eyebrow">Spending Trends</div>
+                  <div class="spend-trends-total" id="st-total">$0.00</div>
+                </div>
+                <div class="spend-trends-toggle mode-switch" id="st-mode" data-mode="stacked">
+                  <div class="mode-switch-thumb"></div>
+                  <button type="button" class="mode-switch-option active" data-mode="stacked">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="4" height="10"/><rect x="10" y="4" width="4" height="16"/><rect x="16" y="13" width="4" height="7"/></svg>
+                    Stacked
+                  </button>
+                  <button type="button" class="mode-switch-option" data-mode="lines">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"/></svg>
+                    Lines
+                  </button>
+                </div>
+              </div>
+              <div class="spend-trends-chart" id="st-chart"></div>
+            </div>
+            <aside class="spend-trends-aside">
+              <div class="spend-trends-stats">
+                <div class="spend-trends-stat">
+                  <div class="spend-trends-stat-label">TOTAL SPENDING</div>
+                  <div class="spend-trends-stat-value" id="st-stat-total">$0.00</div>
+                </div>
+                <div class="spend-trends-stat">
+                  <div class="spend-trends-stat-label">MONTHLY AVG</div>
+                  <div class="spend-trends-stat-value" id="st-stat-avg">$0.00</div>
+                </div>
+                <div class="spend-trends-stat">
+                  <div class="spend-trends-stat-label">CATEGORIES</div>
+                  <div class="spend-trends-stat-value" id="st-stat-cats">0</div>
+                </div>
+                <div class="spend-trends-stat">
+                  <div class="spend-trends-stat-label">MONTHS</div>
+                  <div class="spend-trends-stat-value" id="st-stat-months">0</div>
+                </div>
+              </div>
+              <div class="spend-trends-list-title">CATEGORIES</div>
+              <ul class="spend-trends-list" id="st-list"></ul>
+            </aside>
+          </div>
+        </div>
+      </div><!-- /analytics-views -->
+    </section>
+
+    <!-- INVOICES -->
+    <section id="invoices" class="tab-panel">
+      <!-- LIST VIEW -->
+      <div id="invoices-list-view">
+        <div class="page-heading-mobile">
+          <h1 class="page-title-mobile">Invoices</h1>
+          <p class="page-subtitle-mobile muted">Create, send, and track customer invoices</p>
+        </div>
+        <div class="invoice-summary">
+          <div class="inv-sum-item">
+            <span class="inv-sum-label">Total Invoiced</span>
+            <span class="inv-sum-value" id="inv-sum-all">$0.00</span>
+          </div>
+          <div class="inv-sum-item">
+            <span class="inv-sum-label">Total Paid</span>
+            <span class="inv-sum-value" id="inv-sum-paid">$0.00</span>
+          </div>
+          <div class="inv-sum-item">
+            <span class="inv-sum-label">Outstanding Balance</span>
+            <span class="inv-sum-value" id="inv-sum-outstanding">$0.00</span>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button id="btn-open-tax-report" class="btn" type="button">Sales Tax Liability</button>
+          <select id="inv-filter-year"><option value="">All Years</option></select>
+          <select id="inv-filter-job"><option value="">All Customers</option></select>
+          <input type="search" id="inv-filter-billto" placeholder="Search Bill To..." />
+          <span style="flex:1"></span>
+          <button id="btn-new-invoice" class="btn primary">+ New Invoice</button>
+        </div>
+        <!-- Un-Invoiced jobs (income transactions not linked to any invoice) -->
+        <div id="uninvoiced-jobs-card" class="uninvoiced-card" hidden>
+          <div class="uninvoiced-head">
+            <h3>Jobs not invoiced</h3>
+            <span class="uninvoiced-count" id="uninvoiced-count">0</span>
+          </div>
+          <table class="uninvoiced-table fixed-cols">
+            <colgroup>
+              <col style="width: 15%">
+              <col style="width: 32%">
+              <col style="width: 28%">
+              <col style="width: 25%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Category</th>
+                <th style="text-align:right">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="uninvoiced-list"></tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table id="invoices-table" class="fixed-cols">
+            <colgroup>
+              <col style="width: 10%">
+              <col style="width: 12%">
+              <col style="width: 12%">
+              <col style="width: 26%">
+              <col style="width: 18%">
+              <col style="width: 22%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th style="text-align:right">Total</th>
+                <th>Date</th>
+                <th>Bill To</th>
+                <th>Job</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- EDITOR VIEW -->
+      <div id="invoices-edit-view" hidden>
+        <div class="toolbar">
+          <button id="btn-invoice-back" class="btn" type="button">&#8592; Back</button>
+          <button id="btn-invoice-save" class="btn primary" type="button">Save</button>
+          <button id="btn-invoice-paid" class="btn" type="button">Mark as Paid</button>
+          <button id="btn-invoice-print" class="btn" type="button">Print / PDF</button>
+          <button id="btn-invoice-delete" class="btn danger" type="button" hidden>Delete</button>
+        </div>
+
+        <!-- Linked transactions panel (outside the printable sheet, positioned above it) -->
+        <div id="invoice-linked-section" class="invoice-linked-section no-print">
+          <div class="invoice-linked-head">
+            <h3>Linked Transactions <span id="invoice-linked-count" class="invoice-linked-count">0</span></h3>
+            <span id="invoice-linked-total" class="invoice-linked-total">$0.00</span>
+            <button type="button" id="btn-link-transactions" class="btn">+ Link Transactions…</button>
+          </div>
+          <p class="muted invoice-linked-desc">Transactions whose Job No. matches this invoice's number are automatically linked.</p>
+          <ul id="invoice-linked-list" class="invoice-linked-list"></ul>
+        </div>
+
+        <div class="invoice-sheet" id="invoice-sheet">
+          <div id="invoice-paid-stamp" class="paid-stamp" hidden>
+            <span class="paid-stamp-text">PAID</span>
+            <span class="paid-stamp-date" id="paid-stamp-date"></span>
+          </div>
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Invoice</div>
+              <table class="invoice-meta-table">
+                <thead>
+                  <tr><th>Date</th><th>Invoice #</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="date" id="invoice-date" /></td>
+                    <td><input type="text" id="invoice-number" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="invoice-billto-row">
+            <div class="invoice-billto">
+              <div class="invoice-billto-label">Bill To</div>
+              <input type="text" id="invoice-customer-picker" class="invoice-customer-picker no-print"
+                list="invoice-customer-datalist" placeholder="Pick a customer to autofill…" />
+              <datalist id="invoice-customer-datalist"></datalist>
+              <textarea id="invoice-billto" rows="4" placeholder="Customer name&#10;Address line 1&#10;Address line 2"></textarea>
+            </div>
+            <div class="invoice-job-wrap">
+              <div class="invoice-job-label">Job</div>
+              <select id="invoice-job" class="invoice-job-select"></select>
+            </div>
+          </div>
+
+          <datalist id="invoice-item-datalist"></datalist>
+          <datalist id="invoice-desc-datalist"></datalist>
+
+          <table class="invoice-items" id="invoice-items">
+            <colgroup>
+              <col style="width: 23%">
+              <col style="width: 7%">
+              <col style="width: 40%">
+              <col style="width: 15%">
+              <col style="width: 15%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+
+          <table class="invoice-total-table">
+            <colgroup>
+              <col style="width: 23%">
+              <col style="width: 7%">
+              <col style="width: 40%">
+              <col style="width: 15%">
+              <col style="width: 15%">
+            </colgroup>
+            <tbody id="invoice-totals-body">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+
+          <div class="invoice-tax-controls no-print">
+            <label class="tax-mode">
+              <input type="radio" name="invoice-tax-mode" value="tax" />
+              <span>Tax</span>
+            </label>
+            <label class="tax-mode">
+              <input type="radio" name="invoice-tax-mode" value="nontax" />
+              <span>Non-Tax</span>
+            </label>
+            <label class="tax-field">
+              Tax Label
+              <input type="text" id="invoice-tax-label" />
+            </label>
+            <label class="tax-field">
+              Rate %
+              <input type="number" id="invoice-tax-rate" step="0.01" min="0" />
+            </label>
+          </div>
+
+          <div class="invoice-add-row no-print">
+            <button type="button" id="btn-add-line" class="btn">+ Add Line</button>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="reports" class="tab-panel">
+      <div class="page-heading-mobile">
+        <h1 class="page-title-mobile">Reports</h1>
+        <p class="page-subtitle-mobile muted">Print or export financial summaries</p>
+      </div>
+      <div class="report-picker no-print">
+        <button type="button" class="report-picker-btn" data-report="jobs">Job/Category</button>
+        <button type="button" class="report-picker-btn" data-report="ie">Income vs Expense</button>
+        <button type="button" class="report-picker-btn" data-report="hgb">Helper / Give Back</button>
+        <button type="button" class="report-picker-btn" data-report="tx">Transactions</button>
+        <button type="button" class="report-picker-btn" data-report="mileage">Mileage</button>
+        <button type="button" class="report-picker-btn" data-report="tax">Sales Tax Liability</button>
+        <button type="button" class="report-picker-btn" data-report="pl">Profit &amp; Loss</button>
+        <button type="button" class="report-picker-btn" data-report="sc">Schedule C</button>
+      </div>
+      <!-- Mobile pull-down (richer than native <select>, same look as Analytics amvp) -->
+      <div class="rmvp no-print" id="rmvp">
+        <button type="button" class="amvp-trigger" id="rmvp-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="amvp-current">
+            <span class="amvp-label" id="rmvp-current-label">Job/Category</span>
+          </span>
+          <svg class="amvp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="amvp-menu" id="rmvp-menu" role="listbox" hidden>
+          <button type="button" class="amvp-item active" data-report="jobs"    role="option"><span>Job/Category</span></button>
+          <button type="button" class="amvp-item"        data-report="ie"      role="option"><span>Income vs Expense</span></button>
+          <button type="button" class="amvp-item"        data-report="hgb"     role="option"><span>Helper / Give Back</span></button>
+          <button type="button" class="amvp-item"        data-report="tx"      role="option"><span>Transactions</span></button>
+          <button type="button" class="amvp-item"        data-report="mileage" role="option"><span>Mileage</span></button>
+          <button type="button" class="amvp-item"        data-report="tax"     role="option"><span>Sales Tax Liability</span></button>
+          <button type="button" class="amvp-item"        data-report="pl"      role="option"><span>Profit &amp; Loss</span></button>
+          <button type="button" class="amvp-item"        data-report="sc"      role="option"><span>Schedule C</span></button>
+        </div>
+      </div>
+
+      <div id="pl-report-container" hidden>
+      <div class="toolbar no-print">
+        <label class="date-range">
+          From
+          <input type="date" id="pl-from" />
+        </label>
+        <label class="date-range">
+          To
+          <input type="date" id="pl-to" />
+        </label>
+        <select id="pl-preset" class="btn">
+          <option value="custom">Custom</option><option value="ytd">Year to Date</option><option value="first-half">1st Half of Year</option>
+          <option value="second-half">2nd Half of Year</option>        </select>
+        <button id="btn-pl-toggle-all" class="btn" type="button">Expand All</button>
+        <button id="btn-pl-print" class="btn" type="button">Print / PDF</button>
+      </div>
+
+      <div class="invoice-sheet tax-report-sheet pl-sheet" id="pl-sheet">
+        <div class="invoice-header">
+          <div class="invoice-brand">
+            <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+            <div class="invoice-brand-text">
+              <div class="invoice-brand-name">Jamie Bexten Photography</div>
+              <div>114 Hogan Ln</div>
+              <div>Bryan, OH 43506</div>
+            </div>
+          </div>
+          <div class="invoice-meta">
+            <div class="invoice-title">Profit &amp; Loss</div>
+            <div class="tax-report-range" id="pl-range">—</div>
+          </div>
+        </div>
+
+        <div class="tax-report-section">
+          <h3 class="tax-report-section-title">Summary</h3>
+          <table class="tax-report-detail pl-table" id="pl-table">
+            <thead>
+              <tr>
+                <th>Account</th>
+                <th style="text-align:right" id="pl-col-header">Total</th>
+              </tr>
+            </thead>
+            <tbody id="pl-body"></tbody>
+          </table>
+        </div>
+
+        <div class="invoice-footer">
+          <div>419-551-2103</div>
+          <div>jbexten89@gmail.com</div>
+          <div>www.jbextenphotography.com</div>
+        </div>
+      </div>
+      </div>
+
+      <div id="tax-report-container" hidden>
+        <div class="toolbar no-print">
+          <label class="date-range">
+            From
+            <input type="date" id="tax-report-from" />
+          </label>
+          <label class="date-range">
+            To
+            <input type="date" id="tax-report-to" />
+          </label>
+          <select id="tax-report-preset" class="btn">
+            <option value="custom">Custom</option><option value="ytd">Year to Date</option><option value="last-quarter">Last Quarter</option>
+            <option value="first-half">1st Half of Year</option>
+            <option value="second-half">2nd Half of Year</option>          </select>
+          <label class="check-pill"><input type="checkbox" id="tax-report-include-detail" checked /> Include Invoice Detail</label>
+          <button id="btn-tax-report-print" class="btn" type="button">Print / PDF</button>
+        </div>
+
+        <div class="invoice-sheet tax-report-sheet" id="tax-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Sales Tax Liability</div>
+              <div class="tax-report-range" id="tax-report-range">—</div>
+            </div>
+          </div>
+
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">By Tax Agency</h3>
+            <table class="tax-report-table">
+              <thead>
+                <tr>
+                  <th>Tax Agency</th>
+                  <th style="text-align:right">Rate</th>
+                  <th style="text-align:right">Taxable Sales</th>
+                  <th style="text-align:right">Tax Collected</th>
+                </tr>
+              </thead>
+              <tbody id="tax-report-agency-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" style="text-align:right">Totals:</td>
+                  <td style="text-align:right" id="tax-report-taxable-total">$0.00</td>
+                  <td style="text-align:right" id="tax-report-collected-total">$0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Summary</h3>
+            <table class="tax-report-summary">
+              <tbody>
+                <tr><td>Total Taxable Sales</td><td id="sum-taxable">$0.00</td></tr>
+                <tr><td>Total Non-Taxable Sales</td><td id="sum-nontaxable">$0.00</td></tr>
+                <tr><td>Total Sales</td><td id="sum-sales">$0.00</td></tr>
+                <tr class="emphasize"><td>Total Sales Tax Collected</td><td id="sum-tax">$0.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tax-report-section" id="tax-report-section-detail">
+            <h3 class="tax-report-section-title">Invoice Detail</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Invoice #</th>
+                  <th>Bill To</th>
+                  <th>Tax Agency</th>
+                  <th style="text-align:right">Subtotal</th>
+                  <th style="text-align:right">Tax</th>
+                  <th style="text-align:right">Total</th>
+                </tr>
+              </thead>
+              <tbody id="tax-report-detail-body"></tbody>
+            </table>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="jobs-report-container" hidden>
+        <div class="toolbar no-print">
+          <label class="date-range">
+            From
+            <input type="date" id="jobs-report-from" />
+          </label>
+          <label class="date-range">
+            To
+            <input type="date" id="jobs-report-to" />
+          </label>
+          <select id="jobs-report-preset" class="btn">
+            <option value="custom">Custom</option><option value="ytd">Year to Date</option><option value="first-half">1st Half of Year</option>
+            <option value="second-half">2nd Half of Year</option>          </select>
+          <span class="jobs-mode-toggle" id="jobs-report-group-toggle">
+            <button type="button" class="year-pill" data-group="category">By Category</button>
+            <button type="button" class="year-pill active" data-group="job">By Job No.</button>
+          </span>
+          <label class="check-pill"><input type="checkbox" id="jobs-report-include-jobs"     checked /> Include Jobs</label>
+          <label class="check-pill"><input type="checkbox" id="jobs-report-include-category" checked /> Include Category/Expense</label>
+          <label class="check-pill"><input type="checkbox" id="jobs-report-include-account"  checked /> Include Account</label>
+          <button id="btn-jobs-report-toggle-all" class="btn" type="button">Expand All</button>
+          <button id="btn-jobs-report-print" class="btn" type="button">Print / PDF</button>
+        </div>
+
+        <div class="invoice-sheet tax-report-sheet" id="jobs-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Job / Category Report</div>
+              <div class="tax-report-range" id="jobs-report-range">—</div>
+            </div>
+          </div>
+
+          <div class="tax-report-section" id="jobs-report-section-jobs">
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th style="text-align:right"># Tx</th>
+                  <th style="text-align:right">Income</th>
+                  <th style="text-align:right">Expenses</th>
+                  <th style="text-align:right">Net</th>
+                  <th style="text-align:right">% of Income</th>
+                </tr>
+              </thead>
+              <tbody id="jobs-report-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="font-weight:700">TOTAL</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-total-tx">0</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-total-inc">$0.00</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-total-exp">$0.00</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-total-net">$0.00</td>
+                  <td style="text-align:right;font-weight:700">100.0%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section" id="jobs-report-section-category">
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th id="jobs-report-cat-head">Category</th>
+                  <th style="text-align:right"># Tx</th>
+                  <th style="text-align:right">Income</th>
+                  <th style="text-align:right">Expenses</th>
+                  <th style="text-align:right">Net</th>
+                </tr>
+              </thead>
+              <tbody id="jobs-report-cat-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="font-weight:700">TOTAL</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-cat-total-tx">0</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-cat-total-inc">$0.00</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-cat-total-exp">$0.00</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-cat-total-net">$0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section" id="jobs-report-section-account">
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th style="text-align:right">Income</th>
+                  <th style="text-align:right">Expenses</th>
+                  <th style="text-align:right">Balance</th>
+                </tr>
+              </thead>
+              <tbody id="jobs-report-acct-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="font-weight:700">TOTAL</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-acct-total-inc">$0.00</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-acct-total-exp">$0.00</td>
+                  <td style="text-align:right;font-weight:700" id="jobs-report-acct-total-bal">$0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ie-report-container" hidden>
+        <div class="toolbar no-print">
+          <label class="date-range">From <input type="date" id="ie-report-from" /></label>
+          <label class="date-range">To <input type="date" id="ie-report-to" /></label>
+          <select id="ie-report-preset" class="btn">
+            <option value="custom">Custom</option><option value="ytd">Year to Date</option><option value="first-half">1st Half of Year</option>
+            <option value="second-half">2nd Half of Year</option>          </select>
+          <label class="check-pill"><input type="checkbox" id="ie-report-include-income"  checked /> Include Income</label>
+          <label class="check-pill"><input type="checkbox" id="ie-report-include-expense" checked /> Include Expense</label>
+          <button id="btn-ie-report-toggle-all" class="btn" type="button">Expand All</button>
+          <button id="btn-ie-report-print" class="btn" type="button">Print / PDF</button>
+        </div>
+
+        <div class="invoice-sheet tax-report-sheet ie-report-sheet" id="ie-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Income vs Expense Report</div>
+              <div class="tax-report-range" id="ie-report-range">—</div>
+            </div>
+          </div>
+
+          <div class="tax-report-section" id="ie-report-section-income">
+            <h3 class="tax-report-section-title">Income</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Category / Payee</th>
+                  <th style="text-align:right"># Tx</th>
+                  <th style="text-align:right">Amount</th>
+                  <th style="text-align:right">% of Total</th>
+                </tr>
+              </thead>
+              <tbody id="ie-report-income-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="font-weight:700">TOTAL INCOME</td>
+                  <td style="text-align:right;font-weight:700" id="ie-report-income-total-tx">0</td>
+                  <td style="text-align:right;font-weight:700" id="ie-report-income-total">$0.00</td>
+                  <td style="text-align:right;font-weight:700">100.0%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section" id="ie-report-section-expense">
+            <h3 class="tax-report-section-title">Expenses</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Category / Payee</th>
+                  <th style="text-align:right"># Tx</th>
+                  <th style="text-align:right">Amount</th>
+                  <th style="text-align:right">% of Total</th>
+                </tr>
+              </thead>
+              <tbody id="ie-report-expense-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="font-weight:700">TOTAL EXPENSES</td>
+                  <td style="text-align:right;font-weight:700" id="ie-report-expense-total-tx">0</td>
+                  <td style="text-align:right;font-weight:700" id="ie-report-expense-total">$0.00</td>
+                  <td style="text-align:right;font-weight:700">100.0%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section" id="ie-report-section-net">
+            <table class="tax-report-detail">
+              <tfoot>
+                <tr>
+                  <td style="font-weight:700">NET</td>
+                  <td colspan="2" style="text-align:right;font-weight:700;font-size:16px" id="ie-report-net">$0.00</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tx-report-container" hidden>
+        <div class="toolbar no-print">
+          <label class="date-range">From <input type="date" id="tx-report-from" /></label>
+          <label class="date-range">To <input type="date" id="tx-report-to" /></label>
+          <select id="tx-report-preset" class="btn">
+            <option value="custom">Custom</option><option value="ytd">Year to Date</option><option value="first-half">1st Half of Year</option>
+            <option value="second-half">2nd Half of Year</option>          </select>
+          <select id="tx-report-type" class="btn">
+            <option value="">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+          <select id="tx-report-category" class="btn"><option value="">All Categories</option></select>
+          <select id="tx-report-jobno"    class="btn"><option value="">All Jobs</option></select>
+          <select id="tx-report-expense"  class="btn"><option value="">All Expenses</option></select>
+          <select id="tx-report-customer" class="btn"><option value="">All Customers</option></select>
+          <select id="tx-report-payee"    class="btn"><option value="">All Payees</option></select>
+          <input type="search" id="tx-report-search" class="btn" placeholder="Find…" autocomplete="off" />
+          <select id="tx-report-orientation" class="btn">
+            <option value="portrait">Portrait</option>
+            <option value="landscape" selected>Landscape</option>
+          </select>
+          <button id="btn-tx-report-print" class="btn" type="button">Print / PDF</button>
+        </div>
+
+        <div class="invoice-sheet tax-report-sheet" id="tx-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Transactions Report</div>
+              <div class="tax-report-range" id="tx-report-range">—</div>
+              <div class="tax-report-range" id="tx-report-filter-summary" style="font-size:11px;font-weight:400"></div>
+            </div>
+          </div>
+
+          <div class="tax-report-section">
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Vendor</th>
+                  <th>Customer</th>
+                  <th>Job No.</th>
+                  <th>Expense</th>
+                  <th>Category</th>
+                  <th>Memo</th>
+                  <th style="text-align:right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="tx-report-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="6" style="font-weight:700">TOTAL</td>
+                  <td style="font-weight:700;text-align:right" id="tx-report-total-count">0 tx</td>
+                  <td style="text-align:right;font-weight:700" id="tx-report-total-amount">$0.00</td>
+                </tr>
+                <tr>
+                  <td colspan="6" style="font-weight:700">NET</td>
+                  <td></td>
+                  <td style="text-align:right;font-weight:700" id="tx-report-net">$0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="hgb-report-container" hidden>
+        <div class="toolbar no-print">
+          <label class="date-range">From <input type="date" id="hgb-report-from" /></label>
+          <label class="date-range">To <input type="date" id="hgb-report-to" /></label>
+          <select id="hgb-report-preset" class="btn">
+            <option value="custom">Custom</option><option value="ytd">Year to Date</option><option value="first-half">1st Half of Year</option>
+            <option value="second-half">2nd Half of Year</option>          </select>
+          <label class="check-pill"><input type="checkbox" id="hgb-report-include-helper"   checked /> Include Helper</label>
+          <label class="check-pill"><input type="checkbox" id="hgb-report-include-giveback" checked /> Include Give Back</label>
+          <button id="btn-hgb-report-print" class="btn" type="button">Print / PDF</button>
+        </div>
+
+        <div class="invoice-sheet tax-report-sheet" id="hgb-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Helper / Give Back Report</div>
+              <div class="tax-report-range" id="hgb-report-range">—</div>
+            </div>
+          </div>
+
+          <div class="tax-report-section" id="hgb-report-section-helper">
+            <h3 class="tax-report-section-title">Helper</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Payee</th>
+                  <th>Job</th>
+                  <th style="text-align:right"># Tx</th>
+                  <th style="text-align:right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="hgb-report-helper-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="font-weight:700" colspan="2">TOTAL HELPER</td>
+                  <td style="text-align:right;font-weight:700" id="hgb-report-helper-total-tx">0</td>
+                  <td style="text-align:right;font-weight:700" id="hgb-report-helper-total">$0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section" id="hgb-report-section-giveback">
+            <h3 class="tax-report-section-title">Give Back</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Job (Category)</th>
+                  <th style="text-align:right"># Tx</th>
+                  <th style="text-align:right">Before-Give-Back Net</th>
+                  <th style="text-align:right">% Give Back</th>
+                  <th style="text-align:right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="hgb-report-giveback-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="font-weight:700">TOTAL GIVE BACK</td>
+                  <td style="text-align:right;font-weight:700" id="hgb-report-giveback-total-tx">0</td>
+                  <td style="text-align:right;font-weight:700" id="hgb-report-giveback-total-bgbn">$0.00</td>
+                  <td style="text-align:right;font-weight:700" id="hgb-report-giveback-total-pct">—</td>
+                  <td style="text-align:right;font-weight:700" id="hgb-report-giveback-total">$0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section" id="hgb-report-section-reduced">
+            <h3 class="tax-report-section-title">Reduced Profit By</h3>
+            <table class="tax-report-detail">
+              <tbody>
+                <tr>
+                  <td>Profit before Helper / Give Back</td>
+                  <td style="text-align:right" id="hgb-reduce-theoretical">$0.00</td>
+                </tr>
+                <tr>
+                  <td>Helper Reduction</td>
+                  <td style="text-align:right" id="hgb-reduce-helper">$0.00 — 0.0%</td>
+                </tr>
+                <tr>
+                  <td>Give Back Reduction</td>
+                  <td style="text-align:right" id="hgb-reduce-giveback">$0.00 — 0.0%</td>
+                </tr>
+                <tr style="font-weight:700">
+                  <td>Actual Profit</td>
+                  <td style="text-align:right" id="hgb-reduce-actual">$0.00</td>
+                </tr>
+                <tr style="font-weight:700">
+                  <td>Total Reduction</td>
+                  <td style="text-align:right" id="hgb-reduce-total">$0.00 — 0.0%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="mileage-report-container" hidden>
+        <div class="toolbar no-print">
+          <label class="date-range">
+            From
+            <input type="date" id="mileage-report-from" />
+          </label>
+          <label class="date-range">
+            To
+            <input type="date" id="mileage-report-to" />
+          </label>
+          <select id="mileage-report-preset" class="btn">
+            <option value="custom">Custom</option><option value="ytd">Year to Date</option><option value="first-half">1st Half of Year</option>
+            <option value="second-half">2nd Half of Year</option>          </select>
+          <label class="check-pill"><input type="checkbox" id="mileage-include-detail" checked /> Include Trip Detail</label>
+          <label class="check-pill"><input type="checkbox" id="mileage-include-expense" checked /> Include Mileage Expense</label>
+          <button id="btn-mileage-report-print" class="btn" type="button">Print / PDF</button>
+        </div>
+
+        <div class="invoice-sheet tax-report-sheet" id="mileage-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Mileage by Vehicle Summary</div>
+              <div class="tax-report-range" id="mileage-report-range">—</div>
+            </div>
+          </div>
+
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Summary</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Vehicle</th>
+                  <th style="text-align:right">Miles</th>
+                  <th style="text-align:right">Mileage Expense</th>
+                </tr>
+              </thead>
+              <tbody id="mileage-report-summary-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="text-align:right;font-weight:700">TOTAL</td>
+                  <td style="text-align:right;font-weight:700" id="mileage-report-total-miles">0.00</td>
+                  <td style="text-align:right;font-weight:700" id="mileage-report-total-expense">$0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Trip Detail</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Vehicle</th>
+                  <th>Purpose</th>
+                  <th style="text-align:right">Miles</th>
+                  <th style="text-align:right">Expense</th>
+                </tr>
+              </thead>
+              <tbody id="mileage-report-detail-body"></tbody>
+            </table>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCHEDULE C REPORT -->
+      <div id="sc-report-container" hidden>
+        <div class="toolbar no-print">
+          <label class="date-range">From <input type="date" id="sc-report-from" /></label>
+          <label class="date-range">To <input type="date" id="sc-report-to" /></label>
+          <select id="sc-report-preset" class="btn">
+            <option value="custom">Custom</option>
+            <option value="ytd">Year to Date</option>
+            <option value="last-year">Last Year</option>
+          </select>
+          <span style="flex:1"></span>
+          <button id="btn-sc-report-print" class="btn" type="button">Print / PDF</button>
+        </div>
+        <div class="invoice-sheet tax-report-sheet" id="sc-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Schedule C — Profit or Loss From Business</div>
+              <div class="tax-report-range" id="sc-report-range">—</div>
+              <div class="muted" style="font-size:11px;margin-top:4px">Worksheet for tax filing — categories rolled into IRS Schedule C lines.</div>
+            </div>
+          </div>
+
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Part I — Income</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr><th style="width:60px">Line</th><th>Description</th><th style="text-align:right">Amount</th></tr>
+              </thead>
+              <tbody id="sc-report-income-body"></tbody>
+            </table>
+          </div>
+
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Part II — Expenses</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr><th style="width:60px">Line</th><th>Description</th><th style="text-align:right">Amount</th></tr>
+              </thead>
+              <tbody id="sc-report-expense-body"></tbody>
+              <tfoot>
+                <tr><td colspan="2" style="font-weight:700">Line 28 — Total expenses</td><td style="text-align:right;font-weight:700" id="sc-report-line28">$0.00</td></tr>
+                <tr><td colspan="2" style="font-weight:700">Line 31 — Net profit (loss)</td><td style="text-align:right;font-weight:700" id="sc-report-line31">$0.00</td></tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section no-print" style="margin-top:8px">
+            <p class="muted" style="font-size:11px">
+              Edit which IRS line each Category rolls into in <strong>Settings → Schedule C Mapping</strong>.
+              Mileage automatically uses your trip log × the per-mile rate (Settings → Mileage).
+              Meals (Line 24b) is shown at the IRS-required 50% deductible amount.
+            </p>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MILEAGE -->
+    <section id="mileage" class="tab-panel">
+      <div id="mileage-list-view">
+        <div class="page-heading-mobile">
+          <h1 class="page-title-mobile">Mileage</h1>
+          <p class="page-subtitle-mobile muted">Log trips and calculate vehicle reimbursement</p>
+        </div>
+        <div class="toolbar">
+          <button id="btn-open-mileage-report" class="btn" type="button">Mileage Report</button>
+          <label class="date-range">
+            Rate ($/mile)
+            <input type="number" id="mileage-rate" step="0.001" min="0" value="0.70" />
+          </label>
+          <span style="flex:1"></span>
+          <div class="mileage-total-display">
+            <span class="mileage-total-label">Total Miles</span>
+            <span class="mileage-total-value" id="mileage-grand-total">0.00</span>
+          </div>
+        </div>
+
+        <h2 style="margin-top:8px">Add Trip</h2>
+        <div class="mileage-add-row">
+          <label>Date
+            <input type="date" id="mileage-new-date" />
+          </label>
+          <label>Vehicle
+            <input type="text" id="mileage-new-vehicle" list="mileage-vehicle-datalist" placeholder="e.g., 2020 - Ford Explorer ST" />
+            <datalist id="mileage-vehicle-datalist"></datalist>
+          </label>
+          <label>Miles
+            <input type="number" id="mileage-new-miles" step="0.1" min="0" placeholder="0" />
+          </label>
+          <label>Purpose (optional)
+            <input type="text" id="mileage-new-purpose" placeholder="e.g., Spring Sports shoot" />
+          </label>
+          <button id="btn-add-trip" class="btn primary" type="button">+ Add Trip</button>
+        </div>
+
+        <h2 style="margin-top:24px">Summary by Vehicle</h2>
+        <div class="table-wrap">
+          <table id="mileage-summary-table" class="fixed-cols">
+            <colgroup>
+              <col style="width: 50%">
+              <col style="width: 20%">
+              <col style="width: 15%">
+              <col style="width: 15%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th style="text-align:right">Miles</th>
+                <th style="text-align:right">Mileage Expense</th>
+                <th style="text-align:right">Trips</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <h2 style="margin-top:24px">All Trips</h2>
+        <div class="table-wrap">
+          <table id="mileage-trips-table" class="fixed-cols">
+            <colgroup>
+              <col style="width: 14%">
+              <col style="width: 30%">
+              <col style="width: 38%">
+              <col style="width: 10%">
+              <col style="width: 8%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Vehicle</th>
+                <th>Purpose</th>
+                <th style="text-align:right">Miles</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SCHEDULE -->
+    <section id="schedule" class="tab-panel">
+      <div class="page-heading-mobile">
+        <h1 class="page-title-mobile">Calendar</h1>
+        <p class="page-subtitle-mobile muted">Plan upcoming jobs and shoot dates</p>
+      </div>
+      <div class="schedule-toolbar">
+        <button id="sched-prev" class="btn" type="button" aria-label="Previous year">‹</button>
+        <h2 id="sched-month-label">Year</h2>
+        <button id="sched-next" class="btn" type="button" aria-label="Next year">›</button>
+        <button id="sched-today" class="btn" type="button">Today</button>
+        <span style="flex:1"></span>
+        <button id="sched-new-event" class="btn primary" type="button">+ New Event</button>
+      </div>
+
+      <h2 id="sched-list-heading">Scheduled Jobs</h2>
+      <div class="table-wrap">
+        <table id="schedule-list-table" class="fixed-cols">
+          <colgroup>
+            <col style="width: 16%">
+            <col style="width: 10%">
+            <col style="width: 22%">
+            <col style="width: 24%">
+            <col style="width: 28%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Job</th>
+              <th>Location</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="schedule-year-grid" id="schedule-calendar"></div>
+    </section>
+
+    <!-- BACKFILL JOB NO. MODAL (new-spec) -->
+    <div id="nj-backfill-modal" class="modal hidden">
+      <div class="modal-content nj-backfill-content">
+        <h2>Backfill Job No. on Legacy Transactions</h2>
+        <p class="muted" style="font-size:12px;margin:4px 0 12px">
+          Score = Customer match (50) + Category match (30) + date proximity (up to 20). Rows pre-checked above the threshold. Apply to stamp the chosen Job No. onto the transaction.
+        </p>
+        <div class="nj-backfill-toolbar">
+          <label>Min score
+            <input type="number" id="nj-backfill-threshold" min="0" max="100" step="5" value="70" />
+          </label>
+          <label>Year
+            <select id="nj-backfill-year">
+              <option value="">All</option>
+            </select>
+          </label>
+          <label>Type
+            <select id="nj-backfill-type">
+              <option value="">All</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </label>
+          <label>Customer
+            <select id="nj-backfill-customer">
+              <option value="">All</option>
+            </select>
+          </label>
+          <span style="flex:1"></span>
+          <span class="muted" id="nj-backfill-summary" style="font-size:12px">—</span>
+        </div>
+        <div class="nj-backfill-list-wrap">
+          <table class="nj-backfill-table">
+            <thead>
+              <tr>
+                <th style="width:30px"><input type="checkbox" id="nj-backfill-select-all" /></th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Category</th>
+                <th style="text-align:right">Amount</th>
+                <th>Suggested Job</th>
+                <th style="text-align:right">Score</th>
+              </tr>
+            </thead>
+            <tbody id="nj-backfill-tbody"></tbody>
+          </table>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="nj-backfill-cancel" class="btn">Cancel</button>
+          <button type="button" id="nj-backfill-apply" class="btn primary">Apply selected</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT JOB MODAL (new-spec) -->
+    <div id="nj-edit-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Edit Job</h2>
+        <form id="nj-edit-form">
+          <input type="hidden" id="nj-edit-orig-jobno" />
+          <label>Date *
+            <input type="date" id="nj-edit-date" required />
+          </label>
+          <label>Job Number *
+            <input type="text" id="nj-edit-jobno" required />
+          </label>
+          <label>Customer *
+            <select id="nj-edit-customer" required>
+              <option value="">— Select —</option>
+              <option value="__new__">+ Add new…</option>
+            </select>
+          </label>
+          <label>Category *
+            <select id="nj-edit-category" required>
+              <option value="">— Select —</option>
+              <option value="__new__">+ Add new…</option>
+            </select>
+          </label>
+          <div class="form-row form-row-2">
+            <label>Hours
+              <input type="number" id="nj-edit-hours" step="0.25" min="0" placeholder="0" />
+            </label>
+            <label>Status
+              <select id="nj-edit-status-sel">
+                <option value="">— Open —</option>
+                <option value="Shot">Shot</option>
+                <option value="Edited">Edited</option>
+                <option value="Ordered">Ordered</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Invoiced">Invoiced</option>
+                <option value="Paid">Paid</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" id="nj-edit-delete" class="btn danger" style="margin-right:auto">Delete</button>
+            <button type="button" id="nj-edit-cancel" class="btn">Cancel</button>
+            <button type="submit" class="btn primary">Save Job</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MILEAGE TRIP EDIT MODAL -->
+    <div id="trip-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Edit Trip</h2>
+        <form id="trip-form">
+          <input type="hidden" id="trip-id" />
+
+          <label>Date *
+            <input type="date" id="trip-edit-date" required />
+          </label>
+
+          <label>Vehicle *
+            <input type="text" id="trip-edit-vehicle" list="trip-vehicle-datalist" required />
+            <datalist id="trip-vehicle-datalist"></datalist>
+          </label>
+
+          <label>Miles *
+            <input type="number" id="trip-edit-miles" step="0.1" min="0" required />
+          </label>
+
+          <label>Purpose
+            <input type="text" id="trip-edit-purpose" placeholder="Optional" />
+          </label>
+
+          <div class="form-actions">
+            <button type="button" id="btn-trip-delete" class="btn danger" style="margin-right:auto">Delete</button>
+            <button type="button" id="btn-trip-cancel" class="btn">Cancel</button>
+            <button type="submit" class="btn primary">Save Trip</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- SCHEDULE EVENT MODAL -->
+    <div id="sched-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="sched-modal-title">Schedule Event</h2>
+        <form id="sched-form">
+          <input type="hidden" id="sched-id" />
+
+          <div class="form-row">
+            <label>Date *
+              <input type="date" id="sched-date" required />
+            </label>
+            <label>Time
+              <input type="time" id="sched-time" />
+            </label>
+          </div>
+
+          <label>Job *
+            <select id="sched-job" required></select>
+          </label>
+
+          <label>Location
+            <input type="text" id="sched-location" placeholder="Optional" />
+          </label>
+
+          <label>Notes
+            <textarea id="sched-notes" rows="3" placeholder="Optional"></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button type="button" id="btn-sched-delete" class="btn danger" style="margin-right:auto;display:none">Delete</button>
+            <button type="button" id="btn-sched-cancel" class="btn">Cancel</button>
+            <button type="submit" class="btn primary">Save Event</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="tab-panel">
+      <div class="page-heading-mobile">
+        <h1 class="page-title-mobile">Settings</h1>
+        <p class="page-subtitle-mobile muted">Customize the app, manage data, and sign in to the cloud</p>
+      </div>
+
+      <div class="settings-card nj-settings-card" style="margin-bottom:16px">
+        <h3>Backfill Job No. on Legacy Transactions</h3>
+        <p class="muted" style="font-size:12px;margin:4px 0 8px">
+          Scan transactions without a Job No. and suggest matching jobs based on Customer, Category, and date proximity. Apply selectively or in bulk so historical data shows up in the new By Job analytics.
+        </p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:6px;flex-wrap:wrap">
+          <span class="muted" id="nj-backfill-stat" style="font-size:13px">— transactions without Job No.</span>
+          <button type="button" id="nj-backfill-scan" class="btn primary">Scan for matches</button>
+          <button type="button" id="nj-backfill-undo" class="btn" hidden>Undo last backfill</button>
+        </div>
+      </div>
+
+      <div class="settings-top">
+        <div id="cloud-sync-card" class="cloud-sync-card">
+          <div class="cloud-sync-title">
+            Cloud Sync
+            <span id="cloud-sync-status" class="cloud-sync-status offline">● Offline</span>
+          </div>
+          <div id="cloud-sync-signed-out">
+            <p class="muted cloud-sync-desc">Sign in to back up your data to Supabase and sync across devices.</p>
+            <label class="settings-field">
+              <span>Email</span>
+              <input type="email" id="cloud-sync-email" autocomplete="username" />
+            </label>
+            <label class="settings-field">
+              <span>Password</span>
+              <input type="password" id="cloud-sync-password" autocomplete="current-password" minlength="6" />
+            </label>
+            <div class="cloud-sync-buttons">
+              <button id="btn-cloud-signin" type="button" class="btn primary">Sign In</button>
+              <button id="btn-cloud-signup" type="button" class="btn">Sign Up</button>
+            </div>
+            <p class="muted cloud-sync-error" id="cloud-sync-error" hidden></p>
+          </div>
+          <div id="cloud-sync-signed-in" hidden>
+            <p class="muted">Signed in as <strong id="cloud-sync-user">—</strong></p>
+            <p class="muted cloud-sync-desc">Last synced: <span id="cloud-sync-last">never</span></p>
+            <div class="cloud-sync-buttons">
+              <button id="btn-cloud-push" type="button" class="btn">Force Upload</button>
+              <button id="btn-cloud-pull" type="button" class="btn">Force Download</button>
+              <button id="btn-cloud-signout" type="button" class="btn danger">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <div class="settings-col">
+          <h2>Customers</h2>
+          <p class="muted">Used by the Customer dropdown on new transactions and as Bill To suggestions on invoices.</p>
+          <ul id="customer-list" class="editable-list"></ul>
+          <div class="inline-add">
+            <input type="text" id="new-customer" placeholder="New customer" />
+            <button id="btn-add-customer" class="btn">Add</button>
+          </div>
+        </div>
+
+        <div class="settings-col">
+          <h2>Payees</h2>
+          <p class="muted">Common payees for faster entry.</p>
+          <ul id="payee-list" class="editable-list"></ul>
+          <div class="inline-add">
+            <input type="text" id="new-payee" placeholder="New payee" />
+            <button id="btn-add-payee" class="btn">Add</button>
+          </div>
+        </div>
+
+        <div class="settings-col">
+          <h2>Invoice Items</h2>
+          <p class="muted">Line-item options for the invoice editor.</p>
+          <ul id="invoice-items-list" class="editable-list"></ul>
+          <div class="inline-add">
+            <input type="text" id="new-invoice-item" placeholder="New item" />
+            <button id="btn-add-invoice-item" class="btn">Add</button>
+          </div>
+        </div>
+
+        <div class="settings-col">
+          <h2>Invoice Descriptions</h2>
+          <p class="muted">Common line-item descriptions.</p>
+          <ul id="invoice-descs-list" class="editable-list"></ul>
+          <div class="inline-add">
+            <input type="text" id="new-invoice-desc" placeholder="New description" />
+            <button id="btn-add-invoice-desc" class="btn">Add</button>
+          </div>
+        </div>
+
+        <div class="settings-col">
+          <h2>Categories</h2>
+          <p class="muted">Photo shoot jobs + any extra categories.</p>
+          <p class="muted" style="font-size:11px;border-left:3px solid var(--primary,#3498db);padding:6px 8px;background:rgba(52,152,219,0.08);border-radius:4px;margin:4px 0 8px">
+            <strong>TODO:</strong> merge this list with <em>Customer / Category Pairs</em> (new-spec) below — both define the same set of categories from different angles.
+          </p>
+          <ul id="cat-list" class="editable-list"></ul>
+          <div class="inline-add">
+            <input type="text" id="new-cat" placeholder="New category" />
+            <button id="btn-add-cat" class="btn">Add</button>
+          </div>
+        </div>
+
+        <div class="settings-col data-col">
+          <h2>Startup &amp; Display</h2>
+          <label class="settings-field">
+            <span>Startup View</span>
+            <select id="settings-startup-view">
+              <option value="dashboard">Overview</option>
+              <option value="transactions">All Transactions</option>
+            </select>
+          </label>
+          <label class="settings-field" id="settings-startup-year-field">
+            <span>Overview Year</span>
+            <select id="settings-startup-year">
+              <option value="all">All Years</option>
+              <option value="current">Current Year</option>
+            </select>
+          </label>
+          <label class="settings-field">
+            <span>Mobile Navigation</span>
+            <select id="settings-mobile-nav">
+              <option value="sidebar">Left Slide-Out</option>
+              <option value="bottom">Bottom Bar</option>
+            </select>
+          </label>
+          <label class="settings-field">
+            <span>Color Scheme</span>
+            <select id="settings-color-scheme">
+              <option value="">Default (Blue)</option>
+              <option value="forest">Forest</option>
+              <option value="sunset">Sunset</option>
+              <option value="ocean">Ocean</option>
+              <option value="mono">Mono</option>
+              <option value="studio">Studio</option>
+            </select>
+            <span class="muted" style="font-size:11px;margin-top:4px">Tints the accent colors (Primary, Income, Expense). Light/dark mode still toggles independently.</span>
+          </label>
+          <label class="settings-field">
+            <span>Chart Palette</span>
+            <select id="settings-chart-palette">
+              <option value="vibrant">Vibrant</option>
+              <option value="pastel">Pastel</option>
+              <option value="bold">Bold</option>
+            </select>
+            <span class="muted" style="font-size:11px;margin-top:4px">Color set used for donut slices, breakdown sankey, and trend bands.</span>
+          </label>
+          <label class="settings-field">
+            <span>Reports</span>
+            <label class="check-pill" style="display:inline-flex;align-self:flex-start"><input type="checkbox" id="setting-reports-inverted" /> Invert report colors on screen</label>
+            <span class="muted" style="font-size:11px;margin-top:4px">Flips the report sheet's background to dark for screen viewing. Print/PDF output stays on white paper.</span>
+          </label>
+        </div>
+
+        <div class="settings-col data-col">
+          <h2>Goals</h2>
+          <label class="settings-field">
+            <span>Savings Goal ($)</span>
+            <input type="number" id="settings-savings-goal" min="0" step="100" value="12000" />
+          </label>
+        </div>
+
+        <div class="settings-col data-col">
+          <h2>All Transactions Table</h2>
+          <div class="settings-field">
+            <span>Column Widths</span>
+            <p class="muted" style="margin:4px 0 6px;font-size:12px">Unlock to drag the right edge of any column header to resize it. Widths persist between sessions.</p>
+            <label class="check-pill"><input type="checkbox" id="setting-tx-cols-locked" checked /> Lock column widths</label>
+          </div>
+          <div class="settings-field">
+            <span>Visible Columns</span>
+            <p class="muted" style="margin:4px 0 6px;font-size:12px">Choose which columns are visible on the All Transactions table.</p>
+            <div class="tx-col-toggles">
+              <label class="check-pill"><input type="checkbox" data-tx-col="date"     checked /> Date</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="vendor"   checked /> Vendor</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="customer" checked /> Customer</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="payee"    checked /> Payee</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="category" checked /> Category</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="chart"    checked /> Chart of Accounts</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="amount"   checked /> Amount</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="memo"     checked /> Memo</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="recon"    checked /> Reconciled</label>
+              <label class="check-pill"><input type="checkbox" data-tx-col="tags"     checked /> Tags</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-col data-col">
+          <h2>Bulk Edit</h2>
+          <div class="settings-field">
+            <span>Mass-update Chart of Accounts</span>
+            <p class="muted" style="margin:4px 0 6px;font-size:12px">Pick a Category and a Chart of Accounts entry; every transaction in that category gets the new Chart of Accounts value.</p>
+            <div class="mass-coa-row">
+              <select id="mass-coa-category"><option value="">— Pick a category —</option></select>
+              <select id="mass-coa-account"><option value="">— None —</option></select>
+              <button id="btn-mass-coa-apply" class="btn primary" type="button">Apply</button>
+            </div>
+            <p class="muted mass-coa-status" id="mass-coa-status" style="margin-top:6px;font-size:12px"></p>
+          </div>
+        </div>
+
+        <div class="settings-col data-col">
+          <h2>Backup &amp; Import</h2>
+          <button id="btn-backup" class="btn">Download Backup (JSON)</button>
+          <label class="btn file-btn">
+            Restore from Backup
+            <input type="file" id="file-restore" accept="application/json" hidden />
+          </label>
+          <label class="btn file-btn">
+            Import MoneyStats CSV
+            <input type="file" id="file-import-csv" accept=".csv,text/csv" hidden />
+          </label>
+          <label class="btn file-btn">
+            Import Expenses CSV
+            <input type="file" id="file-import-expenses-csv" accept=".csv,text/csv" hidden />
+          </label>
+          <a id="btn-user-manual" class="btn" href="manual.html" target="_blank" rel="noopener">User Manual</a>
+          <button id="btn-app-info" class="btn" type="button">App Info</button>
+        </div>
+
+        <div class="settings-col data-col">
+          <h2>Danger Zone</h2>
+          <p class="muted" style="font-size:12px">Destructive — these can't be undone except by restoring a backup.</p>
+          <div class="data-danger">
+            <button id="btn-delete-range" class="btn danger">Delete Transactions in Date Range</button>
+            <button id="btn-clear" class="btn danger">Clear All Data</button>
+          </div>
+        </div>
+
+        <div class="settings-col chart-accounts-col">
+          <h2>Chart of Accounts</h2>
+          <p class="muted">Accounting-style accounts for your transactions.</p>
+          <div id="chart-accounts-list" class="chart-accounts-list"></div>
+          <div class="chart-account-add">
+            <input type="text" id="new-chart-name" placeholder="Account name" />
+            <select id="new-chart-type"></select>
+            <select id="new-chart-parent">
+              <option value="">— No parent —</option>
+            </select>
+            <button id="btn-add-chart-account" class="btn">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== New-spec settings panels ===== -->
+      <div class="settings-card nj-settings-card">
+        <h3>Jobs (new-spec)</h3>
+        <p class="muted" style="font-size:12px;margin:4px 0 8px">First-class job records using <code>YY001</code> numbering. Linked to transactions by Job No.</p>
+        <div class="table-wrap">
+          <table id="nj-jobs-table" class="nj-table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Job No.</th><th>Customer</th><th>Category</th>
+                <th style="text-align:right">Hours</th><th>Complete</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="settings-card nj-settings-card">
+        <h3>Customer / Category Pairs (new-spec)</h3>
+        <div class="mileage-add-row nj-cc-add-row" style="margin-bottom:12px">
+          <label>Customer
+            <input type="text" id="nj-cc-name" placeholder="e.g. Montpelier Schools" />
+          </label>
+          <label>Category
+            <input type="text" id="nj-cc-category" placeholder="e.g. Spring Sports" />
+          </label>
+          <button type="button" id="nj-cc-add" class="btn primary">+ Add Pair</button>
+        </div>
+        <div class="table-wrap">
+          <table id="nj-cc-table" class="fixed-cols">
+            <colgroup>
+              <col style="width: 50%">
+              <col style="width: 50%">
+            </colgroup>
+            <thead><tr><th>Customer</th><th>Category</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="settings-card nj-settings-card">
+        <h3>Schedule C Mapping</h3>
+        <p class="muted" style="font-size:12px;margin:4px 0 8px">
+          Pick which IRS Schedule C line each Category rolls into for the Schedule C tax report. Mileage automatically goes to Line 9. Meals on Line 24b are halved per IRS rules.
+        </p>
+        <div class="table-wrap">
+          <table id="sc-map-table" class="fixed-cols nj-table">
+            <colgroup><col style="width:55%"><col style="width:45%"></colgroup>
+            <thead><tr><th>Category</th><th>Schedule C Line</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <div class="settings-card nj-settings-card">
+        <h3>Expenses Table (new-spec)</h3>
+        <div class="mileage-add-row nj-ex-add-row" style="margin-bottom:12px">
+          <label>Entry
+            <input type="text" id="nj-ex-entry" placeholder="e.g. Pictures" />
+          </label>
+          <label>Chart of Accounts
+            <select id="nj-ex-coa">
+              <option value="">— Select —</option>
+            </select>
+          </label>
+          <label>Job Related?
+            <select id="nj-ex-jobrel">
+              <option value="Y">Y</option>
+              <option value="N">N</option>
+            </select>
+          </label>
+          <button type="button" id="nj-ex-add" class="btn primary">+ Add</button>
+        </div>
+        <div class="table-wrap">
+          <table id="nj-ex-table" class="fixed-cols">
+            <colgroup>
+              <col style="width: 40%">
+              <col style="width: 40%">
+              <col style="width: 20%">
+            </colgroup>
+            <thead><tr><th>Entry</th><th>Chart of Accounts</th><th>Job Related</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- ===== End new-spec settings panels ===== -->
+    </section>
+
+    <!-- ===== NEW JOB page ===== -->
+    <section id="newjob" class="tab-panel">
+      <div class="page-heading-mobile">
+        <h1 class="page-title-mobile">New Job</h1>
+        <p class="page-subtitle-mobile muted">Log jobs (YY001 numbering) and track profit by Job No.</p>
+      </div>
+
+      <div class="toolbar">
+        <span style="flex:1"></span>
+        <div class="mileage-total-display">
+          <span class="mileage-total-label">Open Jobs</span>
+          <span class="mileage-total-value" id="nj-open-count">0</span>
+        </div>
+        <div class="mileage-total-display">
+          <span class="mileage-total-label">Complete</span>
+          <span class="mileage-total-value" id="nj-complete-count">0</span>
+        </div>
+      </div>
+
+      <h2 style="margin-top:8px">Add Job</h2>
+      <form id="nj-form" class="mileage-add-row nj-add-row">
+        <label>Date
+          <input type="date" id="nj-date" required />
+        </label>
+        <label>Job No.
+          <input type="text" id="nj-jobno" required placeholder="YY001" />
+        </label>
+        <label>Customer
+          <select id="nj-customer" required>
+            <option value="">— Select —</option>
+            <option value="__new__">+ Add new…</option>
+          </select>
+        </label>
+        <label>Category
+          <select id="nj-category" required>
+            <option value="">— Select —</option>
+            <option value="__new__">+ Add new…</option>
+          </select>
+        </label>
+        <label>Hours
+          <input type="number" id="nj-hours" step="0.25" min="0" placeholder="0" />
+        </label>
+        <button type="submit" class="btn primary">+ Add Job</button>
+      </form>
+
+      <h2 style="margin-top:24px">Job Analytics</h2>
+      <div class="nj-analytics-filters">
+        <label>Year
+          <select id="nj-analytics-year"><option value="">All</option></select>
+        </label>
+        <label>Customer
+          <select id="nj-analytics-customer"><option value="">All</option></select>
+        </label>
+        <label>Category
+          <select id="nj-analytics-category"><option value="">All</option></select>
+        </label>
+        <span style="flex:1"></span>
+        <button type="button" id="nj-analytics-clear" class="btn">Clear filters</button>
+      </div>
+      <div class="table-wrap">
+        <table id="nj-analytics-table" class="fixed-cols">
+          <colgroup>
+            <col style="width: 8%">
+            <col style="width: 16%">
+            <col style="width: 14%">
+            <col style="width: 6%">
+            <col style="width: 10%">
+            <col style="width: 10%">
+            <col style="width: 10%">
+            <col style="width: 14%">
+            <col style="width: 12%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Job No.</th>
+              <th>Customer</th>
+              <th>Category</th>
+              <th style="text-align:right">Hours</th>
+              <th style="text-align:right">Income</th>
+              <th style="text-align:right">Expenses</th>
+              <th style="text-align:right">Profit</th>
+              <th style="text-align:center">Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+    <!-- ===== End NEW JOB page ===== -->
+  </main>
+  </div>
+
+  <!-- RECONCILE MODAL -->
+  <div id="reconcile-modal" class="modal hidden">
+    <div class="modal-content reconcile-modal-content">
+      <h2 class="reconcile-heading">
+        <span>Reconcile with Bank Statement</span>
+        <button type="button" id="btn-reconcile-help" class="reconcile-help-btn" aria-label="Toggle instructions">?</button>
+      </h2>
+      <p class="muted reconcile-instructions" id="reconcile-instructions">Check off each transaction that appears on your bank statement. When the difference reaches $0.00, click Finalize to mark them all as reconciled.</p>
+
+      <div class="reconcile-top">
+        <label>Statement Balance *
+          <input type="number" id="reconcile-balance" step="0.01" placeholder="0.00" />
+        </label>
+        <label>Statement Date
+          <input type="date" id="reconcile-date" />
+        </label>
+        <label>Account
+          <select id="reconcile-account"></select>
+        </label>
+      </div>
+
+      <div class="reconcile-last" id="reconcile-last">Last reconciled: —</div>
+
+      <div class="reconcile-summary">
+        <div class="rec-item">
+          <span class="rec-label">Prev. Reconciled</span>
+          <span class="rec-value" id="reconcile-prev">$0.00</span>
+        </div>
+        <div class="rec-item">
+          <span class="rec-label">Cleared This Session</span>
+          <span class="rec-value" id="reconcile-cleared">$0.00</span>
+        </div>
+        <div class="rec-item">
+          <span class="rec-label">Current Total</span>
+          <span class="rec-value" id="reconcile-current">$0.00</span>
+        </div>
+        <div class="rec-item main">
+          <span class="rec-label">Difference</span>
+          <span class="rec-value" id="reconcile-diff">$0.00</span>
+        </div>
+      </div>
+
+      <div class="reconcile-list-wrap">
+        <table class="reconcile-list" id="reconcile-list">
+          <thead>
+            <tr>
+              <th style="width:36px"><input type="checkbox" id="reconcile-select-all" aria-label="Select all" /></th>
+              <th>Date</th>
+              <th>Payee</th>
+              <th style="text-align:right">Amount</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" id="btn-cancel-reconcile" class="btn">Cancel</button>
+        <button type="button" id="btn-finalize-reconcile" class="btn primary" disabled>Finalize</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop for mobile bottom-sheets (Filters / Presets popovers) -->
+  <div id="mobile-sheet-backdrop" class="mobile-sheet-backdrop" hidden></div>
+
+  <!-- SAVE PRESET MODAL -->
+  <div id="preset-modal" class="modal hidden">
+    <div class="modal-content preset-modal-content">
+      <div class="preset-modal-head">
+        <h2 id="preset-modal-title">Save Filter Preset</h2>
+        <button type="button" id="btn-preset-modal-close" class="modal-close" aria-label="Close">×</button>
+      </div>
+      <p class="muted preset-modal-sub">Save the current filter configuration for quick access later.</p>
+      <label class="preset-modal-field">
+        <span>Preset name</span>
+        <input type="text" id="preset-name-input" placeholder="e.g. Monthly spending overview" autocomplete="off" />
+      </label>
+      <div class="preset-modal-summary">
+        <div class="preset-summary-title">Current filters</div>
+        <ul id="preset-modal-summary-list"></ul>
+      </div>
+      <div class="preset-modal-actions">
+        <button type="button" id="btn-preset-cancel" class="btn">Cancel</button>
+        <button type="button" id="btn-preset-save"   class="btn primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px;margin-right:6px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+          Save preset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION MODAL -->
+  <div id="tx-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="modal-title">New Transaction</h2>
+      <form id="tx-form">
+        <input type="hidden" id="tx-id" />
+
+        <label>Date *
+          <input type="date" id="tx-date" required />
+        </label>
+
+        <div class="form-row flow-row">
+          <label class="outflow-label">&minus; Outflow
+            <input type="number" id="tx-outflow" step="0.01" min="0" placeholder="0.00" />
+          </label>
+          <button type="button" id="btn-swap-flow" class="swap-btn" title="Swap Outflow and Inflow">&#8646;</button>
+          <label class="inflow-label">+ Inflow
+            <input type="number" id="tx-inflow" step="0.01" min="0" placeholder="0.00" />
+          </label>
+        </div>
+
+        <div class="form-row form-row-2 tx-vendor-job-row">
+          <label>Vendor
+            <select id="tx-vendor">
+              <option value="">— None —</option>
+              <option value="__new__">+ Add new…</option>
+            </select>
+          </label>
+          <label class="tx-existing-pill-label">
+            Existing Job?
+            <span class="jobs-mode-toggle tx-existing-pill" id="tx-existing-pill">
+              <button type="button" class="year-pill active" data-val="N">No</button>
+              <button type="button" class="year-pill" data-val="Y">Yes</button>
+            </span>
+            <input type="checkbox" id="tx-existing-job-toggle" hidden />
+          </label>
+        </div>
+
+        <label>Job No.
+          <select id="tx-job-link" disabled>
+            <option value="">— Select job —</option>
+          </select>
+        </label>
+
+        <div class="form-row form-row-2">
+          <label>Customer
+            <select id="tx-customer">
+              <option value="">— None —</option>
+            </select>
+          </label>
+          <label>Category *
+            <select id="tx-category" required>
+              <option value="">— None —</option>
+              <option value="__new__">+ Add new…</option>
+            </select>
+          </label>
+        </div>
+        <input type="hidden" id="tx-account" />
+
+        <div class="form-row tx-coa-expinc-row">
+          <label>Chart of Accounts
+            <select id="tx-chart-account">
+              <option value="">— None —</option>
+            </select>
+          </label>
+          <label>Expense / Income
+            <select id="tx-expense-income">
+              <option value="">— None —</option>
+              <option value="__new__">+ Add new…</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-row form-row-2">
+          <label>Memo
+            <input type="text" id="tx-memo" placeholder="Optional note" />
+          </label>
+          <label>Tags
+            <input type="text" id="tx-tags" placeholder="Comma-separated (optional)" />
+          </label>
+        </div>
+
+        <div class="tx-mark-clear-row">
+          <label class="nj-mark-row">
+            <input type="checkbox" id="tx-nj-marked" />
+            <span class="nj-mark-text">
+              <span class="nj-badge" aria-hidden="true"></span>
+              Mark this transaction as edited with new logic
+            </span>
+          </label>
+          <button type="button" id="btn-tx-clear" class="year-pill">Clear</button>
+        </div>
+
+        <div class="form-actions tx-form-actions-with-payee">
+          <label class="tx-payee-inline">Payee *
+            <input type="text" id="tx-payee" list="payee-datalist" />
+            <datalist id="payee-datalist"></datalist>
+          </label>
+          <button type="button" id="btn-delete-tx" class="btn danger" style="display:none">Delete</button>
+          <button type="button" id="btn-duplicate-tx" class="btn" style="display:none">Duplicate</button>
+          <button type="button" id="btn-cancel-tx" class="btn">Cancel</button>
+          <button type="submit" class="btn primary">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Link transactions to invoice modal -->
+  <div id="link-tx-modal" class="modal hidden">
+    <div class="modal-content link-tx-content">
+      <h2>Link Transactions to Invoice</h2>
+      <p class="muted">Check every transaction this invoice covers. You can link more than one.</p>
+      <div class="link-tx-filters">
+        <input type="search" id="link-tx-search" placeholder="Search payee, category, memo..." />
+        <select id="link-tx-year"><option value="">All Years</option></select>
+        <label class="link-tx-unlinked-only">
+          <input type="checkbox" id="link-tx-only-unlinked" />
+          <span>Only show transactions not linked to another invoice</span>
+        </label>
+      </div>
+      <div class="link-tx-list-wrap">
+        <table class="link-tx-table">
+          <thead>
+            <tr>
+              <th style="width:32px"></th>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Payee</th>
+              <th>Category</th>
+              <th style="text-align:right">Amount</th>
+              <th>Linked To</th>
+            </tr>
+          </thead>
+          <tbody id="link-tx-tbody"></tbody>
+        </table>
+      </div>
+      <div class="form-actions">
+        <span id="link-tx-selected-total" class="muted" style="margin-right:auto;align-self:center"></span>
+        <button type="button" id="btn-cancel-link-tx" class="btn">Cancel</button>
+        <button type="button" id="btn-save-link-tx" class="btn primary">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="app-info-modal" class="modal hidden">
+    <div class="modal-content app-info-content">
+      <h2>App Info</h2>
+      <p class="muted">Jamie Bexten Photography — Bookkeeping App</p>
+      <h3>Lines of Code</h3>
+      <table class="app-info-table">
+        <tbody>
+          <tr><td>app.js</td><td id="app-info-js">—</td></tr>
+          <tr><td>styles.css</td><td id="app-info-css">—</td></tr>
+          <tr><td>index.html</td><td id="app-info-html">—</td></tr>
+          <tr class="app-info-total"><td><strong>Total</strong></td><td id="app-info-total"><strong>—</strong></td></tr>
+        </tbody>
+      </table>
+      <p class="muted app-info-note">
+        Vanilla HTML / CSS / JavaScript — no framework, no build step.
+      </p>
+      <div class="form-actions">
+        <button type="button" id="btn-close-app-info" class="btn primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=188"></script>
+</body>
+</html>

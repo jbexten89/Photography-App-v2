@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Jamie Bexten Photography — Bookkeeping App · User Manual</title>
+<style>
+  :root {
+    --primary: #2c6ecb;
+    --accent:  #3b9eff;
+    --muted:   #6b7280;
+    --border:  #d7dce5;
+    --bg-soft: #f3f6fb;
+    --text:    #1f2937;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: #fff;
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+  body { max-width: 7in; margin: 0 auto; padding: 0.75in 0.75in 0.5in; }
+
+  /* Screen-only print banner */
+  .print-banner {
+    position: sticky; top: 0; z-index: 100;
+    background: #fff7cc; border: 1px solid #e6c84a;
+    padding: 10px 16px; border-radius: 6px;
+    margin-bottom: 30px;
+    font-size: 10pt;
+  }
+  .print-banner strong { color: #7a5a00; }
+  @media print { .print-banner { display: none !important; } }
+
+  h1 { color: var(--primary); font-size: 26pt; line-height: 1.1; margin: 0 0 0.2em; }
+  h2 { color: var(--primary); font-size: 16pt; margin: 1.2em 0 0.4em; page-break-after: avoid; }
+  h3 { color: var(--text);    font-size: 12pt; margin: 1em 0 0.3em; page-break-after: avoid; }
+  h4 { color: var(--accent);  font-size: 10.5pt; margin: 0.9em 0 0.2em; text-transform: uppercase; letter-spacing: 0.5px; }
+  p  { margin: 0.3em 0 0.6em; }
+  ul, ol { margin: 0.3em 0 0.8em; padding-left: 1.3em; }
+  li { margin-bottom: 3px; }
+  code, tt { font-family: "SF Mono", Consolas, Monaco, monospace; font-size: 0.93em; background: var(--bg-soft); padding: 1px 4px; border-radius: 3px; }
+
+  .muted { color: var(--muted); }
+  .tip {
+    background: var(--bg-soft);
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px;
+    margin: 10px 0 14px;
+    font-size: 10.5pt;
+    border-radius: 0 4px 4px 0;
+  }
+  .tip strong { color: var(--primary); }
+
+  /* ===== Title page ===== */
+  .title-page {
+    text-align: center;
+    padding-top: 2in;
+    page-break-after: always;
+    height: 10in;
+  }
+  .title-page .title-main {
+    font-size: 28pt;
+    color: var(--primary);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .title-page .subtitle {
+    font-size: 14pt;
+    color: var(--muted);
+    margin-top: 0.4em;
+  }
+  .title-page hr {
+    width: 3in; border: none; border-top: 2px solid var(--primary);
+    margin: 0.5in auto;
+  }
+  .title-page .intro {
+    max-width: 5in; margin: 0 auto; color: var(--muted); font-size: 11pt;
+  }
+  .title-page .version {
+    margin-top: 2in; color: var(--muted); font-size: 10pt;
+  }
+
+  /* ===== TOC ===== */
+  .toc { page-break-after: always; }
+  .toc ol { list-style: none; padding: 0; counter-reset: toc; }
+  .toc ol li {
+    counter-increment: toc;
+    display: flex; justify-content: space-between;
+    border-bottom: 1px dotted var(--border);
+    padding: 4px 0;
+    font-size: 11pt;
+  }
+  .toc ol li::before {
+    content: counter(toc) ". ";
+    color: var(--muted);
+    margin-right: 6px;
+  }
+  .toc ol li span:last-child { color: var(--muted); }
+
+  /* ===== Section layout ===== */
+  section { page-break-before: always; }
+  section:first-of-type { page-break-before: auto; }
+
+  /* ===== Print margins / page numbers ===== */
+  @page {
+    size: letter portrait;
+    margin: 0.75in 0.75in 0.7in;
+    @bottom-left   { content: "Jamie Bexten Photography — User Manual"; font-family: Helvetica, sans-serif; font-size: 9pt; color: #6b7280; }
+    @bottom-right  { content: "Page " counter(page) " of " counter(pages); font-family: Helvetica, sans-serif; font-size: 9pt; color: #6b7280; }
+  }
+
+  /* Prevent orphaned lists/headings from splitting awkwardly */
+  h2, h3, h4 { break-after: avoid-page; }
+  ul, ol { break-inside: avoid-page; }
+  .tip { break-inside: avoid-page; }
+</style>
+</head>
+<body>
+
+<div class="print-banner">
+  <strong>To save this manual as a PDF:</strong>
+  press <kbd>Ctrl</kbd>+<kbd>P</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>P</kbd> (Mac) →
+  <em>Destination</em>: Save as PDF → <em>Save</em>.
+  The headers and page numbers are set up automatically.
+</div>
+
+<!-- ============== TITLE PAGE ============== -->
+<div class="title-page">
+  <div class="title-main">Jamie Bexten Photography</div>
+  <div class="title-main">Bookkeeping App</div>
+  <hr>
+  <div class="subtitle">A guide to every feature</div>
+  <div style="margin-top: 0.6in;"></div>
+  <p class="intro">
+    Single-page web app for tracking photography business income, expenses,
+    invoices, mileage, and scheduling. Data lives in your browser's
+    <code>localStorage</code> and can be backed up to iCloud.
+  </p>
+  <div class="version">User Manual — Version 1.0</div>
+</div>
+
+<!-- ============== TABLE OF CONTENTS ============== -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><span>App Overview</span><span>3</span></li>
+    <li><span>Sidebar Navigation</span><span>3</span></li>
+    <li><span>Overview Tab (Dashboard)</span><span>4</span></li>
+    <li><span>Calendar Tab</span><span>5</span></li>
+    <li><span>Analytics Tab</span><span>6</span></li>
+    <li><span>All Transactions Tab</span><span>7</span></li>
+    <li><span>Invoices Tab</span><span>9</span></li>
+    <li><span>Mileage Tab</span><span>11</span></li>
+    <li><span>Reports Tab</span><span>11</span></li>
+    <li><span>Settings Tab</span><span>11</span></li>
+    <li><span>Backup &amp; Restore</span><span>12</span></li>
+    <li><span>Tips &amp; Tricks</span><span>13</span></li>
+  </ol>
+</div>
+
+<!-- ============== 1. APP OVERVIEW ============== -->
+<section>
+  <h2>1. App Overview</h2>
+  <p>This app runs entirely in your browser. No server, no login — just open the
+  page and your data is already loaded from the local device. It's designed for
+  a sole-proprietor photography business to track every dollar in and out,
+  produce invoices, log business mileage, and surface clean financial reports at
+  tax time.</p>
+
+  <h3>What the app tracks</h3>
+  <ul>
+    <li><strong>Income &amp; expenses</strong> per transaction, tagged to a Customer, Category (Job), and Payee.</li>
+    <li><strong>Invoices</strong> with line items, optional sales tax, and direct links to the income transactions they cover.</li>
+    <li><strong>Mileage</strong> trips with IRS-rate deduction.</li>
+    <li><strong>Scheduled photo shoots</strong> (Calendar) that feed the <em>Un Invoiced</em> queue.</li>
+    <li><strong>Savings progress</strong> toward a configurable goal.</li>
+  </ul>
+
+  <h3>Where the data lives</h3>
+  <p>All state is stored in <code>localStorage</code> under the key
+  <code>photo-bookkeeping-v1</code>. Each browser/device keeps its own copy — use
+  the built-in backup tools (Settings → Data) to copy the data elsewhere,
+  including iCloud Drive on Apple devices.</p>
+</section>
+
+<!-- ============== 2. SIDEBAR NAVIGATION ============== -->
+<section>
+  <h2>2. Sidebar Navigation</h2>
+  <p>The left sidebar (or the hamburger menu on mobile) lists the main tabs:</p>
+  <ul>
+    <li><strong>Overview</strong> — financial at-a-glance for the year (dashboard).</li>
+    <li><strong>Calendar</strong> — scheduled photo shoots.</li>
+    <li><strong>Analytics</strong> — two sub-tabs: <em>Breakdown</em> and <em>Trends</em>.</li>
+    <li><strong>All Transactions</strong> — the full income/expense ledger.</li>
+    <li><strong>Invoices</strong> — builder, list, and Un Invoiced queue.</li>
+    <li><strong>Mileage</strong> — business trip tracker.</li>
+    <li><strong>Reports</strong> — Profit &amp; Loss, customer sales, sales tax.</li>
+    <li><strong>Settings</strong> — bottom gear icon; data, customization, backups.</li>
+  </ul>
+
+  <h3>Mobile navigation styles</h3>
+  <p><strong>Settings → Mobile Nav Style</strong> lets you switch between two modes:</p>
+  <ul>
+    <li><strong>Sidebar</strong> (default): hamburger opens the same left drawer as desktop.</li>
+    <li><strong>Bottom Bar</strong>: a fixed 5-slot bottom toolbar — <em>Overview</em>,
+      <em>Transactions</em>, <em>Calendar</em>, <em>Analytics</em>, <em>More</em>.
+      Tapping <em>More</em> slides a right-side flyout containing every other tab
+      plus the light/dark theme toggle and Settings.</li>
+  </ul>
+
+  <h3>Theme toggle</h3>
+  <p>A moon/sun icon at the bottom of the sidebar (or inside the mobile More flyout)
+  flips between dark and light themes. Your choice is remembered per device.</p>
+</section>
+
+<!-- ============== 3. OVERVIEW TAB ============== -->
+<section>
+  <h2>3. Overview Tab (Dashboard)</h2>
+  <p>The Overview gives you the big picture for whichever year you pick.</p>
+
+  <h3>Year selector</h3>
+  <p>Pill buttons across the top let you filter by year or choose <strong>All</strong>.
+  On desktop, every year with data appears as its own pill. On mobile you see
+  <strong>All</strong> + the three most-recent years + a <strong>More ▾</strong>
+  button; tapping More opens a bottom sheet with every available year as a grid.</p>
+
+  <h3>Savings Goal bar</h3>
+  <p>The goal amount is configured in Settings. The bar fills as your
+  <em>Savings</em>-category transactions accumulate. On desktop it renders as a
+  vertical column; on mobile it rotates into a horizontal strip so it doesn't
+  dominate the screen. A thin accent line marks the target — fill past it and
+  the bar turns solid green (Goal met).</p>
+
+  <h3>Total Income by Year</h3>
+  <p>A bar chart showing up to 6 years at a time. Use the <strong>‹ / ›</strong> arrows
+  at the top of the card to slide the window. Each bar is labeled with its
+  total and a percentage-change delta vs. the previous year. Toggle
+  <strong>Full Year</strong> / <strong>Year to Date</strong> to switch the reference.</p>
+
+  <h3>Income by Job donut</h3>
+  <p>Shows the share each job contributed to your income for the selected year.
+  The center displays the total. The legend lists every job with its percentage.
+  Hover a slice to highlight it (desktop); on mobile, tap the legend to focus
+  a slice.</p>
+
+  <h3>Summary cards</h3>
+  <p>Five stat tiles: <strong>Total Income</strong>, <strong>Total Expenses</strong>,
+  <strong>Total Savings</strong>, <strong>Net</strong>, and the
+  <strong>Transactions</strong> count.</p>
+
+  <h3>Summary tables</h3>
+  <p>Three tables sit below the charts:</p>
+  <ul>
+    <li><strong>By Job</strong> — income-positive categories, with Income, Expenses, Net, Count.</li>
+    <li><strong>By Category</strong> — expense-only and savings categories, with Expenses, Income, Net, Count.</li>
+    <li><strong>By Account</strong> — aggregated per account.</li>
+  </ul>
+  <p>On mobile the first two columns (e.g. Job + Income) are visible at the edge;
+  slide the table left to reveal the rest. Desktop shows all columns at once.</p>
+
+  <div class="tip">
+    <strong>Drill-through:</strong> on mobile, <strong>long-press</strong> any row in the By Job or
+    By Category table to open that category's transactions with a Back arrow
+    that returns you to the Overview. On desktop, a single click does the same.
+  </div>
+</section>
+
+<!-- ============== 4. CALENDAR TAB ============== -->
+<section>
+  <h2>4. Calendar Tab</h2>
+  <p>Log every scheduled photo shoot here so nothing slips through the cracks.</p>
+
+  <h3>Year navigation</h3>
+  <p>The sticky top bar contains: <strong>‹ year ›</strong> arrows to jump years, a
+  <strong>Today</strong> button that snaps to the current year, and a
+  <strong>+ New Event</strong> button on the right (inline on mobile so everything
+  fits one row).</p>
+
+  <h3>Adding a new event</h3>
+  <ol>
+    <li>Tap <strong>+ New Event</strong>.</li>
+    <li>Fill out Date (required), Time, Job, Location, and Notes.</li>
+    <li>Save. The event appears in the Scheduled Jobs list below, sorted by date.</li>
+  </ol>
+
+  <h3>Editing / deleting an event</h3>
+  <p>Click any event row to reopen the modal — change values and Save, or click
+  Delete to remove it.</p>
+
+  <div class="tip">
+    Every event you schedule feeds the <strong>Un Invoiced</strong> queue on the
+    Invoices tab when a paid transaction for that job exists but hasn't been
+    linked to an invoice yet.
+  </div>
+</section>
+
+<!-- ============== 5. ANALYTICS TAB ============== -->
+<section>
+  <h2>5. Analytics Tab</h2>
+  <p>Two sub-tabs sit sticky at the top: <strong>Breakdown</strong> and
+  <strong>Trends</strong>. Switch freely — they share the same sidebar selection.</p>
+
+  <h3>Breakdown</h3>
+  <p>Pick a year from the pills. Three donuts summarize the slice —
+  <strong>Jobs</strong> (positive-net categories), <strong>Expenses</strong>, and
+  <strong>Savings</strong>. Empty buckets hide themselves so an unused year
+  shows only the relevant donuts.</p>
+  <p>Below the donuts is a grid of job cards. Each card shows the category name,
+  income, expenses, and net. Use the <strong>Gross | Net</strong> toggle on the
+  right (Gross is default) to flip how the Jobs donut and totals calculate.</p>
+
+  <div class="tip">
+    Click (desktop) or <strong>long-press</strong> (mobile) a job card to jump to
+    the Transactions tab filtered to that category + year. A Back arrow in the
+    Transactions toolbar brings you straight back to Analytics.
+  </div>
+
+  <h3>Trends</h3>
+  <p>Trends draws a historical bar chart. The toolbar controls what you're looking at:</p>
+  <ul>
+    <li><strong>View By</strong> — Year (single year, all jobs stacked) or Job
+      (one job across years).</li>
+    <li><strong>Year</strong> — multi-select when Job view is active; single-select
+      in Year view. Defaults to All Years in Job mode.</li>
+    <li><strong>Jobs</strong> — pick which category drives the chart in Job mode.</li>
+    <li><strong>Payees</strong> — filter by payee (defaults to <em>Job</em> for
+      photography income).</li>
+  </ul>
+  <p>In Job mode every bar is labeled with the dollar amount and
+  <strong>% change vs. the previous year</strong> (green for growth, red for
+  decline). A legend below the chart shows each segment's color and contribution.</p>
+</section>
+
+<!-- ============== 6. ALL TRANSACTIONS ============== -->
+<section>
+  <h2>6. All Transactions Tab</h2>
+  <p>The full ledger. Sort, filter, search, edit, reconcile — everything lives here.</p>
+
+  <h3>Top bar</h3>
+  <p>The running <strong>Selected</strong> count and <strong>Working Balance</strong>
+  sit in a sticky bar at the very top so they stay visible while you scroll.
+  Working Balance reflects your current filter set — narrow the list and the
+  number updates instantly.</p>
+
+  <h3>Toolbar</h3>
+  <ul>
+    <li><strong>+ New Transaction</strong> — opens the form.</li>
+    <li><strong>All Years</strong> / <strong>All Categories</strong> /
+      <strong>All Types</strong> — dropdown filters.</li>
+    <li><strong>Find (magnifying glass)</strong> — click the icon to expand an
+      inline search box. It matches across <em>payee, memo, vendor, customer,
+      category, tags,</em> and <em>amount</em>. Click the icon again to collapse
+      and clear.</li>
+    <li><strong>⋯ menu</strong> — opens the Reconcile modal, toggles Select Mode,
+      and hides/shows reconciled rows.</li>
+  </ul>
+
+  <h3>Table columns</h3>
+  <p>Checkbox • Date • Vendor • Customer • Payee • Category • Amount • Memo •
+  <strong>R</strong> (padlock) • <strong>Tag</strong> icon. The old <em>Account</em>
+  column is removed — the app uses a single default account under the hood.</p>
+
+  <h3>Padlock (R) states</h3>
+  <ul>
+    <li><strong>Dim open padlock</strong> — uncleared.</li>
+    <li><strong>Accent open padlock</strong> — cleared (C).</li>
+    <li><strong>Primary closed padlock</strong> — reconciled (R).</li>
+  </ul>
+  <p>Click the padlock to cycle through the three states.</p>
+
+  <h3>Tag icon</h3>
+  <p>The tag icon dims when the row has no tags and lights up in the primary
+  color when it does. Hover for a tooltip listing the tags.</p>
+
+  <h3>Adding a transaction</h3>
+  <ol>
+    <li>Click <strong>+ New Transaction</strong>.</li>
+    <li>Date is required. Vendor is optional.</li>
+    <li><strong>Customer</strong> is a dropdown of previously-saved names. Pick
+      <em>+ Add new…</em> to be prompted for a new value. Customer is
+      <strong>required</strong> when Payee is <em>Job</em>; optional otherwise.</li>
+    <li>Payee is required. Category is required.</li>
+    <li>Fill the <strong>Outflow</strong> (expense) or <strong>Inflow</strong>
+      (income) amount — not both. The swap arrow flips the two fields if you
+      typed in the wrong one.</li>
+    <li>Memo and Tags are optional.</li>
+    <li>Save. The transaction appears in the list immediately.</li>
+  </ol>
+
+  <h3>Editing / duplicating / deleting</h3>
+  <p>Click any row to open the edit modal. The <strong>Duplicate</strong> button
+  clones the transaction with a fresh ID (but today's date); the
+  <strong>Delete</strong> button removes it with a confirmation prompt.</p>
+
+  <h3>Reconciling against a bank statement</h3>
+  <ol>
+    <li>Open the <strong>⋯</strong> menu → <strong>Reconcile…</strong></li>
+    <li>Enter the statement date, the ending balance, and pick the account.</li>
+    <li>Check off every transaction that appears on the statement. The
+      <strong>Difference</strong> must reach $0.00.</li>
+    <li>Click <strong>Finalize</strong> to mark every checked row as Reconciled (R).</li>
+  </ol>
+
+  <div class="tip">
+    On mobile the instructions auto-hide — tap the small <strong>?</strong> beside
+    the title to toggle them. Cancel and Finalize live at the top-right so they
+    stay in reach while you scroll the transaction list.
+  </div>
+</section>
+
+<!-- ============== 7. INVOICES ============== -->
+<section>
+  <h2>7. Invoices Tab</h2>
+  <p>Build, send, and track invoices — and tie each one to the income transactions
+  it represents so your books stay clean.</p>
+
+  <h3>Summary cards</h3>
+  <p><strong>Total Invoiced</strong>, <strong>Total Paid</strong>,
+  <strong>Outstanding</strong>. All three honor the year filter — narrow to
+  2026 and only 2026 invoices count.</p>
+
+  <h3>Un Invoiced card</h3>
+  <p>Lists income transactions (from the current-filter year) that aren't linked
+  to any invoice yet. Columns: <strong>Date, Customer, Category, Amount</strong>,
+  ascending by date. When every qualifying transaction has an invoice link, the
+  card hides automatically.</p>
+
+  <h3>Invoices list</h3>
+  <p>Sorted by <strong>invoice number descending</strong>. Columns: Invoice # •
+  Total • Date • Bill To • Job • Status (Paid/Unpaid pill) •
+  <strong>Linked</strong> (chain icon with a blue count). On mobile, Total is
+  hidden (tap the invoice to see it); the other columns get wider real estate
+  and the table slides horizontally.</p>
+
+  <h3>Auto-numbering rules</h3>
+  <ul>
+    <li>First invoice of a new year: <strong>YY001</strong> (e.g. <code>26001</code> for 2026).</li>
+    <li>Subsequent new invoices fill the lowest gap in the current-year sequence.</li>
+    <li>Deleting an invoice frees its number for reuse.</li>
+    <li>Auto-numbers never drop below the current year's floor (e.g. won't re-use 25099).</li>
+    <li>Manual override: type any unused number. Duplicates are blocked at save time.</li>
+  </ul>
+
+  <h3>Creating or editing an invoice</h3>
+  <ol>
+    <li>Click <strong>+ New Invoice</strong> (or a row in the list).</li>
+    <li>Confirm the auto-populated <strong>Invoice #</strong> or type your own.</li>
+    <li>Set the <strong>Date</strong>, <strong>Bill To</strong> (multi-line — the
+      first line becomes the Customer), and <strong>Job</strong>.</li>
+    <li>Leave tax as <strong>NON-TAX</strong> (default) or flip to
+      <strong>Tax</strong>; for Tax, set label (e.g. <em>Ohio Sales Tax</em>) and rate.</li>
+    <li>Add line items: Item, Qty, Description, Price. Amount auto-calculates.</li>
+    <li>Link transactions (see below).</li>
+    <li>Click <strong>Save</strong>. Use <strong>Print / PDF</strong> to produce a
+      file to send the client.</li>
+  </ol>
+
+  <h3>Linking transactions to an invoice</h3>
+  <p>The <strong>Linked Transactions</strong> panel sits at the <em>top</em> of
+  the editor, above the printable sheet (it's <em>no-print</em> so it won't
+  appear on PDFs).</p>
+  <ol>
+    <li>Click <strong>+ Link Transactions…</strong> inside that panel.</li>
+    <li>The modal is already filtered to candidates whose <strong>Category</strong>
+      matches the invoice's <strong>Job</strong> AND whose <strong>Customer</strong>
+      matches the first line of <strong>Bill To</strong>.</li>
+    <li>Check the rows that make up this invoice's payment. The Customer column
+      on the right shows any other invoice already linking each row (helpful
+      for avoiding double-links).</li>
+    <li>Save the modal. The panel lists the selected rows with totals; deleted
+      transactions are pruned on the next save so the <em>Linked</em> count
+      stays accurate.</li>
+  </ol>
+
+  <h3>Marking paid / deleting</h3>
+  <p><strong>Mark as Paid</strong> toggles the invoice's paid state (and stamps a
+  paid date). The list immediately reflects the new status pill.
+  <strong>Delete</strong> removes the invoice — a confirmation prompts first.</p>
+</section>
+
+<!-- ============== 8. MILEAGE ============== -->
+<section>
+  <h2>8. Mileage Tab</h2>
+  <p>Log business trips so the IRS-rate deduction is just a click away at tax time.</p>
+
+  <h3>Year summary</h3>
+  <p>Shows total miles, total deduction (miles × IRS rate from Settings), and
+  trip count for the selected year.</p>
+
+  <h3>Adding a trip</h3>
+  <ol>
+    <li>Click <strong>+ New Trip</strong>.</li>
+    <li>Enter Date, From, To, Purpose.</li>
+    <li>Either type <strong>Miles</strong> directly, or fill <strong>Start/End
+      odometer</strong> and the miles auto-calculate.</li>
+    <li>Save. The trip appears in the list sorted by date.</li>
+  </ol>
+  <p>Click a trip row to edit or delete.</p>
+</section>
+
+<!-- ============== 9. REPORTS ============== -->
+<section>
+  <h2>9. Reports Tab</h2>
+  <p>Canned reports you can hand to your accountant:</p>
+  <ul>
+    <li><strong>Profit &amp; Loss</strong> — income, expenses, and net for the selected year.</li>
+    <li><strong>Sales Tax Liability</strong> — breaks down taxable / non-taxable
+      invoiced amounts and total tax collected.</li>
+    <li><strong>Customer Sales Summary</strong> — total revenue per customer.</li>
+  </ul>
+  <p>Every report respects the year filter at the top of the page. Use your
+  browser's Print function to save any report as a PDF.</p>
+</section>
+
+<!-- ============== 10. SETTINGS ============== -->
+<section>
+  <h2>10. Settings Tab</h2>
+  <p>Organized into cards. On mobile the <strong>Data</strong> card floats to
+  the top for one-tap access to backups.</p>
+
+  <h3>Data card</h3>
+  <ul>
+    <li><strong>Startup View</strong> — Overview or All Transactions.</li>
+    <li><strong>Overview Year</strong> — Current Year or All Years when the app first opens.</li>
+    <li><strong>Savings Goal ($)</strong> — drives the goal bar on Overview.</li>
+    <li><strong>Download Backup (JSON)</strong> — native save dialog; file name includes date + time.</li>
+    <li><strong>Backup to iCloud</strong> — remembered-folder backup (see next page).</li>
+    <li><strong>Restore from Backup</strong> — import any JBPhoto-*.json file.</li>
+    <li><strong>Import MoneyStats CSV</strong> — bulk-load transactions from a MoneyStats export.</li>
+    <li><strong>App Info</strong> — shows live line-of-code counts for <code>app.js</code>,
+      <code>styles.css</code>, and <code>index.html</code>.</li>
+    <li><strong>Delete Transactions in Date Range</strong> — type <em>yes</em> to confirm.</li>
+    <li><strong>Clear All Data</strong> — wipes everything in localStorage; also confirmation-gated.</li>
+  </ul>
+
+  <h3>Accounts card</h3>
+  <p>Manage the list of bank accounts / cash buckets. (The app operates on a
+  single default account today; this list is retained for future multi-account
+  support.)</p>
+
+  <h3>Chart of Accounts card</h3>
+  <p>Accounting-style categories. Each transaction can optionally be assigned to
+  a chart account for formal P&amp;L rollups. Add, edit, and nest sub-accounts here.</p>
+</section>
+
+<!-- ============== 11. BACKUP & RESTORE ============== -->
+<section>
+  <h2>11. Backup &amp; Restore</h2>
+  <p>Because every piece of data lives in your browser's localStorage, regular
+  backups are essential. The app gives you two paths.</p>
+
+  <h3>Download Backup (JSON)</h3>
+  <p>Click the button; your browser's native save dialog opens, starting in the
+  <em>Documents</em> folder. The default filename is
+  <code>JBPhoto-backup-YYYY-MM-DD_HH-MM-SS.json</code>, so successive saves
+  never overwrite each other. Navigate anywhere you like — including iCloud
+  Drive — and save.</p>
+
+  <h3>Backup to iCloud (recommended)</h3>
+  <ol>
+    <li>On the <strong>first click</strong> you'll be asked to pick a folder.
+      Browse to <em>iCloud Drive › JBPhoto</em> (create the folder if it doesn't
+      exist) and grant the permission.</li>
+    <li>The app stores the folder reference in your browser (IndexedDB).</li>
+    <li><strong>Every subsequent click</strong> writes straight to that folder
+      with a fresh date-stamped filename — no dialog, no clicks.</li>
+    <li>If you clear browser data or switch devices, the first click will prompt
+      you to choose the folder again.</li>
+  </ol>
+  <div class="tip">
+    Firefox and Safari don't yet support the folder-pick API. On those browsers
+    the button tells you to use <strong>Download Backup (JSON)</strong> instead
+    and pick iCloud Drive from the native save dialog.
+  </div>
+
+  <h3>Restoring a backup</h3>
+  <ol>
+    <li>Click <strong>Restore from Backup</strong>.</li>
+    <li>Select any <code>JBPhoto-*.json</code> file.</li>
+    <li>Confirm the overwrite prompt.</li>
+    <li>The app replaces current state but preserves every field in the backup —
+      transactions, invoices, chart accounts, vendors, customers, mileage trips,
+      scheduled jobs, savings goal.</li>
+  </ol>
+</section>
+
+<!-- ============== 12. TIPS & TRICKS ============== -->
+<section>
+  <h2>12. Tips &amp; Tricks</h2>
+  <ul>
+    <li><strong>Drill-through navigation:</strong> long-press (mobile) or click
+      (desktop) a row in Overview's By Job / By Category tables to open its
+      transactions. The Back arrow on the Transactions toolbar returns you to
+      the exact tab you came from.</li>
+    <li><strong>Analytics job cards</strong> support the same long-press /
+      double-click behavior — a single tap on mobile selects the card, a
+      second tap within half a second opens the drill-through.</li>
+    <li><strong>Sticky top bars</strong> on mobile: year/status bars on
+      Overview, the Selected + Working Balance bar on Transactions, and the
+      Breakdown/Trends tabs on Analytics all stay put while you scroll.</li>
+    <li><strong>Customer autocomplete:</strong> every customer name you've ever
+      entered appears in the dropdown. Pick an existing name or add a new one
+      without leaving the form.</li>
+    <li><strong>Unified Find:</strong> one search box hunts across payee, memo,
+      vendor, customer, category, tags, and amount. Type a dollar figure to
+      find transactions at that price.</li>
+    <li><strong>Invoice auto-numbering</strong> always fills gaps first. Delete
+      26004 and the next new invoice reuses 26004; once current-year numbers
+      are fully used, it rolls forward to 26005, 26006, etc.</li>
+    <li><strong>Linked invoice filter</strong>: the + Link Transactions modal
+      is pre-filtered by the invoice's Bill To (Customer) and Job (Category),
+      so you rarely need to search.</li>
+    <li><strong>Keyboard shortcuts:</strong> <code>Esc</code> closes any open
+      modal; standard browser shortcuts (Cmd/Ctrl+F, Cmd/Ctrl+P) work as expected.</li>
+    <li><strong>Safe exit:</strong> every destructive action (clear data, delete
+      range, delete invoice) requires a typed confirmation. You can't
+      accidentally wipe your books.</li>
+  </ul>
+
+  <p style="text-align: center; margin-top: 2em; color: var(--muted);">
+    <em>End of manual. Questions? Open the app, then Settings → App Info —
+    it shows the current live line-of-code counts as a sanity check that
+    you're running the latest build.</em>
+  </p>
+</section>
+
+</body>
+</html>
