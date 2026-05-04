@@ -12,7 +12,7 @@
 //   2. Copy the 64-char hash it prints.
 //   3. Replace APP_GATE_HASH below with the new hash, push to git.
 // SHA-256 of "changeme":
-const APP_GATE_HASH = "057ba03d6c44104863dc7361fe4578965d1887360f90a0895882e58a6248fc86";
+const APP_GATE_HASH = "5f6222f05d908058e3158ac14334f9a054ce7de98f676cbbc6baaeabadfb2eba";
 const APP_GATE_KEY  = "photo-app-gate-v1";
 
 (function appGate() {
