@@ -2,6 +2,50 @@
 // Photography Bookkeeping App
 // ============================================================
 
+// ---------- App Password Gate ----------
+// Casual access gate. Default password = "changeme". To set your own:
+//   1. Open the live site, press F12, paste this into the Console:
+//        await crypto.subtle.digest("SHA-256",
+//          new TextEncoder().encode("YOUR_NEW_PASSWORD"))
+//        .then(b => Array.from(new Uint8Array(b))
+//          .map(x => x.toString(16).padStart(2,"0")).join(""))
+//   2. Copy the 64-char hash it prints.
+//   3. Replace APP_GATE_HASH below with the new hash, push to git.
+// SHA-256 of "changeme":
+const APP_GATE_HASH = "057ba03d6c44104863dc7361fe4578965d1887360f90a0895882e58a6248fc86";
+const APP_GATE_KEY  = "photo-app-gate-v1";
+
+(function appGate() {
+  const gate = document.getElementById("app-gate");
+  if (!gate) return;
+  // If previously unlocked, stay unlocked.
+  if (localStorage.getItem(APP_GATE_KEY) === APP_GATE_HASH) return;
+  gate.hidden = false;
+  document.body.style.overflow = "hidden";
+  const form  = document.getElementById("app-gate-form");
+  const input = document.getElementById("app-gate-input");
+  const errEl = document.getElementById("app-gate-error");
+  async function sha256(s) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const v = input.value;
+    if (!v) return;
+    const h = await sha256(v);
+    if (h === APP_GATE_HASH) {
+      localStorage.setItem(APP_GATE_KEY, APP_GATE_HASH);
+      gate.hidden = true;
+      document.body.style.overflow = "";
+    } else {
+      errEl.hidden = false;
+      input.value = "";
+      input.focus();
+    }
+  });
+})();
+
 const STORAGE_KEY = "photo-bookkeeping-v1";
 const THEME_KEY = "photo-bookkeeping-theme";
 

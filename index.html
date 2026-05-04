@@ -11,13 +11,27 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" type="image/png" href="apple-touch-icon.png" />
 <title>Photography Bookkeeping</title>
-<link rel="stylesheet" href="styles.css?v=275" />
+<link rel="stylesheet" href="styles.css?v=276" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
 </head>
 <body>
+  <!-- App-level password gate — shown until the user enters the correct password.
+       Hash is configured in app.js (APP_GATE_HASH). Default password: "changeme". -->
+  <div id="app-gate" class="app-gate" hidden>
+    <div class="app-gate-card">
+      <h2>Jamie Bexten Photography</h2>
+      <p class="muted">Enter the access password.</p>
+      <form id="app-gate-form">
+        <input type="password" id="app-gate-input" autocomplete="current-password" autofocus required />
+        <button type="submit" class="btn primary">Enter</button>
+      </form>
+      <div id="app-gate-error" class="app-gate-error" hidden>Incorrect password.</div>
+    </div>
+  </div>
+
   <button id="mobile-menu-btn" class="mobile-menu-btn" type="button" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
