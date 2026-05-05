@@ -608,6 +608,7 @@ function activateAnalyticsView(viewName) {
   if (sel && sel.value !== viewName) sel.value = viewName;
   if (typeof syncAmvpFromActiveView === "function") syncAmvpFromActiveView(viewName);
   if (typeof syncJobsModeTogglePlacement === "function") syncJobsModeTogglePlacement(viewName);
+  if (typeof refreshFilterTriggers === "function") refreshFilterTriggers();
   if (viewName === "flow"   && typeof renderTrends   === "function") renderTrends();
   if (viewName === "trends" && typeof renderByCategory === "function") renderByCategory();
   if (viewName === "cash-flow" && typeof renderCashFlow === "function") renderCashFlow();
@@ -900,12 +901,19 @@ function refreshFilterTriggers() {
   // Plain-text summary of active filters next to the Filters/Presets buttons.
   const sumEl = document.getElementById("analytics-filter-summary");
   if (sumEl) {
+    const activeView = document.querySelector(".analytics-view.active")?.dataset.view;
+    const isByJob = activeView === "by-category";
     const parts = [];
     Object.keys(FILTER_DEFS).forEach(k => {
+      if (isByJob && k === "date-range") return;
       const txt = summarizeFilter(k);
       if (txt && txt !== "All") parts.push(`${FILTER_DEFS[k].label}: ${txt}`);
     });
-    sumEl.textContent = parts.length ? "Showing: " + parts.join(" · ") : "Showing: All";
+    if (isByJob) {
+      sumEl.textContent = parts.length ? "Showing: " + parts.join(" · ") : "";
+    } else {
+      sumEl.textContent = parts.length ? "Showing: " + parts.join(" · ") : "Showing: All";
+    }
   }
 }
 
