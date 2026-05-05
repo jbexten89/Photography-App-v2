@@ -5938,8 +5938,21 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     color: inherit;
   }
   body.tx-mobile-3line #tx-table tbody td[data-col="chart"]   { display: none !important; }
-  body.tx-mobile-3line #tx-table tbody td[data-col="payee"],
-  body.tx-mobile-3line #tx-table tbody td[data-col="expinc"]  { display: none !important; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="payee"]   { display: none !important; }
+  /* Expense rows: show Expense/Income on line 2 right (below amount, above category) */
+  body.tx-mobile-3line #tx-table tbody tr:has(td[data-col="amount"].expense) td[data-col="vendor"] {
+    grid-column: 2 / 4;
+  }
+  body.tx-mobile-3line #tx-table tbody tr:has(td[data-col="amount"].expense) td[data-col="expinc"] {
+    display: block;
+    grid-column: 4;
+    grid-row: 2;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+  }
+  /* Income rows still hide expinc (kept inline in vendor slot via job/customer) */
+  body.tx-mobile-3line #tx-table tbody tr:has(td[data-col="amount"].income) td[data-col="expinc"] { display: none !important; }
   body.tx-mobile-3line #tx-table tbody td[data-col="memo"],
   body.tx-mobile-3line #tx-table tbody td[data-col="recon"],
   body.tx-mobile-3line #tx-table tbody td[data-col="tags"]    { display: none !important; }
