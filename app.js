@@ -11579,7 +11579,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 
   if (txExpInc) txExpInc.addEventListener("change", () => {
     if (txExpInc.value === "__new__") {
-      const entry = (prompt("New Expense/Income entry name:") || "").trim();
+      const entry = (prompt("New Expense entry name:") || "").trim();
       if (!entry) { txExpInc.value = ""; return; }
       const coa = (prompt("Chart of Accounts for \"" + entry + "\":") || "").trim();
       const jobRel = isExistingJob() ? "Y" : "N";
