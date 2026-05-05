@@ -9879,8 +9879,8 @@ function renderTransactions() {
     const cur = jobNoSel.value;
     const jobs = (state.jobs || []).slice().sort((a, b) => (b.jobNo || "").localeCompare(a.jobNo || ""));
     jobNoSel.innerHTML =
-      `<option value="">All Job Nos.</option>` +
-      `<option value="__any__">Only Job Numbers</option>` +
+      `<option value="">All Jobs</option>` +
+      `<option value="__any__">Only Jobs</option>` +
       jobs.map(j => {
         const lbl = `${j.jobNo} - ${j.customer || ""}${j.category ? " / " + j.category : ""}`;
         return `<option value="${escapeHtml(j.jobNo)}">${escapeHtml(lbl)}</option>`;
