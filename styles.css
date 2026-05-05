@@ -5879,6 +5879,69 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .toolbar > span[style*="flex:1"] { display: none; }
   #newjob .toolbar .mileage-total-display { width: auto; flex: 1; }
 
+  /* All Transactions: 3-line stacked layout (opt-in via Settings) */
+  body.tx-mobile-3line #transactions .table-wrap { overflow-x: visible !important; }
+  body.tx-mobile-3line #tx-table { display: block; min-width: 0; border-collapse: separate; border-spacing: 0; }
+  body.tx-mobile-3line #tx-table thead { display: none; }
+  body.tx-mobile-3line #tx-table tbody { display: block; }
+  body.tx-mobile-3line #tx-table tbody tr {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    grid-template-areas:
+      "sel  date     amount"
+      "sel  vendor   vendor"
+      "sel  meta     meta";
+    column-gap: 8px;
+    row-gap: 2px;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border, rgba(0,0,0,0.08));
+    align-items: center;
+  }
+  body.tx-mobile-3line #tx-table tbody td {
+    display: block;
+    padding: 0;
+    border: none !important;
+    background: transparent !important;
+    position: static !important;
+    box-shadow: none !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  body.tx-mobile-3line #tx-table tbody td.tx-select-col { grid-area: sel; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="date"]   { grid-area: date;   font-size: 12px; color: var(--muted); }
+  body.tx-mobile-3line #tx-table tbody td[data-col="amount"] { grid-area: amount; font-weight: 700; text-align: right; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="vendor"] { grid-area: vendor; font-weight: 600; font-size: 14px; }
+  /* Line 3: stack the metadata cells inline with separators */
+  body.tx-mobile-3line #tx-table tbody td[data-col="jobno"],
+  body.tx-mobile-3line #tx-table tbody td[data-col="customer"],
+  body.tx-mobile-3line #tx-table tbody td[data-col="payee"],
+  body.tx-mobile-3line #tx-table tbody td[data-col="category"],
+  body.tx-mobile-3line #tx-table tbody td[data-col="expinc"],
+  body.tx-mobile-3line #tx-table tbody td[data-col="chart"] {
+    grid-row: 3;
+    font-size: 12px;
+    color: var(--muted);
+    display: inline-block;
+    margin-right: 6px;
+  }
+  body.tx-mobile-3line #tx-table tbody td[data-col="jobno"]    { grid-column: 2 / 3; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="customer"] { grid-column: 2 / 3; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="category"] { grid-column: 3 / 4; text-align: right; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="chart"]    { grid-column: 3 / 4; text-align: right; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="payee"],
+  body.tx-mobile-3line #tx-table tbody td[data-col="expinc"]   { display: none; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="memo"],
+  body.tx-mobile-3line #tx-table tbody td[data-col="recon"],
+  body.tx-mobile-3line #tx-table tbody td[data-col="tags"]     { display: none; }
+  body.tx-mobile-3line #tx-table tbody td[data-col="jobno"]:empty,
+  body.tx-mobile-3line #tx-table tbody td[data-col="customer"]:empty,
+  body.tx-mobile-3line #tx-table tbody td[data-col="category"]:empty,
+  body.tx-mobile-3line #tx-table tbody td[data-col="chart"]:empty { display: none; }
+
   /* Analytics By Job: spread Customer/Category/Job pills evenly across the row */
   #jobs-group-toggle {
     display: grid !important;

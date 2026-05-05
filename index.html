@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" type="image/png" href="apple-touch-icon.png" />
 <title>Photography Bookkeeping</title>
-<link rel="stylesheet" href="styles.css?v=283" />
+<link rel="stylesheet" href="styles.css?v=284" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2293,6 +2293,11 @@
             <span>Column Widths</span>
             <p class="muted" style="margin:4px 0 6px;font-size:12px">Unlock to drag the right edge of any column header to resize it. Widths persist between sessions.</p>
             <label class="check-pill"><input type="checkbox" id="setting-tx-cols-locked" checked /> Lock column widths</label>
+          </div>
+          <div class="settings-field">
+            <span>Mobile Layout</span>
+            <p class="muted" style="margin:4px 0 6px;font-size:12px">Switch from the side-scrolling table to a 3-line stacked card per transaction (mobile only).</p>
+            <label class="check-pill"><input type="checkbox" id="setting-tx-mobile-3line" /> 3 lines per row on mobile</label>
           </div>
           <div class="settings-field">
             <span>Visible Columns</span>

@@ -158,6 +158,8 @@ if (!state.txColWidths || typeof state.txColWidths !== "object") state.txColWidt
 if (typeof state.txColsLocked !== "boolean") state.txColsLocked = true;
 if (typeof state.reportsInverted !== "boolean") state.reportsInverted = false;
 document.body.classList.toggle("reports-inverted", state.reportsInverted);
+if (typeof state.txMobile3Line !== "boolean") state.txMobile3Line = false;
+document.body.classList.toggle("tx-mobile-3line", state.txMobile3Line);
 
 // Startup preferences
 if (state.startupView !== "dashboard" && state.startupView !== "transactions") state.startupView = "dashboard";
@@ -3563,6 +3565,17 @@ if (_lockBox) {
   _lockBox.addEventListener("change", e => {
     state.txColsLocked = !!e.target.checked;
     applyTxColWidths();
+    saveState();
+  });
+}
+
+// Settings: 3-line stacked layout for All Transactions on mobile.
+const _tx3lineBox = document.getElementById("setting-tx-mobile-3line");
+if (_tx3lineBox) {
+  _tx3lineBox.checked = !!state.txMobile3Line;
+  _tx3lineBox.addEventListener("change", e => {
+    state.txMobile3Line = !!e.target.checked;
+    document.body.classList.toggle("tx-mobile-3line", state.txMobile3Line);
     saveState();
   });
 }
