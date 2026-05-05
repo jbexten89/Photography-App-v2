@@ -4884,7 +4884,18 @@ select option {
   #transactions > .toolbar { display: flex; flex-wrap: wrap; }
   /* New Transaction modal — keep the date input from overflowing the modal
      content on narrow screens. */
-  #tx-modal #tx-date { width: 100%; min-width: 0; box-sizing: border-box; }
+  #tx-modal #tx-date {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: block;
+  }
+  #tx-modal label:has(> #tx-date) {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+  }
 
   /* Mobile-only ordering for the relocated toggle (desktop styling lives
      outside this @media block so it applies everywhere). */
