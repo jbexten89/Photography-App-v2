@@ -5881,12 +5881,19 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     min-width: 100px;
     margin-right: 0 !important;
   }
-  /* Match Payee input height to the Clear button (36px on mobile) */
-  .tx-mark-clear-row .tx-payee-inline #tx-payee {
-    height: 36px;
-    padding: 6px 10px;
+  /* Pin Payee input + Clear pill to identical box metrics on mobile */
+  .tx-mark-clear-row .tx-payee-inline #tx-payee,
+  .tx-mark-clear-row #btn-tx-clear {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 14px !important;
+    line-height: 38px !important;
+    font-size: 14px !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
   }
-  .tx-mark-clear-row #btn-tx-clear { height: 36px; padding: 0 14px; }
+  .tx-mark-clear-row .tx-payee-inline #tx-payee { padding: 0 10px !important; }
   /* Customer + Category stay side-by-side on mobile (3/5 + 2/5) */
   #tx-form .form-row.tx-customer-category-row {
     grid-template-columns: 3fr 2fr;
