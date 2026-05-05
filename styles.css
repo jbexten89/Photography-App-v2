@@ -8143,7 +8143,18 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   display: flex !important;
   flex-direction: column !important;
   margin: 0 !important;
+  align-self: end;
 }
+.tx-mark-clear-row .tx-payee-inline #tx-payee {
+  margin-top: 0 !important;
+  height: 32px;
+  padding: 4px 10px;
+  box-sizing: border-box;
+}
+.tx-mark-clear-row .tx-payee-inline {
+  /* Hide the "Payee *" hint here — the input is self-explanatory inline. */
+}
+.tx-mark-clear-row #btn-tx-clear { height: 32px; padding: 0 14px; }
 
 #tx-form .form-row.tx-hours-jobno-row {
   grid-template-columns: 1fr 3fr;
