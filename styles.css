@@ -5945,23 +5945,14 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     min-width: 0;
   }
   .toolbar select { flex: 1 1 45%; min-width: 0; }
-  .running-balance {
-    padding: 1px 4px 16px !important;
-    margin: 0 0 6px;
-    justify-content: space-between;
-    gap: 12px;
-    position: sticky;
-    top: env(safe-area-inset-top, 0px);   /* stick below status-bar overlay */
-    z-index: 50;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    flex-wrap: nowrap;
-    box-sizing: border-box;
-    width: 100%;
+  /* Stack three sticky bands at the top of the All Transactions page so the
+     heading, running balance and full filter toolbar stay visible while the
+     table scrolls. The CSS variables below approximate each band's height —
+     adjust if the metrics change. */
+  #transactions {
+    --tx-heading-h: 44px;
+    --tx-balance-h: 40px;
   }
-  /* Keep the All Transactions page heading and full filter toolbar pinned to
-     the top while the table scrolls. The running-balance bar above is already
-     sticky; stack the heading and toolbar around it. */
   #transactions .page-heading-mobile {
     position: sticky;
     top: 0;
@@ -5969,11 +5960,28 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     background: var(--bg);
     margin: 0;
     padding: 6px 0 4px;
+    min-height: var(--tx-heading-h);
   }
+  .running-balance {
+    padding: 1px 4px 16px !important;
+    margin: 0 0 6px;
+    justify-content: space-between;
+    gap: 12px;
+    position: sticky;
+    top: var(--tx-heading-h);
+    z-index: 51;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--tx-balance-h);
+  }
+  .running-balance .rb-item { padding-top: 0; }
   #transactions > .toolbar {
     position: sticky;
-    top: 78px; /* heading ~40 + running-balance ~38 */
-    z-index: 49;
+    top: calc(var(--tx-heading-h) + var(--tx-balance-h));
+    z-index: 50;
     background: var(--bg);
     padding-top: 6px;
     padding-bottom: 6px;
