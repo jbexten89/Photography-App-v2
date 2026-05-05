@@ -3142,6 +3142,99 @@ if (btnTxFind && txFindWrap && txFindInput) {
 // --------- Transaction Selection Mode ---------
 let txSelectMode = false;
 
+// Job Analytics swipe-left → reveal Edit action (3-line mode only)
+(function setupNjSwipe() {
+  const tbl = document.getElementById("nj-analytics-table");
+  if (!tbl) return;
+
+  let activeRow = null;
+  let panel = null;
+  let startX = 0, startY = 0, dx = 0, dy = 0, isSwiping = false, locked = false;
+  const REVEAL = 90;
+  const TRIGGER = 40;
+
+  function isMobile3Line() {
+    return document.body.classList.contains("nj-mobile-3line") &&
+           window.matchMedia("(max-width: 768px)").matches;
+  }
+  function closeSwipe() {
+    if (activeRow) {
+      activeRow.style.transform = "";
+      activeRow.classList.remove("nj-row-swiped");
+    }
+    if (panel) panel.remove();
+    panel = null;
+    activeRow = null;
+    locked = false;
+  }
+  function openActions(row) {
+    if (panel) panel.remove();
+    panel = document.createElement("div");
+    panel.className = "nj-row-actions";
+    panel.innerHTML = `<button type="button" class="nj-action-edit">Edit</button>`;
+    row.appendChild(panel);
+    panel.querySelector(".nj-action-edit").addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const jobNo = row.dataset.jobno;
+      closeSwipe();
+      if (jobNo && typeof openJobEditModal === "function") openJobEditModal(jobNo);
+    });
+  }
+
+  tbl.addEventListener("touchstart", (e) => {
+    if (!isMobile3Line()) return;
+    const row = e.target.closest("tr.nj-row-edit");
+    if (!row) { if (activeRow) closeSwipe(); return; }
+    if (e.target.closest("button, input, select, .nj-row-actions, .nj-job-expand-btn")) return;
+    if (locked && activeRow !== row) { closeSwipe(); return; }
+    if (activeRow && activeRow !== row) closeSwipe();
+    activeRow = row;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    dx = 0; dy = 0;
+    isSwiping = false;
+  }, { passive: true });
+
+  tbl.addEventListener("touchmove", (e) => {
+    if (!activeRow) return;
+    dx = e.touches[0].clientX - startX;
+    dy = e.touches[0].clientY - startY;
+    if (!isSwiping) {
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) isSwiping = true;
+      else if (Math.abs(dy) > 10) { activeRow = null; return; }
+    }
+    if (isSwiping) {
+      if (e.cancelable) e.preventDefault();
+      const base = locked ? -REVEAL : 0;
+      const x = Math.min(0, Math.max(-REVEAL, base + dx));
+      activeRow.style.transform = `translateX(${x}px)`;
+    }
+  }, { passive: false });
+
+  tbl.addEventListener("touchend", () => {
+    if (!activeRow) return;
+    if (isSwiping) {
+      const base = locked ? -REVEAL : 0;
+      const finalX = base + dx;
+      if (finalX < -TRIGGER) {
+        activeRow.style.transform = `translateX(-${REVEAL}px)`;
+        activeRow.classList.add("nj-row-swiped");
+        if (!panel) openActions(activeRow);
+        locked = true;
+      } else {
+        closeSwipe();
+      }
+    }
+    isSwiping = false;
+  });
+
+  document.addEventListener("touchstart", (e) => {
+    if (!activeRow || !locked) return;
+    if (e.target.closest("tr.nj-row-edit") === activeRow) return;
+    closeSwipe();
+  }, true);
+})();
+
 // Mileage — open/close the Add Trip modal
 (function wireMileageAddModal() {
   function openModal() {

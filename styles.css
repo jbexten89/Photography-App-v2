@@ -6039,6 +6039,34 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .toolbar > span[style*="flex:1"] { display: none; }
   #newjob .toolbar .mileage-total-display { width: auto; flex: 1; }
 
+  /* Swipe-left action panel on Job Analytics rows (3-line mode only) */
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit {
+    position: relative;
+    transition: transform 0.18s ease;
+    will-change: transform;
+  }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit .nj-row-actions {
+    position: absolute;
+    top: 0;
+    right: -90px;
+    bottom: 0;
+    width: 90px;
+    display: flex;
+    align-items: stretch;
+    pointer-events: auto;
+  }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit .nj-row-actions button {
+    flex: 1;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+  }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit .nj-row-actions .nj-action-edit { background: #3b82f6; }
+
   /* Job Analytics 3-line stacked layout (opt-in via Settings) */
   body.nj-mobile-3line #newjob .table-wrap { overflow-x: visible !important; }
   body.nj-mobile-3line #nj-analytics-table { display: block; min-width: 0; border-collapse: separate; border-spacing: 0; }
