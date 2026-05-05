@@ -12538,6 +12538,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 
     let cancelled = false;
     const commit = () => {
+      // Suppress the row's hold-to-duplicate from firing on the tap that
+      // dismissed the inline editor (especially noticeable on touch).
+      window.__txInlineEditCooldownUntil = Date.now() + 800;
       if (cancelled) { cell.innerHTML = oldHtml; cell.dataset.editing = ""; return; }
       let v = saveValue();
       if (colKey === "amount") {
@@ -12589,9 +12592,26 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     // popping the duplicate modal mid-edit. Block the row's mousedown when
     // the press lands on an editable cell or on an active inline editor.
     _txTable.addEventListener("mousedown", (e) => {
+      // Cooldown right after an inline-edit commit — block the row's
+      // hold-to-duplicate timer entirely for a short window.
+      if (window.__txInlineEditCooldownUntil && Date.now() < window.__txInlineEditCooldownUntil) {
+        e.stopImmediatePropagation();
+        return;
+      }
       const cell = e.target.closest("td[data-col]");
       if (!cell) return;
       if (cell.dataset.editing === "1" || NJ_INLINE_FIELDS[cell.dataset.col]) {
+        e.stopImmediatePropagation();
+      }
+    }, true);
+    // Same cooldown for touch (mobile)
+    _txTable.addEventListener("touchstart", (e) => {
+      if (window.__txInlineEditCooldownUntil && Date.now() < window.__txInlineEditCooldownUntil) {
+        e.stopImmediatePropagation();
+      }
+    }, true);
+    _txTable.addEventListener("click", (e) => {
+      if (window.__txInlineEditCooldownUntil && Date.now() < window.__txInlineEditCooldownUntil) {
         e.stopImmediatePropagation();
       }
     }, true);
