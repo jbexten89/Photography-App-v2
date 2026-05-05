@@ -13460,6 +13460,8 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 
   // Expose for debugging
   window.__nj = { state, renderNjJobsTable, renderNjCcTable, renderNjExTable, renderNjAnalytics, lowestAvailableJobNo };
-  // Expose openJobEditModal globally so the top-level swipe handler can call it
+  // Expose for the top-level swipe handler (which lives outside this IIFE)
   window.openJobEditModal = openJobEditModal;
+  window.renderNjJobsTable = renderNjJobsTable;
+  window.renderNjAnalytics = renderNjAnalytics;
 })();
