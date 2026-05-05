@@ -3139,6 +3139,23 @@ if (btnTxFind && txFindWrap && txFindInput) {
 
 // --------- Transaction Selection Mode ---------
 let txSelectMode = false;
+
+// Measure the heights of the sticky bands above the All Transactions table
+// (heading + running-balance) and write them into CSS variables so the
+// toolbar can offset itself precisely beneath them. Re-measures on resize
+// and after every tx render (running-balance height grows when select count
+// expands the row, etc.).
+function syncTxStickyHeights() {
+  const sect = document.getElementById("transactions");
+  if (!sect) return;
+  const heading = sect.querySelector(".page-heading-mobile");
+  const balance = sect.querySelector(".running-balance");
+  if (heading) sect.style.setProperty("--tx-heading-h", `${Math.ceil(heading.getBoundingClientRect().height)}px`);
+  if (balance) sect.style.setProperty("--tx-balance-h", `${Math.ceil(balance.getBoundingClientRect().height)}px`);
+}
+window.addEventListener("resize", () => syncTxStickyHeights());
+window.addEventListener("DOMContentLoaded", () => syncTxStickyHeights());
+setTimeout(syncTxStickyHeights, 100);
 const txSelectedIds = new Set();
 let txLastClickedId = null;
 let txVisibleIds = []; // ids in currently displayed order (for range selection)

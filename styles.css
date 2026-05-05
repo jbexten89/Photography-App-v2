@@ -5950,8 +5950,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      table scrolls. The CSS variables below approximate each band's height —
      adjust if the metrics change. */
   #transactions {
-    --tx-heading-h: 44px;
-    --tx-balance-h: 40px;
+    --tx-heading-h: 56px;
+    --tx-balance-h: 56px;
   }
   #transactions .page-heading-mobile {
     position: sticky;
