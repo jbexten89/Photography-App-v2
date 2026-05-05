@@ -5958,7 +5958,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     overflow: visible;
   }
   #transactions > .tx-sticky-header .running-balance {
-    min-height: 32px;
+    min-height: 36px;
+    padding: 8px 4px 8px !important;
+    align-items: center !important;
   }
   #transactions > .tx-sticky-header .page-heading-mobile {
     position: static;
