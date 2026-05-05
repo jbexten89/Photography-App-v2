@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" type="image/png" href="apple-touch-icon.png" />
 <title>Photography Bookkeeping</title>
-<link rel="stylesheet" href="styles.css?v=336" />
+<link rel="stylesheet" href="styles.css?v=337" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1843,22 +1843,34 @@
           </div>
         </div>
 
-        <h2 style="margin-top:8px">Add Trip</h2>
-        <div class="mileage-add-row">
-          <label>Date
-            <input type="date" id="mileage-new-date" />
-          </label>
-          <label>Vehicle
-            <input type="text" id="mileage-new-vehicle" list="mileage-vehicle-datalist" placeholder="e.g., 2020 - Ford Explorer ST" />
-            <datalist id="mileage-vehicle-datalist"></datalist>
-          </label>
-          <label>Miles
-            <input type="number" id="mileage-new-miles" step="0.1" min="0" placeholder="0" />
-          </label>
-          <label>Purpose (optional)
-            <input type="text" id="mileage-new-purpose" placeholder="e.g., Spring Sports shoot" />
-          </label>
-          <button id="btn-add-trip" class="btn primary" type="button">+ Add Trip</button>
+        <div class="nj-add-trigger-row">
+          <button type="button" id="mileage-open-add-modal" class="btn primary">+ New Trip</button>
+        </div>
+
+        <!-- Add Trip modal -->
+        <div id="mileage-add-modal" class="modal hidden">
+          <div class="modal-content">
+            <h2>Add Trip</h2>
+            <div class="mileage-add-row" id="mileage-add-form">
+              <label>Date
+                <input type="date" id="mileage-new-date" />
+              </label>
+              <label>Vehicle
+                <input type="text" id="mileage-new-vehicle" list="mileage-vehicle-datalist" placeholder="e.g., 2020 - Ford Explorer ST" />
+                <datalist id="mileage-vehicle-datalist"></datalist>
+              </label>
+              <label>Miles
+                <input type="number" id="mileage-new-miles" step="0.1" min="0" placeholder="0" />
+              </label>
+              <label>Purpose (optional)
+                <input type="text" id="mileage-new-purpose" placeholder="e.g., Spring Sports shoot" />
+              </label>
+              <div class="form-actions">
+                <button type="button" id="mileage-cancel-add" class="btn">Cancel</button>
+                <button id="btn-add-trip" class="btn primary" type="button">Save Trip</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <h2 style="margin-top:24px">Summary by Vehicle</h2>

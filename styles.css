@@ -6061,6 +6061,43 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     font-size: 16px !important;
     line-height: 38px !important;
   }
+  /* Add-Trip modal: stack each field on its own row, mirror Add Job sizing */
+  #mileage-add-modal .modal-content #mileage-add-form {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  #mileage-add-modal #mileage-add-form > label { grid-column: 1; }
+  #mileage-add-modal #mileage-add-form input {
+    width: 100% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+    font-size: 16px !important;
+    line-height: 38px !important;
+  }
+  #mileage-add-modal label:has(> #mileage-new-date) {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  #mileage-add-modal #mileage-new-date {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-min-logical-width: 0;
+  }
+  #mileage-add-modal #mileage-new-date::-webkit-date-and-time-value { min-width: 0; min-height: 1.4em; text-align: left; }
+  #mileage-add-modal #mileage-new-date::-webkit-datetime-edit,
+  #mileage-add-modal #mileage-new-date::-webkit-datetime-edit-fields-wrapper { min-width: 0; width: 100%; min-height: 1.4em; }
+
   /* iOS date input overflow guard — same fix as the Edit Transaction modal */
   #nj-add-modal label:has(> #nj-date) {
     display: flex !important;

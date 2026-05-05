@@ -3140,6 +3140,30 @@ if (btnTxFind && txFindWrap && txFindInput) {
 // --------- Transaction Selection Mode ---------
 let txSelectMode = false;
 
+// Mileage — open/close the Add Trip modal
+(function wireMileageAddModal() {
+  function openModal() {
+    const m = document.getElementById("mileage-add-modal");
+    if (!m) return;
+    m.classList.remove("hidden");
+    const d = document.getElementById("mileage-new-date");
+    if (d && !d.value) d.value = new Date().toISOString().slice(0, 10);
+    setTimeout(() => d && d.focus(), 0);
+  }
+  function closeModal() {
+    const m = document.getElementById("mileage-add-modal");
+    if (m) m.classList.add("hidden");
+  }
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#mileage-open-add-modal")) { openModal(); return; }
+    if (e.target.closest("#mileage-cancel-add"))     { closeModal(); return; }
+    if (e.target.id === "mileage-add-modal")         { closeModal(); return; }
+    // Auto-close after Save Trip — the existing #btn-add-trip handler
+    // commits the trip; we just dismiss the modal afterwards.
+    if (e.target.closest("#btn-add-trip"))           { setTimeout(closeModal, 0); }
+  });
+})();
+
 // New Job — open/close the Add Job modal
 (function wireNjAddModal() {
   function openModal() {
