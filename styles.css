@@ -4933,9 +4933,9 @@ select option {
   /* Row 2 — Categories (2/3) · Type (1/3) */
   #transactions .toolbar #tx-filter-category { order: -4; flex: 0 0 calc(66.667% - 4px); min-width: 0; }
   #transactions .toolbar #tx-filter-type     { order: -3; flex: 0 0 calc(33.333% - 4px); min-width: 0; }
-  /* Row 3 — More (1/3, left) · + New Transaction (2/3, far right) */
-  #transactions .toolbar .tx-more-wrap    { order: -2; flex: 0 0 calc(33.333% - 4px); min-width: 0; }
-  #transactions .toolbar #btn-new-tx      { order: -1; flex: 0 0 calc(66.667% - 4px); min-width: 0; margin-left: auto; }
+  /* Row 3 — More (1/2, left) · + New Transaction (1/2, right) */
+  #transactions .toolbar .tx-more-wrap    { order: -2; flex: 0 0 calc(50% - 4px); min-width: 0; }
+  #transactions .toolbar #btn-new-tx      { order: -1; flex: 0 0 calc(50% - 4px); min-width: 0; margin-left: auto; }
   /* Back — full-width when visible (rare; only after drilling in from Analytics) */
   #transactions .toolbar #btn-tx-back     { order: -7; flex: 1 1 100%; }
 }
