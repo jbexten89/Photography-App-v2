@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" type="image/png" href="apple-touch-icon.png" />
 <title>Photography Bookkeeping</title>
-<link rel="stylesheet" href="styles.css?v=306" />
+<link rel="stylesheet" href="styles.css?v=307" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2735,17 +2735,17 @@
             <input type="checkbox" id="tx-nj-marked" />
             <span class="nj-mark-text">
               <span class="nj-badge" aria-hidden="true"></span>
-              Mark this transaction as edited with new logic
+              Edited with new logic
             </span>
+          </label>
+          <label class="tx-payee-inline">Payee *
+            <input type="text" id="tx-payee" list="payee-datalist" />
+            <datalist id="payee-datalist"></datalist>
           </label>
           <button type="button" id="btn-tx-clear" class="year-pill">Clear</button>
         </div>
 
         <div class="form-actions tx-form-actions-with-payee">
-          <label class="tx-payee-inline">Payee *
-            <input type="text" id="tx-payee" list="payee-datalist" />
-            <datalist id="payee-datalist"></datalist>
-          </label>
           <button type="button" id="btn-delete-tx" class="btn danger" style="display:none">Delete</button>
           <button type="button" id="btn-duplicate-tx" class="btn" style="display:none">Duplicate</button>
           <button type="button" id="btn-cancel-tx" class="btn">Cancel</button>
