@@ -3150,8 +3150,8 @@ let txSelectMode = false;
   let activeRow = null;
   let panel = null;
   let startX = 0, startY = 0, dx = 0, dy = 0, isSwiping = false, locked = false;
-  const REVEAL = 90;
-  const TRIGGER = 40;
+  const REVEAL = 160;
+  const TRIGGER = 50;
 
   function isMobile3Line() {
     return document.body.classList.contains("nj-mobile-3line") &&
@@ -3171,13 +3171,28 @@ let txSelectMode = false;
     if (panel) panel.remove();
     panel = document.createElement("div");
     panel.className = "nj-row-actions";
-    panel.innerHTML = `<button type="button" class="nj-action-edit">Edit</button>`;
+    panel.innerHTML = `
+      <button type="button" class="nj-action-edit">Edit</button>
+      <button type="button" class="nj-action-delete">Delete</button>
+    `;
     row.appendChild(panel);
     panel.querySelector(".nj-action-edit").addEventListener("click", (e) => {
       e.preventDefault(); e.stopPropagation();
       const jobNo = row.dataset.jobno;
       closeSwipe();
       if (jobNo && typeof openJobEditModal === "function") openJobEditModal(jobNo);
+    });
+    panel.querySelector(".nj-action-delete").addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const jobNo = row.dataset.jobno;
+      if (!jobNo) { closeSwipe(); return; }
+      if (!confirm(`Delete job ${jobNo}? (Job number ${jobNo} will become reusable.)`)) { closeSwipe(); return; }
+      state.jobs = (state.jobs || []).filter(j => j.jobNo !== jobNo);
+      (state.transactions || []).forEach(t => { if (t.jobNo === jobNo) delete t.jobNo; });
+      saveState();
+      closeSwipe();
+      if (typeof renderNjJobsTable === "function") renderNjJobsTable();
+      if (typeof renderNjAnalytics === "function") renderNjAnalytics();
     });
   }
 

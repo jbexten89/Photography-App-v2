@@ -6048,9 +6048,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit .nj-row-actions {
     position: absolute;
     top: 0;
-    right: -90px;
+    right: -160px;
     bottom: 0;
-    width: 90px;
+    width: 160px;
     display: flex;
     align-items: stretch;
     pointer-events: auto;
@@ -6065,7 +6065,47 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     padding: 0;
     margin: 0;
   }
-  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit .nj-row-actions .nj-action-edit { background: #3b82f6; }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit .nj-row-actions .nj-action-edit   { background: #3b82f6; }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit .nj-row-actions .nj-action-delete { background: #ef4444; }
+
+  /* Edit Job modal: stack each field on its own row, mirror Add Job sizing */
+  #nj-edit-modal .modal-content #nj-edit-form {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  #nj-edit-modal #nj-edit-form > .form-row { display: contents; }
+  #nj-edit-modal #nj-edit-form > .form-row > label { grid-column: 1; }
+  #nj-edit-modal #nj-edit-form input,
+  #nj-edit-modal #nj-edit-form select {
+    width: 100% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+    font-size: 16px !important;
+    line-height: 38px !important;
+  }
+  #nj-edit-modal label:has(> #nj-edit-date) {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  #nj-edit-modal #nj-edit-date {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-min-logical-width: 0;
+  }
+  #nj-edit-modal #nj-edit-date::-webkit-date-and-time-value { min-width: 0; min-height: 1.4em; text-align: left; }
+  #nj-edit-modal #nj-edit-date::-webkit-datetime-edit,
+  #nj-edit-modal #nj-edit-date::-webkit-datetime-edit-fields-wrapper { min-width: 0; width: 100%; min-height: 1.4em; }
 
   /* Job Analytics 3-line stacked layout (opt-in via Settings) */
   body.nj-mobile-3line #newjob .table-wrap { overflow-x: visible !important; }
