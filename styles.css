@@ -5880,37 +5880,47 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .toolbar .mileage-total-display { width: auto; flex: 1; }
 
   /* All Transactions: sticky select-checkbox column on mobile */
-  #tx-table th.tx-select-col,
-  #tx-table td.tx-select-col,
+  #transactions .table-wrap { overflow-x: auto !important; }
+  #tx-table { border-collapse: separate !important; border-spacing: 0; }
   #tx-table th:first-child,
   #tx-table td:first-child {
-    position: sticky;
+    position: sticky !important;
     left: 0;
     z-index: 2;
-    background: var(--card, #fff);
+    background: var(--surface, #fff);
     box-shadow: 1px 0 0 var(--border, rgba(0,0,0,0.08));
   }
-  #tx-table thead th:first-child { z-index: 3; }
-  [data-theme="dark"] #tx-table th:first-child,
+  #tx-table thead th:first-child {
+    z-index: 3;
+    background: var(--surface-alt, #f5f5f5);
+  }
   [data-theme="dark"] #tx-table td:first-child {
-    background: var(--card, #1e1e1e);
+    background: var(--surface, #1e1e1e);
+  }
+  [data-theme="dark"] #tx-table thead th:first-child {
+    background: var(--surface-alt, #2a2a2a);
   }
 
   /* New Job analytics table: horizontal scroll with sticky Job No. column */
-  #nj-analytics-table { min-width: 760px; table-layout: auto; }
+  #nj-analytics-table { min-width: 760px; table-layout: auto; border-collapse: separate !important; border-spacing: 0; }
   #nj-analytics-table colgroup { display: none; }
   #nj-analytics-table th:first-child,
   #nj-analytics-table td:first-child {
-    position: sticky;
+    position: sticky !important;
     left: 0;
     z-index: 2;
-    background: var(--card, #fff);
+    background: var(--surface, #fff);
     box-shadow: 1px 0 0 var(--border, rgba(0,0,0,0.08));
   }
-  #nj-analytics-table thead th:first-child { z-index: 3; }
-  [data-theme="dark"] #nj-analytics-table th:first-child,
+  #nj-analytics-table thead th:first-child {
+    z-index: 3;
+    background: var(--surface-alt, #f5f5f5);
+  }
   [data-theme="dark"] #nj-analytics-table td:first-child {
-    background: var(--card, #1e1e1e);
+    background: var(--surface, #1e1e1e);
+  }
+  [data-theme="dark"] #nj-analytics-table thead th:first-child {
+    background: var(--surface-alt, #2a2a2a);
   }
 
   /* --- Bigger touch targets on pills and buttons --- */
