@@ -4900,8 +4900,21 @@ select option {
     min-width: 0 !important;
     box-sizing: border-box !important;
     display: block !important;
-    flex: 1 1 auto;
+    flex: 1 1 0;
     -webkit-min-logical-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  /* iOS Safari renders date inputs with an internal flex layout whose
+     fields-wrapper has its own min-width. Force it to shrink. */
+  #tx-modal #tx-date::-webkit-date-and-time-value {
+    min-width: 0;
+    text-align: left;
+  }
+  #tx-modal #tx-date::-webkit-datetime-edit,
+  #tx-modal #tx-date::-webkit-datetime-edit-fields-wrapper {
+    min-width: 0;
+    width: 100%;
   }
 
   /* Mobile-only ordering for the relocated toggle (desktop styling lives
