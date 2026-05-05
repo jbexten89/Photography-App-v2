@@ -6037,6 +6037,19 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* New Job: hide Open Jobs + Complete summary cards on mobile */
   #newjob .toolbar { display: none; }
 
+  /* New Job add-job form: Date full width, then Hours+Job No, then Customer+Category */
+  #nj-form {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px 10px !important;
+  }
+  #nj-form > label:has(#nj-date)     { grid-column: 1 / 3; grid-row: 1; }
+  #nj-form > label:has(#nj-hours)    { grid-column: 1;     grid-row: 2; }
+  #nj-form > label:has(#nj-jobno)    { grid-column: 2;     grid-row: 2; }
+  #nj-form > label:has(#nj-customer) { grid-column: 1;     grid-row: 3; }
+  #nj-form > label:has(#nj-category) { grid-column: 2;     grid-row: 3; }
+  #nj-form > button                  { grid-column: 1 / 3; grid-row: 4; }
+
   /* Swipe-left action panel on All Transactions rows (3-line mode only) */
   body.tx-mobile-3line #tx-table tbody tr.tx-row {
     position: relative;
