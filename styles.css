@@ -2224,9 +2224,36 @@ td.amount.expense { color: var(--expense); }
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: var(--primary);
   margin: 0;
   vertical-align: middle;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #1f2937;
+  border: 1px solid #111827;
+  border-radius: 3px;
+  position: relative;
+  transition: background-color 0.12s ease;
+}
+.tx-select-col input[type="checkbox"]:checked {
+  background: #111827;
+}
+.tx-select-col input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+[data-theme="dark"] .tx-select-col input[type="checkbox"] {
+  background: #4b5563;
+  border-color: #1f2937;
+}
+[data-theme="dark"] .tx-select-col input[type="checkbox"]:checked {
+  background: #111827;
 }
 
 /* TOOLBAR */
