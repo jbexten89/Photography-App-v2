@@ -3168,6 +3168,23 @@ function ensureTxStickyHeader() {
 }
 window.addEventListener("DOMContentLoaded", ensureTxStickyHeader);
 setTimeout(ensureTxStickyHeader, 0);
+
+// Pull the Analytics toolbar-row out of the (short) analytics-header so it
+// has the entire #jobs section as its sticky containing block — otherwise
+// it stops sticking the moment the analytics-header scrolls out of view.
+function ensureAnalyticsStickyToolbar() {
+  const sect = document.getElementById("jobs");
+  if (!sect) return;
+  const row = sect.querySelector(".analytics-toolbar-row");
+  if (!row) return;
+  if (row.parentElement === sect) return; // already lifted
+  // Place it right before the .analytics-views block
+  const views = sect.querySelector(".analytics-views");
+  if (!views) return;
+  sect.insertBefore(row, views);
+}
+window.addEventListener("DOMContentLoaded", ensureAnalyticsStickyToolbar);
+setTimeout(ensureAnalyticsStickyToolbar, 0);
 function syncTxStickyHeights() { /* no-op: header is now a single sticky block */ }
 const txSelectedIds = new Set();
 let txLastClickedId = null;
