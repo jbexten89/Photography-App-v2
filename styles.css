@@ -5959,6 +5959,27 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     box-sizing: border-box;
     width: 100%;
   }
+  /* Keep the All Transactions page heading and full filter toolbar pinned to
+     the top while the table scrolls. The running-balance bar above is already
+     sticky; stack the heading and toolbar around it. */
+  #transactions .page-heading-mobile {
+    position: sticky;
+    top: 0;
+    z-index: 52;
+    background: var(--bg);
+    margin: 0;
+    padding: 6px 0 4px;
+  }
+  #transactions > .toolbar {
+    position: sticky;
+    top: 78px; /* heading ~40 + running-balance ~38 */
+    z-index: 49;
+    background: var(--bg);
+    padding-top: 6px;
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
   .running-balance .rb-item {
     flex-direction: row;
     align-items: baseline;
