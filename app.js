@@ -160,6 +160,8 @@ if (typeof state.reportsInverted !== "boolean") state.reportsInverted = false;
 document.body.classList.toggle("reports-inverted", state.reportsInverted);
 if (typeof state.txMobile3Line !== "boolean") state.txMobile3Line = false;
 document.body.classList.toggle("tx-mobile-3line", state.txMobile3Line);
+if (typeof state.njMobile3Line !== "boolean") state.njMobile3Line = false;
+document.body.classList.toggle("nj-mobile-3line", state.njMobile3Line);
 
 // Startup preferences
 if (state.startupView !== "dashboard" && state.startupView !== "transactions") state.startupView = "dashboard";
@@ -3666,6 +3668,16 @@ if (_tx3lineBox) {
   _tx3lineBox.addEventListener("change", e => {
     state.txMobile3Line = !!e.target.checked;
     document.body.classList.toggle("tx-mobile-3line", state.txMobile3Line);
+    saveState();
+  });
+}
+// Settings: 3-line stacked layout for Job Analytics on mobile.
+const _nj3lineBox = document.getElementById("setting-nj-mobile-3line");
+if (_nj3lineBox) {
+  _nj3lineBox.checked = !!state.njMobile3Line;
+  _nj3lineBox.addEventListener("change", e => {
+    state.njMobile3Line = !!e.target.checked;
+    document.body.classList.toggle("nj-mobile-3line", state.njMobile3Line);
     saveState();
   });
 }
@@ -12175,14 +12187,14 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
         : `<div class="muted" style="padding:8px 4px">No transactions linked to this job yet.</div>`;
       return `
         <tr data-jobno="${escapeHtml(j.jobNo)}" class="nj-row-edit">
-          <td><button type="button" class="nj-job-expand-btn" aria-label="Expand transactions">▸</button> <strong>${escapeHtml(j.jobNo)}</strong></td>
-          <td>${escapeHtml(j.customer || "")}</td>
-          <td>${escapeHtml(j.category || "")}</td>
-          <td style="text-align:right">${j.hours || ""}</td>
-          <td style="text-align:right">${fmt(income)}</td>
-          <td style="text-align:right">${fmt(expense)}</td>
-          <td style="text-align:right; color:${profit >= 0 ? "#27ae60" : "#c0392b"}">${fmt(profit)}</td>
-          <td style="text-align:center">
+          <td data-col="jobno"><button type="button" class="nj-job-expand-btn" aria-label="Expand transactions">▸</button> <strong>${escapeHtml(j.jobNo)}</strong></td>
+          <td data-col="customer">${escapeHtml(j.customer || "")}</td>
+          <td data-col="category">${escapeHtml(j.category || "")}</td>
+          <td data-col="hours" style="text-align:right">${j.hours || ""}</td>
+          <td data-col="income" style="text-align:right">${fmt(income)}</td>
+          <td data-col="expense" style="text-align:right">${fmt(expense)}</td>
+          <td data-col="profit" style="text-align:right; color:${profit >= 0 ? "#27ae60" : "#c0392b"}">${fmt(profit)}</td>
+          <td data-col="status" style="text-align:center">
             <select class="nj-status-select" data-jobno="${escapeHtml(j.jobNo)}" data-status="${escapeHtml(getJobStatus(j) || "")}">
               ${["", ...JOB_STATUSES].map(s => {
                 const cur = getJobStatus(j);
@@ -12191,7 +12203,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
               }).join("")}
             </select>
           </td>
-          <td><button type="button" class="btn nj-invoice-btn" data-jobno="${escapeHtml(j.jobNo)}" title="Create an invoice for this job">+ Invoice</button></td>
+          <td data-col="invoice"><button type="button" class="btn nj-invoice-btn" data-jobno="${escapeHtml(j.jobNo)}" title="Create an invoice for this job">+ Invoice</button></td>
         </tr>
         <tr class="nj-job-expand-row" data-for="${escapeHtml(j.jobNo)}" hidden>
           <td colspan="9" class="nj-job-expand-cell">${linkedRowsHtml}</td>
