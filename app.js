@@ -901,19 +901,13 @@ function refreshFilterTriggers() {
   // Plain-text summary of active filters next to the Filters/Presets buttons.
   const sumEl = document.getElementById("analytics-filter-summary");
   if (sumEl) {
-    const activeView = document.querySelector(".analytics-view.active")?.dataset.view;
-    const isByJob = activeView === "by-category";
     const parts = [];
     Object.keys(FILTER_DEFS).forEach(k => {
-      if (isByJob && k === "date-range") return;
+      if (k === "date-range") return;
       const txt = summarizeFilter(k);
       if (txt && txt !== "All") parts.push(`${FILTER_DEFS[k].label}: ${txt}`);
     });
-    if (isByJob) {
-      sumEl.textContent = parts.length ? "Showing: " + parts.join(" · ") : "";
-    } else {
-      sumEl.textContent = parts.length ? "Showing: " + parts.join(" · ") : "Showing: All";
-    }
+    sumEl.textContent = parts.length ? "Showing: " + parts.join(" · ") : "";
   }
 }
 
