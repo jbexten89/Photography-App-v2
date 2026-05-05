@@ -5884,6 +5884,35 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .toolbar > span[style*="flex:1"] { display: none; }
   #newjob .toolbar .mileage-total-display { width: auto; flex: 1; }
 
+  /* Swipe-left action panel on All Transactions rows (3-line mode only) */
+  body.tx-mobile-3line #tx-table tbody tr.tx-row {
+    position: relative;
+    transition: transform 0.18s ease;
+    will-change: transform;
+  }
+  body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-row-actions {
+    position: absolute;
+    top: 0;
+    right: -160px;
+    bottom: 0;
+    width: 160px;
+    display: flex;
+    align-items: stretch;
+    pointer-events: auto;
+  }
+  body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-row-actions button {
+    flex: 1;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+  }
+  body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-row-actions .tx-action-edit   { background: #3b82f6; }
+  body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-row-actions .tx-action-delete { background: #ef4444; }
+
   /* All Transactions: 3-line stacked layout (opt-in via Settings).
      Default (no select mode): content is flush-left, 3 grid columns.
      In select mode (.select-mode on #tx-table), a 32px checkbox column is

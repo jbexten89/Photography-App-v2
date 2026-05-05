@@ -12626,6 +12626,128 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   }
 
   // ============================================================
+  // ALL TRANSACTIONS — swipe-left for Edit / Delete (mobile, 3-line mode)
+  // ============================================================
+  (function setupTxSwipe() {
+    const tbl = document.getElementById("tx-table");
+    if (!tbl) return;
+
+    let activeRow = null;
+    let panel = null;
+    let startX = 0, startY = 0, dx = 0, dy = 0, isSwiping = false, locked = false;
+    const REVEAL = 160; // total width of the action panel
+    const TRIGGER = 60; // px swipe distance to lock open
+
+    function isMobile3Line() {
+      return document.body.classList.contains("tx-mobile-3line") &&
+             window.matchMedia("(max-width: 768px)").matches;
+    }
+
+    function closeSwipe() {
+      if (activeRow) {
+        activeRow.style.transform = "";
+        activeRow.classList.remove("tx-row-swiped");
+      }
+      if (panel) panel.remove();
+      panel = null;
+      activeRow = null;
+      locked = false;
+    }
+
+    function openActions(row) {
+      if (panel) panel.remove();
+      panel = document.createElement("div");
+      panel.className = "tx-row-actions";
+      panel.innerHTML = `
+        <button type="button" class="tx-action-edit">Edit</button>
+        <button type="button" class="tx-action-delete">Delete</button>
+      `;
+      row.appendChild(panel);
+      panel.querySelector(".tx-action-edit").addEventListener("click", (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const id = row.dataset.id;
+        const tx = (state.transactions || []).find(t => t.id === id);
+        closeSwipe();
+        if (tx && typeof openTxModal === "function") openTxModal(tx);
+      });
+      panel.querySelector(".tx-action-delete").addEventListener("click", (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const id = row.dataset.id;
+        if (!confirm("Delete this transaction?")) { closeSwipe(); return; }
+        state.transactions = (state.transactions || []).filter(t => t.id !== id);
+        saveState();
+        if (typeof renderTransactions === "function") renderTransactions();
+        closeSwipe();
+      });
+    }
+
+    tbl.addEventListener("touchstart", (e) => {
+      if (!isMobile3Line()) return;
+      const row = e.target.closest("tr.tx-row");
+      if (!row) { if (activeRow) closeSwipe(); return; }
+      // Don't start a swipe on interactive bits inside the row
+      if (e.target.closest(".tx-select-col, .recon-circle, button, input, select, .tx-row-actions")) return;
+      if (locked && activeRow !== row) { closeSwipe(); return; }
+      if (activeRow && activeRow !== row) closeSwipe();
+      activeRow = row;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      dx = 0; dy = 0;
+      isSwiping = false;
+    }, { passive: true });
+
+    tbl.addEventListener("touchmove", (e) => {
+      if (!activeRow) return;
+      dx = e.touches[0].clientX - startX;
+      dy = e.touches[0].clientY - startY;
+      if (!isSwiping) {
+        if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+          isSwiping = true;
+        } else if (Math.abs(dy) > 10) {
+          // vertical scroll wins — abandon swipe
+          activeRow = null;
+          return;
+        }
+      }
+      if (isSwiping) {
+        if (e.cancelable) e.preventDefault();
+        const base = locked ? -REVEAL : 0;
+        const tx = Math.min(0, Math.max(-REVEAL, base + dx));
+        activeRow.style.transform = `translateX(${tx}px)`;
+      }
+    }, { passive: false });
+
+    tbl.addEventListener("touchend", () => {
+      if (!activeRow) return;
+      if (isSwiping) {
+        const base = locked ? -REVEAL : 0;
+        const finalX = base + dx;
+        if (finalX < -TRIGGER) {
+          activeRow.style.transform = `translateX(-${REVEAL}px)`;
+          activeRow.classList.add("tx-row-swiped");
+          if (!panel) openActions(activeRow);
+          locked = true;
+        } else {
+          closeSwipe();
+        }
+      }
+      isSwiping = false;
+    });
+
+    // Close when tapping anywhere outside the active row
+    document.addEventListener("touchstart", (e) => {
+      if (!activeRow || !locked) return;
+      if (e.target.closest("tr.tx-row") === activeRow) return;
+      closeSwipe();
+    }, true);
+
+    // Close on render / scroll outside table
+    document.addEventListener("scroll", () => {
+      if (locked) closeSwipe();
+    }, true);
+  })();
+
+  // ============================================================
   // ALL TRANSACTIONS — "edited with new logic" indicator
   // Watches the tx table for re-renders and stamps a green dot onto
   // rows whose tx has either a jobNo or expenseIncome field.
