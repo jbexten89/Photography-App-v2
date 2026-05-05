@@ -5860,9 +5860,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     grid-template-columns: 1fr auto;
     gap: 8px 10px;
   }
-  /* Customer + Category stay side-by-side on mobile */
+  /* Customer + Category stay side-by-side on mobile (3/5 + 2/5) */
   #tx-form .form-row.tx-customer-category-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 3fr 2fr;
     gap: 8px 10px;
   }
   /* Chart of Accounts + Expense / Income consistent gap on mobile */
