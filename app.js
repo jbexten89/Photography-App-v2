@@ -13460,4 +13460,6 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 
   // Expose for debugging
   window.__nj = { state, renderNjJobsTable, renderNjCcTable, renderNjExTable, renderNjAnalytics, lowestAvailableJobNo };
+  // Expose openJobEditModal globally so the top-level swipe handler can call it
+  window.openJobEditModal = openJobEditModal;
 })();
