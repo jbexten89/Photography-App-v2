@@ -3140,6 +3140,32 @@ if (btnTxFind && txFindWrap && txFindInput) {
 // --------- Transaction Selection Mode ---------
 let txSelectMode = false;
 
+// New Job — open/close the Add Job modal
+(function wireNjAddModal() {
+  function openModal() {
+    const m = document.getElementById("nj-add-modal");
+    if (!m) return;
+    m.classList.remove("hidden");
+    const d = document.getElementById("nj-date");
+    if (d && !d.value) d.value = new Date().toISOString().slice(0, 10);
+    setTimeout(() => d && d.focus(), 0);
+  }
+  function closeModal() {
+    const m = document.getElementById("nj-add-modal");
+    if (m) m.classList.add("hidden");
+  }
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#nj-open-add-modal")) { openModal(); return; }
+    if (e.target.closest("#nj-cancel-add"))     { closeModal(); return; }
+    if (e.target.id === "nj-add-modal")         { closeModal(); return; }
+  });
+  document.addEventListener("submit", (e) => {
+    if (e.target && e.target.id === "nj-form") {
+      setTimeout(() => closeModal(), 0);
+    }
+  });
+})();
+
 // Measure the heights of the sticky bands above the All Transactions table
 // (heading + running-balance) and write them into CSS variables so the
 // toolbar can offset itself precisely beneath them. Re-measures on resize

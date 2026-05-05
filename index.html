@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" type="image/png" href="apple-touch-icon.png" />
 <title>Photography Bookkeeping</title>
-<link rel="stylesheet" href="styles.css?v=332" />
+<link rel="stylesheet" href="styles.css?v=333" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2482,31 +2482,43 @@
         </div>
       </div>
 
-      <h2 style="margin-top:8px">Add Job</h2>
-      <form id="nj-form" class="mileage-add-row nj-add-row">
-        <label>Date
-          <input type="date" id="nj-date" required />
-        </label>
-        <label>Job No.
-          <input type="text" id="nj-jobno" required placeholder="YY001" />
-        </label>
-        <label>Customer
-          <select id="nj-customer" required>
-            <option value="">— Select —</option>
-            <option value="__new__">+ Add new…</option>
-          </select>
-        </label>
-        <label>Category
-          <select id="nj-category" required>
-            <option value="">— Select —</option>
-            <option value="__new__">+ Add new…</option>
-          </select>
-        </label>
-        <label>Hours
-          <input type="number" id="nj-hours" step="0.25" min="0" placeholder="0" />
-        </label>
-        <button type="submit" class="btn primary">+ Add Job</button>
-      </form>
+      <div class="nj-add-trigger-row">
+        <button type="button" id="nj-open-add-modal" class="btn primary">+ Add Job</button>
+      </div>
+
+      <!-- Add Job modal — shown when "+ Add Job" is clicked -->
+      <div id="nj-add-modal" class="modal hidden">
+        <div class="modal-content">
+          <h2>Add Job</h2>
+          <form id="nj-form" class="mileage-add-row nj-add-row">
+            <label>Date
+              <input type="date" id="nj-date" required />
+            </label>
+            <label>Job No.
+              <input type="text" id="nj-jobno" required placeholder="YY001" />
+            </label>
+            <label>Customer
+              <select id="nj-customer" required>
+                <option value="">— Select —</option>
+                <option value="__new__">+ Add new…</option>
+              </select>
+            </label>
+            <label>Category
+              <select id="nj-category" required>
+                <option value="">— Select —</option>
+                <option value="__new__">+ Add new…</option>
+              </select>
+            </label>
+            <label>Hours
+              <input type="number" id="nj-hours" step="0.25" min="0" placeholder="0" />
+            </label>
+            <div class="form-actions">
+              <button type="button" id="nj-cancel-add" class="btn">Cancel</button>
+              <button type="submit" class="btn primary">+ Add Job</button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       <h2 style="margin-top:24px">Job Analytics</h2>
       <div class="nj-analytics-filters">
