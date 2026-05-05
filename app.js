@@ -3420,7 +3420,17 @@ document.getElementById("btn-select-mode").addEventListener("click", () => {
   }
   document.getElementById("btn-select-label").textContent =
     txSelectMode ? "Exit Select Mode" : "Select Transactions";
-  renderTransactions();
+  // Toggle the table class immediately for snappy UI; the checkboxes are
+  // already in the DOM, only their visibility is gated by .select-mode.
+  const _txTable = document.getElementById("tx-table");
+  if (_txTable) _txTable.classList.toggle("select-mode", txSelectMode);
+  if (!txSelectMode) {
+    // On exit, clear any checked rows visually without a full re-render.
+    document.querySelectorAll("#tx-table tbody tr.is-checked").forEach(r => r.classList.remove("is-checked"));
+    document.querySelectorAll("#tx-table tbody .tx-select-box:checked").forEach(c => { c.checked = false; });
+    const sa = document.getElementById("tx-select-all");
+    if (sa) sa.checked = false;
+  }
 });
 
 document.getElementById("dashboard-year").addEventListener("change", renderDashboard);
