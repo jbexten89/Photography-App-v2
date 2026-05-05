@@ -6195,21 +6195,18 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 
   /* Analytics By Job: keep the Filters / Presets / Gross/Net row + the
      By Customer / By Category / By Job No. row pinned to the top while
-     scrolling the analytics list. The toolbar-row is lifted out of the
-     short analytics-header by JS so the entire #jobs section becomes its
-     sticky containing block. */
-  #jobs > .analytics-toolbar-row {
+     scrolling the analytics list. */
+  #jobs .analytics-toolbar-row {
     position: sticky;
     top: 0;
     z-index: 51;
     background: var(--bg);
     padding: 6px 0;
     margin-bottom: 4px;
-    border-bottom: 1px solid var(--border);
   }
   #jobs .analytics-view[data-view="by-category"] .jobs-section[data-section="jobs"] .jobs-section-head {
     position: sticky;
-    top: 56px;
+    top: 56px; /* below the toolbar-row */
     z-index: 50;
     background: var(--bg);
     padding: 6px 0;
