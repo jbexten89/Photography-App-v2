@@ -11500,9 +11500,8 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     if (txExpInc) txExpInc.disabled = inflow;
     // Job picker only meaningful when Existing Job = Y
     if (txJobLink) txJobLink.disabled = !existing;
-    // Customer / Category / Chart of Accounts stay editable so existing
-    // transactions can be re-tagged using the new logic.
-    if (txCustomer) txCustomer.disabled = false;
+    // Customer is meaningless when Existing Job = N (job hasn't been picked yet)
+    if (txCustomer) txCustomer.disabled = !existing;
     if (txCategory) txCategory.disabled = false;
     if (txChartAcc) txChartAcc.disabled = false;
     repopulateTxCustomer();
