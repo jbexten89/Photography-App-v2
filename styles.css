@@ -6065,6 +6065,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     min-width: 0 !important;
     white-space: normal;
     text-align: left !important;
+    position: static !important;
+    box-shadow: none !important;
   }
   /* Line 1 — Job No (left) · Profit (right). Status + Invoice hidden. */
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="jobno"]   { grid-column: 1 / 3; grid-row: 1; font-weight: 700; font-size: 14px; }
