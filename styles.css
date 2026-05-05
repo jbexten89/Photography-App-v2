@@ -6037,13 +6037,19 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* New Job: hide Open Jobs + Complete summary cards on mobile */
   #newjob .toolbar { display: none; }
 
-  /* Add-Job modal: keep the form's grid layout the same as the inline form */
+  /* Add-Job modal: stack each field on its own row (5 rows + actions) */
   #nj-add-modal .modal-content #nj-form {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px 10px !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
-  #nj-add-modal .modal-content #nj-form > .form-actions { grid-column: 1 / 3; grid-row: 4; }
+  #nj-add-modal .modal-content #nj-form > label { grid-column: 1; }
+  #nj-add-modal .modal-content #nj-form > label:has(#nj-date)     { grid-row: 1; }
+  #nj-add-modal .modal-content #nj-form > label:has(#nj-jobno)    { grid-row: 2; }
+  #nj-add-modal .modal-content #nj-form > label:has(#nj-customer) { grid-row: 3; }
+  #nj-add-modal .modal-content #nj-form > label:has(#nj-category) { grid-row: 4; }
+  #nj-add-modal .modal-content #nj-form > label:has(#nj-hours)    { grid-row: 5; }
+  #nj-add-modal .modal-content #nj-form > .form-actions { grid-column: 1; grid-row: 6; }
 
   /* New Job add-job form: Date full width, then Hours+Job No, then Customer+Category */
   #nj-form {
