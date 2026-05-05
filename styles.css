@@ -6199,21 +6199,21 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      short analytics-header by JS so the entire #jobs section becomes its
      sticky containing block. */
   #jobs > .analytics-toolbar-row {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 51 !important;
-    background: var(--bg) !important;
-    padding: 6px 0 !important;
-    margin-bottom: 4px !important;
-    border-bottom: 1px solid var(--border) !important;
+    position: sticky;
+    top: 0;
+    z-index: 51;
+    background: var(--bg);
+    padding: 6px 0;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
   }
-  #jobs .jobs-section[data-section="jobs"] .jobs-section-head {
-    position: sticky !important;
-    top: 56px !important;
-    z-index: 50 !important;
-    background: var(--bg) !important;
-    padding: 6px 0 !important;
-    border-bottom: 1px solid var(--border) !important;
+  #jobs .analytics-view[data-view="by-category"] .jobs-section[data-section="jobs"] .jobs-section-head {
+    position: sticky;
+    top: 56px;
+    z-index: 50;
+    background: var(--bg);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
   }
 
   /* All Transactions: sticky select-checkbox column on mobile */
