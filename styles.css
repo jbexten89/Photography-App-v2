@@ -6555,8 +6555,19 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     background-position: 8px center;
     background-size: 16px 16px;
   }
-  /* Match the All Years select height too so the two are visually identical. */
-  #transactions .toolbar #tx-filter-year { height: 34px; box-sizing: border-box; }
+  /* All toolbar fields (search input + every filter select) share the same
+     height so rows look uniform on mobile. */
+  #transactions .toolbar #tx-filter-year,
+  #transactions .toolbar #tx-filter-category,
+  #transactions .toolbar #tx-filter-type,
+  #transactions .toolbar #tx-search-all,
+  #transactions .tx-find-input,
+  #transactions .toolbar .tx-find-btn,
+  #transactions .toolbar .tx-find-close-btn {
+    height: 40px !important;
+    min-height: 40px !important;
+    box-sizing: border-box;
+  }
 
   /* Native <select> dropdowns inside the All-Tx toolbar render their
      chevron in a system color that's nearly invisible in dark mode.
