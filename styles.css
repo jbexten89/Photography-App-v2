@@ -5879,6 +5879,22 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .toolbar > span[style*="flex:1"] { display: none; }
   #newjob .toolbar .mileage-total-display { width: auto; flex: 1; }
 
+  /* Analytics By Job: spread Customer/Category/Job pills evenly across the row */
+  #jobs-group-toggle {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    width: 100%;
+    margin-right: 0 !important;
+  }
+  #jobs-group-toggle .year-pill {
+    width: 100%;
+    text-align: center;
+    padding-left: 4px;
+    padding-right: 4px;
+    white-space: nowrap;
+  }
+
   /* All Transactions: sticky select-checkbox column on mobile */
   #transactions .table-wrap { overflow-x: auto !important; }
   #tx-table { border-collapse: separate !important; border-spacing: 0; }
