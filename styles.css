@@ -5945,48 +5945,40 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     min-width: 0;
   }
   .toolbar select { flex: 1 1 45%; min-width: 0; }
-  /* Stack three sticky bands at the top of the All Transactions page so the
-     heading, running balance and full filter toolbar stay visible while the
-     table scrolls. The CSS variables below approximate each band's height —
-     adjust if the metrics change. */
-  #transactions {
-    --tx-heading-h: 56px;
-    --tx-balance-h: 56px;
-  }
-  #transactions .page-heading-mobile {
+  /* Single sticky band wrapping heading + running-balance + toolbar so they
+     all move as one and stay pinned at the top while the table scrolls. */
+  #transactions > .tx-sticky-header {
     position: sticky;
     top: 0;
-    z-index: 52;
-    background: var(--bg);
-    margin: 0;
-    padding: 6px 0 4px;
-    min-height: var(--tx-heading-h);
-  }
-  .running-balance {
-    padding: 1px 4px 16px !important;
-    margin: 0 0 6px;
-    justify-content: space-between;
-    gap: 12px;
-    position: sticky;
-    top: var(--tx-heading-h);
-    z-index: 51;
+    z-index: 50;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+  }
+  #transactions > .tx-sticky-header .page-heading-mobile {
+    position: static;
+    margin: 0;
+    padding: 6px 0 4px;
+  }
+  .running-balance {
+    padding: 1px 4px 12px !important;
+    margin: 0 0 4px;
+    justify-content: space-between;
+    gap: 12px;
+    position: static;
+    background: var(--bg);
     flex-wrap: nowrap;
     box-sizing: border-box;
     width: 100%;
-    min-height: var(--tx-balance-h);
   }
-  .running-balance .rb-item { padding-top: 0; }
-  #transactions > .toolbar {
-    position: sticky;
-    top: calc(var(--tx-heading-h) + var(--tx-balance-h));
-    z-index: 50;
-    background: var(--bg);
-    padding-top: 6px;
-    padding-bottom: 6px;
-    margin-bottom: 4px;
-    border-bottom: 1px solid var(--border);
+  #transactions > .tx-sticky-header > .toolbar {
+    position: static;
+    background: transparent;
+    margin: 0;
+    padding-top: 4px;
+    padding-bottom: 0;
+    border-bottom: none;
   }
   .running-balance .rb-item {
     flex-direction: row;

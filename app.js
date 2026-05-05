@@ -3145,27 +3145,30 @@ let txSelectMode = false;
 // toolbar can offset itself precisely beneath them. Re-measures on resize
 // and after every tx render (running-balance height grows when select count
 // expands the row, etc.).
-function syncTxStickyHeights() {
+// Wrap the All Transactions heading + running-balance + toolbar into a
+// single sticky band so they stay glued together at the top while the table
+// scrolls — avoids the per-element stacking glitches seen when each was
+// individually sticky.
+function ensureTxStickyHeader() {
   const sect = document.getElementById("transactions");
   if (!sect) return;
-  const heading = sect.querySelector(".page-heading-mobile");
-  const balance = sect.querySelector(".running-balance");
-  // Include each band's margin-top + margin-bottom so the toolbar's sticky
-  // top offset matches where the previous band actually ends visually.
-  if (heading) {
-    const cs = getComputedStyle(heading);
-    const h = heading.getBoundingClientRect().height + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom);
-    sect.style.setProperty("--tx-heading-h", `${Math.ceil(h)}px`);
-  }
-  if (balance) {
-    const cs = getComputedStyle(balance);
-    const h = balance.getBoundingClientRect().height + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom);
-    sect.style.setProperty("--tx-balance-h", `${Math.ceil(h)}px`);
-  }
+  if (sect.querySelector(":scope > .tx-sticky-header")) return; // already wrapped
+  const heading = sect.querySelector(":scope > .page-heading-mobile");
+  const balance = sect.querySelector(":scope > .running-balance");
+  const toolbar = sect.querySelector(":scope > .toolbar");
+  if (!toolbar) return;
+  const wrap = document.createElement("div");
+  wrap.className = "tx-sticky-header";
+  // Insert wrapper where the heading currently is (or before balance/toolbar)
+  const anchor = heading || balance || toolbar;
+  sect.insertBefore(wrap, anchor);
+  if (heading) wrap.appendChild(heading);
+  if (balance) wrap.appendChild(balance);
+  wrap.appendChild(toolbar);
 }
-window.addEventListener("resize", () => syncTxStickyHeights());
-window.addEventListener("DOMContentLoaded", () => syncTxStickyHeights());
-setTimeout(syncTxStickyHeights, 100);
+window.addEventListener("DOMContentLoaded", ensureTxStickyHeader);
+setTimeout(ensureTxStickyHeader, 0);
+function syncTxStickyHeights() { /* no-op: header is now a single sticky block */ }
 const txSelectedIds = new Set();
 let txLastClickedId = null;
 let txVisibleIds = []; // ids in currently displayed order (for range selection)
