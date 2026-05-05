@@ -6094,12 +6094,12 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     scrollbar-width: thin;
   }
 
-  /* Keep the first column sticky on long transaction tables so users can
-     see the date while scrolling sideways through other columns. */
+  /* Keep the Date column sticky too, parked just to the right of the
+     sticky checkbox column (which is 36px wide). */
   #tx-table thead th:nth-child(2),
   #tx-table tbody td:nth-child(2) {
     position: sticky;
-    left: 0;
+    left: 36px;
     z-index: 2;
     background: var(--surface);
   }
