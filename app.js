@@ -3150,8 +3150,18 @@ function syncTxStickyHeights() {
   if (!sect) return;
   const heading = sect.querySelector(".page-heading-mobile");
   const balance = sect.querySelector(".running-balance");
-  if (heading) sect.style.setProperty("--tx-heading-h", `${Math.ceil(heading.getBoundingClientRect().height)}px`);
-  if (balance) sect.style.setProperty("--tx-balance-h", `${Math.ceil(balance.getBoundingClientRect().height)}px`);
+  // Include each band's margin-top + margin-bottom so the toolbar's sticky
+  // top offset matches where the previous band actually ends visually.
+  if (heading) {
+    const cs = getComputedStyle(heading);
+    const h = heading.getBoundingClientRect().height + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom);
+    sect.style.setProperty("--tx-heading-h", `${Math.ceil(h)}px`);
+  }
+  if (balance) {
+    const cs = getComputedStyle(balance);
+    const h = balance.getBoundingClientRect().height + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom);
+    sect.style.setProperty("--tx-balance-h", `${Math.ceil(h)}px`);
+  }
 }
 window.addEventListener("resize", () => syncTxStickyHeights());
 window.addEventListener("DOMContentLoaded", () => syncTxStickyHeights());
