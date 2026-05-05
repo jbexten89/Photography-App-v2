@@ -4883,17 +4883,25 @@ select option {
 @media (max-width: 768px) {
   #transactions > .toolbar { display: flex; flex-wrap: wrap; }
   /* New Transaction modal — keep the date input from overflowing the modal
-     content on narrow screens. */
-  #tx-modal #tx-date {
+     content on narrow screens. iOS date inputs have an internal min-width
+     that ignores plain width:100%, so we use a flex container + min-width:0
+     to force the input to shrink to its parent. */
+  #tx-modal label:has(> #tx-date) {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    box-sizing: border-box;
-    display: block;
   }
-  #tx-modal label:has(> #tx-date) {
-    display: block;
-    max-width: 100%;
+  #tx-modal #tx-date {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    flex: 1 1 auto;
+    -webkit-min-logical-width: 0;
   }
 
   /* Mobile-only ordering for the relocated toggle (desktop styling lives
