@@ -5920,6 +5920,23 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   body.tx-mobile-3line #tx-table tbody td[data-col="jobno"]   { grid-column: 2;     grid-row: 3; font-size: 12px; color: var(--muted); }
   body.tx-mobile-3line #tx-table tbody td[data-col="customer"]{ grid-column: 3;     grid-row: 3; font-size: 12px; color: var(--muted); }
   body.tx-mobile-3line #tx-table tbody td[data-col="category"]{ grid-column: 4;     grid-row: 3; font-size: 12px; color: var(--muted); text-align: right; }
+  /* Income rows: promote Job No + Customer into the prominent vendor slot
+     (line 2). Vendor is empty for income, so hide it. */
+  body.tx-mobile-3line #tx-table tbody tr:has(td[data-col="amount"].income) td[data-col="vendor"] { display: none; }
+  body.tx-mobile-3line #tx-table tbody tr:has(td[data-col="amount"].income) td[data-col="jobno"] {
+    grid-column: 2;
+    grid-row: 2;
+    font-weight: 600;
+    font-size: 14px;
+    color: inherit;
+  }
+  body.tx-mobile-3line #tx-table tbody tr:has(td[data-col="amount"].income) td[data-col="customer"] {
+    grid-column: 3 / 5;
+    grid-row: 2;
+    font-weight: 600;
+    font-size: 14px;
+    color: inherit;
+  }
   body.tx-mobile-3line #tx-table tbody td[data-col="chart"]   { display: none !important; }
   body.tx-mobile-3line #tx-table tbody td[data-col="payee"],
   body.tx-mobile-3line #tx-table tbody td[data-col="expinc"]  { display: none !important; }
