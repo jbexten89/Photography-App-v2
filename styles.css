@@ -6047,7 +6047,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   body.nj-mobile-3line #nj-analytics-table tbody { display: block; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto;
     grid-template-rows: auto auto auto;
     column-gap: 8px;
     row-gap: 2px;
@@ -6066,20 +6066,19 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     white-space: normal;
     text-align: left !important;
   }
-  /* Line 1 — Job No · (spacer) · Status · + Invoice */
+  /* Line 1 — Job No · Status · Profit (right) */
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="jobno"]   { grid-column: 1; grid-row: 1; font-weight: 700; font-size: 14px; }
-  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"]  { grid-column: 3; grid-row: 1; }
-  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="invoice"] { grid-column: 4; grid-row: 1; }
-  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="invoice"] .nj-invoice-btn { padding: 4px 8px; font-size: 12px; }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"]  { grid-column: 2; grid-row: 1; justify-self: center; }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="profit"]  { grid-column: 3; grid-row: 1; font-weight: 700; font-size: 14px; text-align: right !important; }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="invoice"] { display: none !important; }
   /* Line 2 — Customer · Category */
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="customer"]{ grid-column: 1 / 3; grid-row: 2; font-size: 13px; color: var(--muted); }
-  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="category"]{ grid-column: 3 / 5; grid-row: 2; font-size: 13px; color: var(--muted); text-align: right !important; }
-  /* Line 3 — Hours · Income · Expenses · Profit */
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="category"]{ grid-column: 3;     grid-row: 2; font-size: 13px; color: var(--muted); text-align: right !important; }
+  /* Line 3 — Hours · Income · Expenses */
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="hours"]   { grid-column: 1; grid-row: 3; font-size: 12px; color: var(--muted); }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="hours"]::before   { content: "Hours: "; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="income"]  { grid-column: 2; grid-row: 3; font-size: 12px; color: var(--income, #27ae60); text-align: right !important; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="expense"] { grid-column: 3; grid-row: 3; font-size: 12px; color: var(--expense, #c0392b); text-align: right !important; }
-  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="profit"]  { grid-column: 4; grid-row: 3; font-size: 12px; font-weight: 700; text-align: right !important; }
   /* Expanded transactions row: span the whole card (only when not [hidden]) */
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-job-expand-row { display: block; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-job-expand-row[hidden] { display: none !important; }
