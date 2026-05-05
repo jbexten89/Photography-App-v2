@@ -6080,8 +6080,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="income"]  { grid-column: 2; grid-row: 3; font-size: 12px; color: var(--income, #27ae60); text-align: right !important; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="expense"] { grid-column: 3; grid-row: 3; font-size: 12px; color: var(--expense, #c0392b); text-align: right !important; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="profit"]  { grid-column: 4; grid-row: 3; font-size: 12px; font-weight: 700; text-align: right !important; }
-  /* Expanded transactions row: span the whole card */
+  /* Expanded transactions row: span the whole card (only when not [hidden]) */
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-job-expand-row { display: block; }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-job-expand-row[hidden] { display: none !important; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-job-expand-row td {
     display: block;
     padding: 0;
