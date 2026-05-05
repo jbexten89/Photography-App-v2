@@ -6034,10 +6034,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .mileage-add-row .btn { grid-column: 1 / -1; }
   .mileage-total-display { width: 100%; }
 
-  /* New Job: keep Open Jobs + Complete side-by-side on mobile */
-  #newjob .toolbar { flex-wrap: wrap; gap: 8px; }
-  #newjob .toolbar > span[style*="flex:1"] { display: none; }
-  #newjob .toolbar .mileage-total-display { width: auto; flex: 1; }
+  /* New Job: hide Open Jobs + Complete summary cards on mobile */
+  #newjob .toolbar { display: none; }
 
   /* Swipe-left action panel on All Transactions rows (3-line mode only) */
   body.tx-mobile-3line #tx-table tbody tr.tx-row {
