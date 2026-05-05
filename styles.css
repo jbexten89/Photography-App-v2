@@ -5927,7 +5927,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     grid-template-rows: auto auto auto;
     column-gap: 6px;
     row-gap: 2px;
-    padding: 10px 8px;
+    padding: 10px 8px 10px 16px;
     border-bottom: 1px solid var(--border, rgba(0,0,0,0.08));
     align-items: center;
   }
