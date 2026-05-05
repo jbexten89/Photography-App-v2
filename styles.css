@@ -6193,28 +6193,40 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     white-space: nowrap;
   }
 
-  /* Analytics By Job: keep the Filters / Presets / Gross/Net row + the
-     By Customer / By Category / By Job No. row pinned to the top while
-     scrolling the analytics list. The toolbar-row is lifted out of the
-     short analytics-header by JS so the entire #jobs section becomes its
-     sticky containing block. */
-  #jobs > .analytics-toolbar-row {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 51 !important;
-    background: var(--bg) !important;
-    padding: 6px 0 !important;
-    margin-bottom: 4px !important;
-    border-bottom: 1px solid var(--border) !important;
+  /* Analytics By Job — single fixed sticky bar at the top of the viewport
+     containing Filters/Presets/Gross-Net row + By Customer/Category/Job pills.
+     JS sets body.jobs-fixed-bar only while the By Job view is active, and
+     a spacer div reserves the equivalent height in the document flow. */
+  body.jobs-fixed-bar #jobs-fixed-bar {
+    display: block;
+    position: fixed;
+    top: env(safe-area-inset-top, 0px);
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 12px 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   }
-  #jobs .jobs-section[data-section="jobs"] .jobs-section-head {
-    position: sticky !important;
-    top: 56px !important;
-    z-index: 50 !important;
-    background: var(--bg) !important;
-    padding: 6px 0 !important;
-    border-bottom: 1px solid var(--border) !important;
+  #jobs-fixed-bar { display: none; }
+  #jobs-fixed-bar .analytics-toolbar-row { padding: 0 0 6px; }
+  #jobs-fixed-bar #jobs-group-toggle {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    width: 100%;
+    margin: 0 !important;
   }
+  #jobs-fixed-bar #jobs-group-toggle .year-pill {
+    width: 100%;
+    text-align: center;
+    padding-left: 4px;
+    padding-right: 4px;
+    white-space: nowrap;
+  }
+  body.jobs-fixed-bar #jobs-fixed-bar-spacer { display: block; }
+  #jobs-fixed-bar-spacer { display: none; }
 
   /* All Transactions: sticky select-checkbox column on mobile */
   #transactions .table-wrap { overflow-x: auto !important; }

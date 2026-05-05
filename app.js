@@ -611,6 +611,11 @@ function activateAnalyticsView(viewName) {
   if (typeof syncAmvpFromActiveView === "function") syncAmvpFromActiveView(viewName);
   if (typeof syncJobsModeTogglePlacement === "function") syncJobsModeTogglePlacement(viewName);
   if (typeof refreshFilterTriggers === "function") refreshFilterTriggers();
+  if (typeof activateJobsFixedBar === "function") {
+    const onByJob = viewName === "by-category";
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    activateJobsFixedBar(onByJob && isMobile);
+  }
   if (viewName === "flow"   && typeof renderTrends   === "function") renderTrends();
   if (viewName === "trends" && typeof renderByCategory === "function") renderByCategory();
   if (viewName === "cash-flow" && typeof renderCashFlow === "function") renderCashFlow();
@@ -3169,22 +3174,67 @@ function ensureTxStickyHeader() {
 window.addEventListener("DOMContentLoaded", ensureTxStickyHeader);
 setTimeout(ensureTxStickyHeader, 0);
 
-// Pull the Analytics toolbar-row out of the (short) analytics-header so it
-// has the entire #jobs section as its sticky containing block — otherwise
-// it stops sticking the moment the analytics-header scrolls out of view.
-function ensureAnalyticsStickyToolbar() {
+// Analytics By Job — floating fixed bar at the top of the viewport that
+// holds the Filters/Presets/Gross-Net row + the By Customer/Category/Job
+// pills. We MOVE the originals into the bar (preserving their event
+// handlers) when entering the By Job view, and move them back to their
+// original locations when leaving. A spacer div keeps the document flow
+// height correct so the page doesn't jump.
+let __jobsBarOriginals = null;
+function setupJobsFixedBar() {
   const sect = document.getElementById("jobs");
   if (!sect) return;
-  const row = sect.querySelector(".analytics-toolbar-row");
-  if (!row) return;
-  if (row.parentElement === sect) return; // already lifted
-  // Place it right before the .analytics-views block
+  if (document.getElementById("jobs-fixed-bar")) return;
+  const bar = document.createElement("div");
+  bar.id = "jobs-fixed-bar";
+  document.body.appendChild(bar);
+  const spacer = document.createElement("div");
+  spacer.id = "jobs-fixed-bar-spacer";
+  // Insert spacer right before the .analytics-views so flow height is preserved
   const views = sect.querySelector(".analytics-views");
-  if (!views) return;
-  sect.insertBefore(row, views);
+  if (views) sect.insertBefore(spacer, views);
 }
-window.addEventListener("DOMContentLoaded", ensureAnalyticsStickyToolbar);
-setTimeout(ensureAnalyticsStickyToolbar, 0);
+function activateJobsFixedBar(active) {
+  setupJobsFixedBar();
+  const bar = document.getElementById("jobs-fixed-bar");
+  const spacer = document.getElementById("jobs-fixed-bar-spacer");
+  const sect = document.getElementById("jobs");
+  if (!bar || !sect) return;
+  const toolbar = sect.querySelector(".analytics-toolbar-row");
+  const groupToggle = document.getElementById("jobs-group-toggle");
+  if (active) {
+    if (!__jobsBarOriginals) {
+      __jobsBarOriginals = {
+        toolbar: toolbar ? { parent: toolbar.parentElement, next: toolbar.nextSibling } : null,
+        groupToggle: groupToggle ? { parent: groupToggle.parentElement, next: groupToggle.nextSibling } : null,
+      };
+    }
+    if (toolbar && toolbar.parentElement !== bar) bar.appendChild(toolbar);
+    if (groupToggle && groupToggle.parentElement !== bar) bar.appendChild(groupToggle);
+    document.body.classList.add("jobs-fixed-bar");
+    // Measure the bar height and apply to the spacer so layout doesn't jump
+    requestAnimationFrame(() => {
+      if (spacer) spacer.style.height = `${bar.getBoundingClientRect().height}px`;
+    });
+  } else {
+    document.body.classList.remove("jobs-fixed-bar");
+    if (spacer) spacer.style.height = "";
+    if (__jobsBarOriginals) {
+      const t = __jobsBarOriginals.toolbar;
+      if (t && toolbar) t.parent.insertBefore(toolbar, t.next || null);
+      const g = __jobsBarOriginals.groupToggle;
+      if (g && groupToggle) g.parent.insertBefore(groupToggle, g.next || null);
+    }
+  }
+}
+window.addEventListener("DOMContentLoaded", setupJobsFixedBar);
+setTimeout(setupJobsFixedBar, 0);
+window.addEventListener("resize", () => {
+  const activeView = document.querySelector(".analytics-view.active")?.dataset.view;
+  if (activeView !== "by-category") return;
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  activateJobsFixedBar(isMobile);
+});
 function syncTxStickyHeights() { /* no-op: header is now a single sticky block */ }
 const txSelectedIds = new Set();
 let txLastClickedId = null;
