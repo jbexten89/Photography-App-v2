@@ -12037,15 +12037,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   function applyTxConditionalUI() {
     const inflow = isInflow();
     const existing = isExistingJob();
-    // Payee is irrelevant for inflow — drop the HTML required attribute
-    // so the form can be saved without one. (Edits already drop it via the
-    // MutationObserver further down.)
+    // Payee is never required (user request). Strip the attribute if present.
     const payeeEl = document.getElementById("tx-payee");
-    if (payeeEl) {
-      const editingId = $("tx-id").value;
-      if (inflow || editingId) payeeEl.removeAttribute("required");
-      else payeeEl.setAttribute("required", "");
-    }
+    if (payeeEl) payeeEl.removeAttribute("required");
     // Per spec: disable Vendor and Expense/Income on inflow.
     if (txVendor) txVendor.disabled = inflow;
     if (txExpInc) txExpInc.disabled = inflow;
