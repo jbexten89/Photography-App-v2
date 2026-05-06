@@ -4567,25 +4567,6 @@ function normalizeImportDate(s) {
   return s;
 }
 
-// ----- Vendor-specific mapping for the Expenses CSV import -----
-// Lookup is case-insensitive. Each entry can override category, expense
-// (state.expenseIncome), and chartAccount. Anything left empty defers to
-// the row's CSV value (or the "Cost of Goods Sold" → "CoGS" fallback).
-const EXPENSE_IMPORT_VENDOR_MAP = {
-  "meridian pro":       { category: "CoGS",         expense: "Pictures" },
-  "whcc":               { category: "CoGS",         expense: "Pictures" },
-  "picture frames.com": { category: "CoGS",         expense: "Frames",       chartAccount: "CoGS" },
-  "tyndell":            { category: "Memory Mates", expense: "Memory Mates" },
-  "aci":                { category: "Banners",      expense: "Banners" },
-};
-
-function normalizeChartAccountForImport(raw) {
-  const v = (raw || "").trim();
-  // QuickBooks exports "Cost of Goods Sold" — collapse to the app's CoGS short form
-  if (/^cost of goods sold$/i.test(v)) return "CoGS";
-  return v;
-}
-
 document.getElementById("file-import-expenses-csv")?.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -4602,7 +4583,7 @@ document.getElementById("file-import-expenses-csv")?.addEventListener("change", 
       const idx = {
         date:   header.findIndex(h => h === "date"),
         vendor: header.findIndex(h => h === "vendor" || h === "name" || h === "payee"),
-        chart:  header.findIndex(h => h === "chartaccount" || h === "chart of accounts" || h === "chart" || h === "split"),
+        chart:  header.findIndex(h => h === "chartaccount" || h === "chart of accounts" || h === "chart" || h === "split" || h === "account"),
         amount: header.findIndex(h => h === "amount"),
       };
       if (idx.date < 0 || idx.amount < 0) {
@@ -4615,20 +4596,13 @@ document.getElementById("file-import-expenses-csv")?.addEventListener("change", 
         state.transactions.map(t => `${t.date}|${(t.vendor || "").toLowerCase()}|${(+t.amount).toFixed(2)}`)
       );
 
-      // Stamp every row with the same batch id so the user can undo this
-      // entire import in one click (Settings → Undo last expense import).
-      const importBatchId = "imp-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
-      const importedIds = [];
-
       let added = 0, skipped = 0, malformed = 0;
       const newVendors = new Set(state.vendors || []);
-      const newCategories = new Set(state.categories || []);
-      const newExpenses = new Set((state.expensesTable || []).map(r => r.entry).filter(Boolean));
       for (let i = 1; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
         const date = normalizeImportDate(cols[idx.date]);
         const vendor = (idx.vendor >= 0 ? (cols[idx.vendor] || "") : "").trim();
-        const chartAccountRaw = (idx.chart >= 0 ? (cols[idx.chart] || "") : "").trim();
+        const chartAccount = (idx.chart >= 0 ? (cols[idx.chart] || "") : "").trim();
         const amtRaw = (cols[idx.amount] || "").replace(/[$,]/g, "").trim();
         const amount = parseFloat(amtRaw);
         if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isFinite(amount) || amount === 0) {
@@ -4637,14 +4611,7 @@ document.getElementById("file-import-expenses-csv")?.addEventListener("change", 
         }
         const key = `${date}|${vendor.toLowerCase()}|${Math.abs(amount).toFixed(2)}`;
         if (existingKey.has(key)) { skipped++; continue; }
-
-        // Apply vendor-specific overrides + Split → CoGS shorthand
-        const vendorMap = EXPENSE_IMPORT_VENDOR_MAP[vendor.toLowerCase()] || {};
-        const chartAccount = vendorMap.chartAccount || normalizeChartAccountForImport(chartAccountRaw);
-        const category = vendorMap.category || "";
-        const expenseIncome = vendorMap.expense || "";
-
-        const tx = {
+        state.transactions.push({
           id: uid(),
           type: "expense",
           date,
@@ -4652,44 +4619,30 @@ document.getElementById("file-import-expenses-csv")?.addEventListener("change", 
           vendor,
           customer: "",
           amount: Math.abs(amount),
-          category,
+          category: "",
           account: "",
           memo: "",
           tags: [],
           reconciled: "",
           chartAccount,
-          importBatch: importBatchId,
-        };
-        if (expenseIncome) tx.expenseIncome = expenseIncome;
-        state.transactions.push(tx);
-        importedIds.push(tx.id);
+        });
         existingKey.add(key);
         if (vendor) newVendors.add(vendor);
-        if (category) newCategories.add(category);
-        if (expenseIncome) newExpenses.add(expenseIncome);
         added++;
       }
 
-      if (Array.isArray(state.vendors))    state.vendors = Array.from(newVendors).sort();
-      if (Array.isArray(state.categories)) state.categories = Array.from(newCategories).sort();
-
-      // Remember this batch so Settings can offer an Undo button.
-      state.lastExpenseImport = added > 0
-        ? { batchId: importBatchId, count: added, when: new Date().toISOString() }
-        : (state.lastExpenseImport || null);
+      if (Array.isArray(state.vendors)) {
+        state.vendors = Array.from(newVendors).sort();
+      }
 
       saveState();
       render();
-      if (typeof refreshExpenseImportUndoUi === "function") refreshExpenseImportUndoUi();
-
-      if (window.toast && added > 0) toast(`Imported ${added} expense${added === 1 ? "" : "s"}`, { kind: "success" });
 
       alert(
         `Expenses CSV import complete.\n\n` +
         `Added: ${added}\n` +
         `Skipped (duplicates): ${skipped}\n` +
-        `Malformed rows: ${malformed}` +
-        (added > 0 ? `\n\nThis import can be undone in Settings.` : "")
+        `Malformed rows: ${malformed}`
       );
     } catch (err) {
       alert("Import failed: " + err.message);
@@ -4699,43 +4652,6 @@ document.getElementById("file-import-expenses-csv")?.addEventListener("change", 
   reader.readAsText(file, "UTF-8");
   e.target.value = "";
 });
-
-// ---- Undo last expense import ----
-function refreshExpenseImportUndoUi() {
-  const btn = document.getElementById("btn-undo-expense-import");
-  const meta = document.getElementById("expense-import-undo-meta");
-  if (!btn) return;
-  const last = state.lastExpenseImport;
-  if (!last || !last.batchId) {
-    btn.disabled = true;
-    btn.textContent = "Undo last expense import";
-    if (meta) meta.textContent = "No recent import to undo.";
-    return;
-  }
-  btn.disabled = false;
-  btn.textContent = `Undo last expense import (${last.count})`;
-  if (meta) {
-    const when = last.when ? new Date(last.when) : null;
-    meta.textContent = when
-      ? `${last.count} transaction${last.count === 1 ? "" : "s"} imported ${when.toLocaleString()}.`
-      : `${last.count} transactions in last import.`;
-  }
-}
-document.getElementById("btn-undo-expense-import")?.addEventListener("click", () => {
-  const last = state.lastExpenseImport;
-  if (!last || !last.batchId) return;
-  if (!confirm(`Remove the ${last.count} transaction${last.count === 1 ? "" : "s"} from the most recent expense import? This can't be re-done without importing the CSV again.`)) return;
-  const before = state.transactions.length;
-  state.transactions = state.transactions.filter(t => t.importBatch !== last.batchId);
-  const removed = before - state.transactions.length;
-  state.lastExpenseImport = null;
-  saveState();
-  render();
-  refreshExpenseImportUndoUi();
-  if (window.toast) toast(`Removed ${removed} imported expense${removed === 1 ? "" : "s"}`, { kind: "success" });
-});
-// Initial render of the undo UI
-setTimeout(refreshExpenseImportUndoUi, 0);
 
 document.getElementById("btn-clear").addEventListener("click", () => {
   const answer = prompt(
