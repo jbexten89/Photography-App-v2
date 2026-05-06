@@ -6897,10 +6897,10 @@ function renderInvoicesList() {
       uninvoicedList.innerHTML = uninvoiced.map(j => {
         const earned = incomeByJob.get(j.jobNo) || 0;
         return `<tr class="uninvoiced-row" data-jobno="${escapeHtml(j.jobNo)}">
-           <td class="uninvoiced-date">${escapeHtml(j.date || "")}</td>
-           <td class="uninvoiced-customer">${escapeHtml(j.customer || "")} <span class="muted" style="font-size:11px">· ${escapeHtml(j.jobNo)}</span></td>
-           <td class="uninvoiced-job">${escapeHtml(j.category || "")}${(j.status || (j.complete ? "Paid" : "")) ? ' <span class="muted" style="font-size:11px">(' + escapeHtml(j.status || (j.complete ? "Paid" : "")) + ')</span>' : ""}</td>
-           <td class="uninvoiced-amt income">${fmtMoney(earned)}</td>
+           <td data-col="date" class="uninvoiced-date">${escapeHtml(j.date || "")}</td>
+           <td data-col="customer" class="uninvoiced-customer">${escapeHtml(j.customer || "")} <span class="muted" style="font-size:11px">· ${escapeHtml(j.jobNo)}</span></td>
+           <td data-col="job" class="uninvoiced-job">${escapeHtml(j.category || "")}${(j.status || (j.complete ? "Paid" : "")) ? ' <span class="muted" style="font-size:11px">(' + escapeHtml(j.status || (j.complete ? "Paid" : "")) + ')</span>' : ""}</td>
+           <td data-col="amt" class="uninvoiced-amt income">${fmtMoney(earned)}</td>
          </tr>`;
       }).join("");
     } else {

@@ -6043,6 +6043,39 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .toolbar > span[style*="flex:1"] { display: none; }
   #newjob .toolbar .mileage-total-display { width: auto; flex: 1; }
 
+  /* "Jobs not invoiced" 3-line stacked layout — uses the same Settings toggle
+     (inv-mobile-3line) so both the Invoices table and this card are consistent. */
+  body.inv-mobile-3line .uninvoiced-table { display: block; min-width: 0; border-collapse: separate; border-spacing: 0; }
+  body.inv-mobile-3line .uninvoiced-table colgroup { display: none; }
+  body.inv-mobile-3line .uninvoiced-table thead { display: none; }
+  body.inv-mobile-3line .uninvoiced-table tbody { display: block; }
+  body.inv-mobile-3line .uninvoiced-table tbody tr.uninvoiced-row {
+    display: grid;
+    grid-template-columns: auto 1fr 90px;
+    grid-template-rows: auto auto auto;
+    column-gap: 8px;
+    row-gap: 2px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border, rgba(0,0,0,0.08));
+    align-items: center;
+    cursor: pointer;
+  }
+  body.inv-mobile-3line .uninvoiced-table tbody tr.uninvoiced-row > td {
+    display: block;
+    padding: 0;
+    border: none !important;
+    background: transparent !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    white-space: normal;
+    text-align: left !important;
+  }
+  body.inv-mobile-3line .uninvoiced-table tbody tr.uninvoiced-row td[data-col="date"]     { grid-column: 1 / 3; grid-row: 1; font-size: 12px; color: var(--muted); }
+  body.inv-mobile-3line .uninvoiced-table tbody tr.uninvoiced-row td[data-col="amt"]      { grid-column: 3;     grid-row: 1; font-weight: 700; font-size: 14px; text-align: right !important; }
+  body.inv-mobile-3line .uninvoiced-table tbody tr.uninvoiced-row td[data-col="customer"] { grid-column: 1 / 4; grid-row: 2; font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.inv-mobile-3line .uninvoiced-table tbody tr.uninvoiced-row td[data-col="job"]      { grid-column: 1 / 4; grid-row: 3; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
   /* Invoices 3-line stacked layout (opt-in via Settings) */
   body.inv-mobile-3line #invoices-list-view .table-wrap { overflow-x: visible !important; }
   body.inv-mobile-3line #invoices-table { display: block; min-width: 0; border-collapse: separate; border-spacing: 0; }
