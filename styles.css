@@ -6038,8 +6038,21 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* New Job: hide the "Job Analytics" heading on mobile */
   #newjob .nj-analytics-heading { display: none !important; }
 
-  /* Overview: All pill matches the width of the year pills on mobile */
-  #dashboard-year-pills .year-pill { min-width: 60px; text-align: center; }
+  /* Overview: spread All + year pills + More evenly across the row on mobile */
+  #dashboard-year-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    width: 100%;
+  }
+  #dashboard-year-pills .year-pill {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 4px;
+    padding-right: 4px;
+    text-align: center;
+    white-space: nowrap;
+  }
 
   /* New Job: keep Open Jobs + Complete cards side-by-side on mobile */
   #newjob .toolbar { flex-wrap: wrap; gap: 8px; }
