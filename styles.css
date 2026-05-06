@@ -6038,6 +6038,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* New Job: hide the "Job Analytics" heading on mobile */
   #newjob .nj-analytics-heading { display: none !important; }
 
+  /* Overview: All pill matches the width of the year pills on mobile */
+  #dashboard-year-pills .year-pill { min-width: 60px; text-align: center; }
+
   /* New Job: keep Open Jobs + Complete cards side-by-side on mobile */
   #newjob .toolbar { flex-wrap: wrap; gap: 8px; }
   #newjob .toolbar > span[style*="flex:1"] { display: none; }
