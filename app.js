@@ -3283,7 +3283,7 @@ let txSelectMode = false;
   }, true);
 })();
 
-// Mileage trips swipe-left → reveal Delete (mobile only)
+// Mileage trips swipe-left → reveal Edit + Delete (mobile only)
 (function setupMileageSwipe() {
   const tbl = document.getElementById("mileage-trips-table");
   if (!tbl) return;
@@ -3291,8 +3291,8 @@ let txSelectMode = false;
   let activeRow = null;
   let panel = null;
   let startX = 0, startY = 0, dx = 0, dy = 0, isSwiping = false, locked = false;
-  const REVEAL = 90;
-  const TRIGGER = 40;
+  const REVEAL = 160;
+  const TRIGGER = 50;
 
   function isMobile() {
     return window.matchMedia("(max-width: 768px)").matches;
@@ -3311,8 +3311,18 @@ let txSelectMode = false;
     if (panel) panel.remove();
     panel = document.createElement("div");
     panel.className = "trip-row-actions";
-    panel.innerHTML = `<button type="button" class="trip-action-delete">Delete</button>`;
+    panel.innerHTML = `
+      <button type="button" class="trip-action-edit">Edit</button>
+      <button type="button" class="trip-action-delete">Delete</button>
+    `;
     row.appendChild(panel);
+    panel.querySelector(".trip-action-edit").addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const id = row.dataset.id;
+      const trip = (state.trips || []).find(t => t.id === id);
+      closeSwipe();
+      if (trip && typeof openTripModal === "function") openTripModal(trip);
+    });
     panel.querySelector(".trip-action-delete").addEventListener("click", (e) => {
       e.preventDefault(); e.stopPropagation();
       const id = row.dataset.id;

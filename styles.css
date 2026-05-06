@@ -6867,14 +6867,14 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #mileage-trips-table tbody tr.trip-row .trip-row-actions {
     position: absolute;
     top: 0;
-    right: -90px;
+    right: -160px;
     bottom: 0;
-    width: 90px;
+    width: 160px;
     display: flex;
     align-items: stretch;
     pointer-events: auto;
   }
-  #mileage-trips-table tbody tr.trip-row .trip-row-actions .trip-action-delete {
+  #mileage-trips-table tbody tr.trip-row .trip-row-actions button {
     flex: 1;
     border: none;
     color: #fff;
@@ -6883,8 +6883,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     cursor: pointer;
     padding: 0;
     margin: 0;
-    background: #ef4444;
   }
+  #mileage-trips-table tbody tr.trip-row .trip-row-actions .trip-action-edit   { background: #3b82f6; }
+  #mileage-trips-table tbody tr.trip-row .trip-row-actions .trip-action-delete { background: #ef4444; }
   /* Hide the inline Delete column on mobile — swipe-left replaces it */
   #mileage-trips-table .trip-del-btn { display: none !important; }
 }
