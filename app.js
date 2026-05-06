@@ -6894,6 +6894,23 @@ function renderInvoicesList() {
         if (t.type !== "income" || !t.jobNo) return;
         incomeByJob.set(t.jobNo, (incomeByJob.get(t.jobNo) || 0) + (+t.amount || 0));
       });
+      uninvoicedList.onclick = (e) => {
+        const row = e.target.closest(".uninvoiced-row");
+        if (!row) return;
+        const jobNo = row.dataset.jobno;
+        if (!jobNo) return;
+        const newBtn = document.getElementById("btn-new-invoice");
+        if (newBtn) newBtn.click();
+        setTimeout(() => {
+          const sel = document.getElementById("invoice-job");
+          if (!sel) return;
+          const opt = [...sel.options].find(o => o.value === "nj:" + jobNo);
+          if (opt) {
+            sel.value = "nj:" + jobNo;
+            sel.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        }, 50);
+      };
       uninvoicedList.innerHTML = uninvoiced.map(j => {
         const earned = incomeByJob.get(j.jobNo) || 0;
         return `<tr class="uninvoiced-row" data-jobno="${escapeHtml(j.jobNo)}">
