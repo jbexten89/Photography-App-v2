@@ -21,7 +21,7 @@
     } catch (e) {}
   })();
 </script>
-<link rel="stylesheet" href="styles.css?v=377" />
+<link rel="stylesheet" href="styles.css?v=378" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -30,6 +30,13 @@
 <body>
   <!-- App-level password gate — shown until the user enters the correct password.
        Hash is configured in app.js (APP_GATE_HASH). Default password: "changeme". -->
+  <!-- Brief loading veil shown on launch while Supabase pulls cloud state.
+       Prevents the empty-state flash before sync completes. -->
+  <div id="app-loading" class="app-loading" aria-hidden="true">
+    <div class="app-loading-spinner"></div>
+    <div class="app-loading-text">Loading…</div>
+  </div>
+
   <div id="app-gate" class="app-gate" hidden>
     <div class="app-gate-card">
       <h2>Jamie Bexten Photography</h2>
@@ -2847,6 +2854,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=199"></script>
+  <script src="app.js?v=200"></script>
 </body>
 </html>
