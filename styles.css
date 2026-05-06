@@ -1,4 +1,7 @@
 * { box-sizing: border-box; }
+/* Disable double-tap-to-zoom (Safari & Chrome) while still allowing
+   pinch-to-zoom. Applies to every element so taps anywhere are snappy. */
+html { touch-action: manipulation; }
 
 /* App password gate — full-screen overlay shown until the user enters the
    correct password. Configured in app.js. */
