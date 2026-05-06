@@ -8615,22 +8615,9 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
    Job No., Customer, and Payee cells on the same row also light up so the
    full record context is obvious at a glance. Solid fill, no per-cell border
    so adjacent highlighted cells read as one continuous block. */
-#tx-table tr.expinc-cat-match td[data-col="expinc"],
-#tx-table tr.expinc-cat-match td[data-col="category"],
-#tx-table tr.expinc-cat-match td[data-col="jobno"],
-#tx-table tr.expinc-cat-match td[data-col="customer"],
-#tx-table tr.expinc-cat-match td[data-col="payee"],
-#tx-table tr.expinc-cat-match td[data-col="chart"] {
-  background: rgba(108, 122, 224, 0.22);
-  box-shadow: none;
-  border-color: transparent;
-}
-
-/* Sales income rows: tint Category, Expense, Chart of Accounts and Payee. */
-#tx-table tr.chart-sales td[data-col="category"],
-#tx-table tr.chart-sales td[data-col="expinc"],
-#tx-table tr.chart-sales td[data-col="chart"],
-#tx-table tr.chart-sales td[data-col="payee"] {
+/* Sales income rows: tint the entire row green when the highlight setting
+   is on (default). Toggle off via Settings → All Transactions Table. */
+body:not(.chart-sales-off) #tx-table tr.chart-sales td {
   background: rgba(39, 174, 96, 0.22);
   box-shadow: none;
   border-color: transparent;

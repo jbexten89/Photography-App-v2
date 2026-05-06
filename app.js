@@ -164,6 +164,9 @@ if (typeof state.njMobile3Line !== "boolean") state.njMobile3Line = false;
 document.body.classList.toggle("nj-mobile-3line", state.njMobile3Line);
 if (typeof state.invMobile3Line !== "boolean") state.invMobile3Line = false;
 document.body.classList.toggle("inv-mobile-3line", state.invMobile3Line);
+// Default ON; toggle in Settings → All Transactions Table.
+if (typeof state.chartSalesHighlight !== "boolean") state.chartSalesHighlight = true;
+document.body.classList.toggle("chart-sales-off", !state.chartSalesHighlight);
 
 // Startup preferences
 if (state.startupView !== "dashboard" && state.startupView !== "transactions") state.startupView = "dashboard";
@@ -3970,6 +3973,17 @@ if (_lockBox) {
   _lockBox.addEventListener("change", e => {
     state.txColsLocked = !!e.target.checked;
     applyTxColWidths();
+    saveState();
+  });
+}
+
+// Settings: green highlight for Sales-account income rows.
+const _chartSalesBox = document.getElementById("setting-chart-sales-highlight");
+if (_chartSalesBox) {
+  _chartSalesBox.checked = state.chartSalesHighlight !== false;
+  _chartSalesBox.addEventListener("change", e => {
+    state.chartSalesHighlight = !!e.target.checked;
+    document.body.classList.toggle("chart-sales-off", !state.chartSalesHighlight);
     saveState();
   });
 }
