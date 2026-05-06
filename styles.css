@@ -4933,9 +4933,10 @@ select option {
   /* Row 2 — Categories (2/3) · Type (1/3) */
   #transactions .toolbar #tx-filter-category { order: -4; flex: 0 0 calc(66.667% - 4px); min-width: 0; }
   #transactions .toolbar #tx-filter-type     { order: -3; flex: 0 0 calc(33.333% - 4px); min-width: 0; }
-  /* Row 3 — More (1/2, left) · + New Transaction (1/2, right) */
-  #transactions .toolbar .tx-more-wrap    { order: -2; flex: 0 0 calc(50% - 4px); min-width: 0; }
-  #transactions .toolbar #btn-new-tx      { order: -1; flex: 0 0 calc(50% - 4px); min-width: 0; margin-left: auto; }
+  /* Row 3 — More (1/3) · Clear filters (1/3) · + New Transaction (1/3) */
+  #transactions .toolbar .tx-more-wrap         { order: -3; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+  #transactions .toolbar #btn-tx-clear-filters { order: -2; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
+  #transactions .toolbar #btn-new-tx           { order: -1; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
   /* Back — full-width when visible (rare; only after drilling in from Analytics) */
   #transactions .toolbar #btn-tx-back     { order: -7; flex: 1 1 100%; }
 }
@@ -6690,6 +6691,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 
 /* New Job: trigger row spacing for + Add Job button (desktop + mobile) */
 .nj-add-trigger-row { display: flex; justify-content: flex-end; margin: 8px 0 16px; }
+
+/* All Transactions: hide Clear filters on desktop (it lives in row 3 mobile only) */
+@media (min-width: 769px) { #transactions #btn-tx-clear-filters { display: none; } }
 
 /* === Additional mobile polish (≤ 768px) === */
 @media (max-width: 768px) {

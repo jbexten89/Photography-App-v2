@@ -3274,6 +3274,26 @@ let txSelectMode = false;
   });
 })();
 
+// All Transactions — Clear filters button (resets every toolbar filter)
+(function wireTxClearFilters() {
+  const btn = document.getElementById("btn-tx-clear-filters");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    ["tx-filter-year", "tx-filter-category", "tx-filter-jobno", "tx-filter-type"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.value = ""; el.dispatchEvent(new Event("change", { bubbles: true })); }
+    });
+    const search = document.getElementById("tx-search-all");
+    if (search) { search.value = ""; search.dispatchEvent(new Event("input", { bubbles: true })); }
+    if (typeof refreshTxDrillChip === "function") {
+      window.__txDrillFilter = null;
+      window.__txDrillLabel = "";
+      refreshTxDrillChip();
+    }
+    if (typeof renderTransactions === "function") renderTransactions();
+  });
+})();
+
 // New Job — open/close the Add Job modal
 (function wireNjAddModal() {
   function openModal() {
