@@ -5988,7 +5988,12 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   }
   /* Select all bar — only visible while in select mode, lives inside the
      sticky header band so it stays pinned while scrolling. */
-  #tx-select-all-bar { display: none; padding: 8px 12px 4px; }
+  #tx-select-all-bar {
+    display: none;
+    padding: 14px 12px 6px;
+    margin-top: 8px;
+    border-top: 1px solid var(--border, rgba(0,0,0,0.08));
+  }
   body.tx-select-active #tx-select-all-bar { display: block; }
   #tx-select-all-bar label {
     display: inline-flex;
