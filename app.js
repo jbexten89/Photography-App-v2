@@ -9651,7 +9651,9 @@ function renderIncomeByYearChart(years, opts = {}) {
   }
 
   const W = 900, H = 360;
-  const padL = 40, padR = 20, padT = 20, padB = 40;
+  // padL bumped from 40 → 90 so the y-axis money labels (e.g., "$10K") sit
+  // inside the SVG's viewBox instead of being clipped at the left edge.
+  const padL = 90, padR = 20, padT = 20, padB = 40;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 
