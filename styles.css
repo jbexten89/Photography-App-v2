@@ -5270,13 +5270,8 @@ td.recon-cell { text-align: center; }
   gap: 4px;
   position: relative;
 }
-.tx-find-btn {
-  padding: 6px 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.tx-find-btn svg { width: 16px; height: 16px; display: block; }
+#btn-tx-find svg,
+#btn-tx-find-close svg { width: 16px; height: 16px; display: block; }
 .tx-find-input {
   width: 0;
   padding: 6px 0;
@@ -5297,7 +5292,7 @@ td.recon-cell { text-align: center; }
   opacity: 1;
   pointer-events: auto;
 }
-.tx-find-close-btn { display: none; }
+#btn-tx-find-close { display: none; }
 
 /* When JS relocates Gross/Net into the Analytics toolbar-row (any breakpoint),
    margin-left:auto pins it to the right edge alongside Filters / Presets. */
@@ -6651,8 +6646,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* Option A — search always visible on mobile. Magnifying-glass button
      and close button hide; the input is permanently expanded so there's no
      toggle, no animation, no flash. */
-  #transactions .tx-find-btn,
-  #transactions .tx-find-close-btn { display: none !important; }
+  #transactions #btn-tx-find,
+  #transactions #btn-tx-find-close { display: none !important; }
   #transactions .tx-find-input {
     /* Match the height of the All Years <select> alongside it. */
     height: 34px;
@@ -6674,9 +6669,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #transactions .toolbar #tx-filter-category,
   #transactions .toolbar #tx-filter-type,
   #transactions .toolbar #tx-search-all,
-  #transactions .tx-find-input,
-  #transactions .toolbar .tx-find-btn,
-  #transactions .toolbar .tx-find-close-btn {
+  #transactions .tx-find-input {
     height: 40px !important;
     min-height: 40px !important;
     box-sizing: border-box;
