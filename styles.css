@@ -242,7 +242,8 @@ body {
   margin-bottom: 8px;
 }
 
-.logo-wrap {
+.logo-wrap,
+.right-flyout-logo-wrap {
   position: relative;
   display: block;
 }
@@ -8621,6 +8622,11 @@ body:not(.chart-sales-off) #tx-table tr.chart-sales td {
   background: rgba(39, 174, 96, 0.22);
   box-shadow: none;
   border-color: transparent;
+}
+/* Same highlight in mobile 3-line mode — apply to the row itself since the
+   reset above sets each <td> background to transparent. */
+body.tx-mobile-3line:not(.chart-sales-off) #tx-table tbody tr.chart-sales {
+  background: rgba(39, 174, 96, 0.22);
 }
 
 .nj-badge {
