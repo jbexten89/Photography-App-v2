@@ -7238,18 +7238,20 @@ function openInvoiceEditor(inv) {
     // 2-digit year. First invoice of a new year is YY001 (26001 in 2026,
     // 27001 in 2027, etc.). Auto-number never picks a value below the
     // current year's floor — gaps in older years are left alone.
-    const usedSet = new Set(
-      state.invoices
-        .map(x => parseInt(x.number, 10))
-        .filter(n => !isNaN(n))
-    );
+    // Match against numeric portion of any existing invoice (handles both
+    // legacy "26001" and new "INV-26001" / "INV-26001-2" formats).
+    const usedSet = new Set();
+    state.invoices.forEach(x => {
+      const m = String(x.number || "").match(/(\d{5})/);
+      if (m) usedSet.add(parseInt(m[1], 10));
+    });
     const currentYYYY = new Date().getFullYear();
     const yearFloor = (currentYYYY % 100) * 1000 + 1; // 26001 for 2026
     let candidate = yearFloor;
     while (usedSet.has(candidate)) candidate++;
     inv = {
       id: uid(),
-      number: String(candidate),
+      number: `INV-${candidate}`,
       date: new Date().toISOString().slice(0, 10),
       billTo: "",
       lineItems: [{ item: "", qty: "", description: "", price: "" }],
@@ -13406,9 +13408,10 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       if (!job) return;
       e.stopImmediatePropagation();
 
-      // Auto-suffix the invoice number when this job already has invoice(s).
-      // 26002 → 26002-2 → 26002-3 ... so each invoice has a unique number
-      // while still all linking back to the same base jobNo.
+      // Auto-prefix invoice numbers with "INV-" so they're distinct from
+      // raw job numbers while the invoice still links back to the job via
+      // editingInvoice.data.jobNo (set below). Auto-suffix when this job
+      // already has invoice(s): INV-26002 → INV-26002-2 → INV-26002-3 ...
       const myId = editingInvoice && editingInvoice.data ? editingInvoice.data.id : null;
       const usedNums = new Set(
         (state.invoices || [])
@@ -13416,11 +13419,12 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
           .map(i => (i.number || "").trim())
           .filter(Boolean)
       );
-      let nextNum = job.jobNo;
+      const base = `INV-${job.jobNo}`;
+      let nextNum = base;
       if (usedNums.has(nextNum)) {
         let n = 2;
-        while (usedNums.has(`${job.jobNo}-${n}`)) n++;
-        nextNum = `${job.jobNo}-${n}`;
+        while (usedNums.has(`${base}-${n}`)) n++;
+        nextNum = `${base}-${n}`;
       }
       const numEl = document.getElementById("invoice-number");
       if (numEl) {
