@@ -3776,14 +3776,47 @@ document.getElementById("btn-select-mode").addEventListener("click", () => {
   // already in the DOM, only their visibility is gated by .select-mode.
   const _txTable = document.getElementById("tx-table");
   if (_txTable) _txTable.classList.toggle("select-mode", txSelectMode);
+  document.body.classList.toggle("tx-select-active", txSelectMode);
+  ensureTxSelectAllBar();
+  syncTxStickyHeights();
   if (!txSelectMode) {
     // On exit, clear any checked rows visually without a full re-render.
     document.querySelectorAll("#tx-table tbody tr.is-checked").forEach(r => r.classList.remove("is-checked"));
     document.querySelectorAll("#tx-table tbody .tx-select-box:checked").forEach(c => { c.checked = false; });
     const sa = document.getElementById("tx-select-all");
     if (sa) sa.checked = false;
+    const saMirror = document.getElementById("tx-select-all-mirror");
+    if (saMirror) saMirror.checked = false;
   }
 });
+
+// Inject a Select-all bar inside the .tx-sticky-header so it stays visible
+// while scrolling (the <thead> version has reliability issues across browsers
+// when the table becomes display:block in 3-line mode).
+function ensureTxSelectAllBar() {
+  const sect = document.getElementById("transactions");
+  const wrap = sect && sect.querySelector(":scope > .tx-sticky-header");
+  if (!wrap) return;
+  let bar = document.getElementById("tx-select-all-bar");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "tx-select-all-bar";
+    bar.innerHTML = `
+      <label>
+        <input type="checkbox" id="tx-select-all-mirror" />
+        <span>Select all</span>
+      </label>
+    `;
+    wrap.appendChild(bar);
+    const mirror = bar.querySelector("#tx-select-all-mirror");
+    mirror.addEventListener("change", () => {
+      const orig = document.getElementById("tx-select-all");
+      if (!orig) return;
+      orig.checked = mirror.checked;
+      orig.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  }
+}
 
 document.getElementById("dashboard-year").addEventListener("change", renderDashboard);
 document.getElementById("jobs-year").addEventListener("change", renderJobs);
