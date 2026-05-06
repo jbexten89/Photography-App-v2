@@ -324,7 +324,7 @@ function initSupabase() {
 }
 
 async function cloudSyncPull(mergeFromLocal) {
-  if (!supa || !supaUser) return;
+  if (!supa || !supaUser) { flushDeferredInitialRender(); return; }
   setSyncStatus("syncing", "◐ Syncing…");
   try {
     const { data, error } = await supa.from("app_state_v2")
@@ -346,17 +346,34 @@ async function cloudSyncPull(mergeFromLocal) {
       setSyncStatus("synced", "● Synced");
       refreshCloudSyncUI();
       if (typeof render === "function") render();
+      __initialRenderPending = false;
     } else if (mergeFromLocal) {
       // First sign-in on this account — seed the remote row from local state.
       await cloudSyncPush();
+      flushDeferredInitialRender();
     } else {
       setSyncStatus("synced", "● Synced (empty)");
+      flushDeferredInitialRender();
     }
   } catch (e) {
     console.warn("cloudSyncPull failed:", e);
     setSyncStatus("error", "● Error");
+    flushDeferredInitialRender();
   }
 }
+
+// When the initial render is deferred (waiting on cloud pull), this flushes
+// it after the pull finishes — succeeded, errored, or returned no remote row.
+let __initialRenderPending = false;
+function flushDeferredInitialRender() {
+  if (__initialRenderPending && typeof render === "function") {
+    __initialRenderPending = false;
+    render();
+  }
+}
+// Safety net: force the initial render after 6 seconds so a stalled pull or
+// JS error can never leave the user on a blank screen.
+setTimeout(flushDeferredInitialRender, 6000);
 
 async function cloudSyncPush() {
   if (!supa || !supaUser) return;
@@ -11643,7 +11660,25 @@ function renderEditableList(elId, key) {
   if (panel) panel.classList.add("active");
 })();
 
-render();
+// Defer the initial render if local state is empty BUT a Supabase session
+// token exists in localStorage — meaning a cloud pull is about to populate
+// state. This avoids the empty-data flash on first refresh. cloudSyncPull
+// will trigger render() once data lands; a 6s safety timer renders anyway
+// if the pull never resolves.
+(function maybeDeferInitialRender() {
+  const empty = !Array.isArray(state.transactions) || state.transactions.length === 0;
+  let hasSupabaseSession = false;
+  try {
+    for (const k in localStorage) {
+      if (/^sb-.*-auth-token$/.test(k)) { hasSupabaseSession = true; break; }
+    }
+  } catch (e) { /* ignore */ }
+  if (empty && hasSupabaseSession) {
+    __initialRenderPending = true;
+    return; // defer — cloudSyncPull or its safety timer will render
+  }
+  render();
+})();
 // Initialize the Analytics filter default selections (current year for Date
 // Range) and refresh the filter-count badge before the user opens the panel.
 if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
