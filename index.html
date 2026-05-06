@@ -29,7 +29,7 @@
     if (el) el.hidden = true;
   }, 15000);
 </script>
-<link rel="stylesheet" href="styles.css?v=381" />
+<link rel="stylesheet" href="styles.css?v=380" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -39,19 +39,10 @@
   <!-- App-level password gate — shown until the user enters the correct password.
        Hash is configured in app.js (APP_GATE_HASH). Default password: "changeme". -->
   <!-- Brief loading veil shown on launch while Supabase pulls cloud state.
-       Prevents the empty-state flash before sync completes. If the pull
-       fails after retries, the veil reveals a Retry / Continue control. -->
+       Prevents the empty-state flash before sync completes. -->
   <div id="app-loading" class="app-loading" aria-hidden="true">
     <div class="app-loading-spinner"></div>
     <div class="app-loading-text">Loading…</div>
-    <div class="app-loading-error" hidden>
-      <div class="app-loading-error-msg">Couldn't reach the cloud.</div>
-      <div class="app-loading-error-actions">
-        <button type="button" id="btn-loading-retry" class="btn primary">Retry</button>
-        <button type="button" id="btn-loading-continue" class="btn">Continue offline</button>
-      </div>
-      <div class="app-loading-error-hint">"Continue offline" loads whatever's in this device's local storage.</div>
-    </div>
   </div>
 
   <div id="app-gate" class="app-gate" hidden>
@@ -2871,6 +2862,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=203"></script>
+  <script src="app.js?v=202"></script>
 </body>
 </html>

@@ -370,13 +370,7 @@ async function cloudSyncPull(mergeFromLocal, attempt) {
     }
     setSyncStatus("error", "● Error");
   }
-  if (succeeded) {
-    hideAppLoading();
-  } else if (attempt >= 3) {
-    // Don't hide the veil on final failure — show a Retry / Continue choice
-    // so the user can recover instead of landing on an empty-looking app.
-    showAppLoadingError();
-  }
+  if (succeeded || attempt >= 3) hideAppLoading();
 }
 
 // Hide the launch loading veil. Idempotent — safe to call multiple times.
@@ -386,37 +380,6 @@ function hideAppLoading() {
   el.classList.add("fading");
   setTimeout(() => { el.hidden = true; }, 220);
 }
-// Show the cloud-pull failure UI on the loading veil so the user can pick
-// Retry or Continue offline instead of being stranded on a frozen-looking
-// empty app.
-function showAppLoadingError() {
-  const veil = document.getElementById("app-loading");
-  if (!veil) return;
-  const spinner = veil.querySelector(".app-loading-spinner");
-  const text    = veil.querySelector(".app-loading-text");
-  const err     = veil.querySelector(".app-loading-error");
-  if (spinner) spinner.style.display = "none";
-  if (text)    text.style.display = "none";
-  if (err)     err.hidden = false;
-}
-function resetAppLoadingError() {
-  const veil = document.getElementById("app-loading");
-  if (!veil) return;
-  const spinner = veil.querySelector(".app-loading-spinner");
-  const text    = veil.querySelector(".app-loading-text");
-  const err     = veil.querySelector(".app-loading-error");
-  if (spinner) spinner.style.display = "";
-  if (text)    text.style.display = "";
-  if (err)     err.hidden = true;
-}
-document.addEventListener("click", (e) => {
-  if (e.target.closest("#btn-loading-retry")) {
-    resetAppLoadingError();
-    if (typeof cloudSyncPull === "function") cloudSyncPull(true, 1);
-  } else if (e.target.closest("#btn-loading-continue")) {
-    hideAppLoading();
-  }
-});
 // (No short timer here — the veil only hides when the cloud pull actually
 // completes, when the user is signed out, or when Supabase is unavailable.
 // A 15s catastrophic-failure safety net lives in the inline <head> script

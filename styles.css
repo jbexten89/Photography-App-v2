@@ -33,17 +33,6 @@ html { touch-action: manipulation; }
   animation: app-loading-spin 0.9s linear infinite;
 }
 @keyframes app-loading-spin { to { transform: rotate(360deg); } }
-.app-loading-error {
-  text-align: center;
-  max-width: 320px;
-  padding: 0 24px;
-  color: var(--text, #e6ebf2);
-  text-transform: none;
-  letter-spacing: normal;
-}
-.app-loading-error-msg { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
-.app-loading-error-actions { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
-.app-loading-error-hint { font-size: 11px; color: var(--muted, #8b95a3); }
 
 /* App password gate — full-screen overlay shown until the user enters the
    correct password. Configured in app.js. */
