@@ -325,9 +325,11 @@ function initSupabase() {
   });
 }
 
-async function cloudSyncPull(mergeFromLocal) {
-  if (!supa || !supaUser) return;
+async function cloudSyncPull(mergeFromLocal, attempt) {
+  attempt = attempt || 1;
+  if (!supa || !supaUser) { hideAppLoading(); return; }
   setSyncStatus("syncing", "◐ Syncing…");
+  let succeeded = false;
   try {
     const { data, error } = await supa.from("app_state_v2")
       .select("data, updated_at")
@@ -348,18 +350,27 @@ async function cloudSyncPull(mergeFromLocal) {
       setSyncStatus("synced", "● Synced");
       refreshCloudSyncUI();
       if (typeof render === "function") render();
+      succeeded = true;
     } else if (mergeFromLocal) {
       // First sign-in on this account — seed the remote row from local state.
       await cloudSyncPush();
+      succeeded = true;
     } else {
       setSyncStatus("synced", "● Synced (empty)");
+      succeeded = true;
     }
   } catch (e) {
-    console.warn("cloudSyncPull failed:", e);
+    console.warn(`cloudSyncPull attempt ${attempt} failed:`, e);
+    if (attempt < 3) {
+      // Retry up to 3 attempts with exponential-ish backoff so a cold-start
+      // delay doesn't dump the user onto stale local data.
+      setSyncStatus("syncing", `◐ Syncing (retry ${attempt}/3)…`);
+      setTimeout(() => cloudSyncPull(mergeFromLocal, attempt + 1), 1000 * attempt);
+      return; // keep veil up — don't hide on transient errors
+    }
     setSyncStatus("error", "● Error");
-  } finally {
-    hideAppLoading();
   }
+  if (succeeded || attempt >= 3) hideAppLoading();
 }
 
 // Hide the launch loading veil. Idempotent — safe to call multiple times.
