@@ -10729,6 +10729,7 @@ function renderDonut(containerId, items, centerLabel, opts = {}) {
           data-value="${s.item.value}" data-pct="${s.pct.toFixed(2)}"
           cx="${CX}" cy="${CY}" r="${R}" fill="transparent"
           stroke="${s.color}" stroke-width="${STROKE}"
+          pathLength="100"
           stroke-dasharray="${s.dash}"
           stroke-dashoffset="${s.dashOffset}"
           transform="rotate(-90 ${CX} ${CY})">
