@@ -3023,6 +3023,7 @@ txForm.addEventListener("submit", e => {
   saveState();
   closeTxModal();
   render();
+  if (window.toast) toast(id ? "Transaction updated" : "Transaction saved", { kind: "success" });
 });
 
 // --------- Helpers ---------
@@ -3143,6 +3144,36 @@ if (btnTxFind && txFindWrap && txFindInput) {
 
 // --------- Transaction Selection Mode ---------
 let txSelectMode = false;
+
+// Toast utility — small floating "Saved" / status confirmation near the
+// bottom of the screen. Use as `toast("Saved")` or `toast("Job 26012 saved", { kind: "success" })`.
+(function setupToast() {
+  let container;
+  function ensureContainer() {
+    if (container && document.body.contains(container)) return container;
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.setAttribute("aria-live", "polite");
+    document.body.appendChild(container);
+    return container;
+  }
+  window.toast = function (message, opts = {}) {
+    if (!message) return;
+    const c = ensureContainer();
+    const el = document.createElement("div");
+    el.className = "toast" + (opts.kind ? " toast-" + opts.kind : "");
+    el.textContent = message;
+    c.appendChild(el);
+    // Force layout, then add .visible so the transition runs.
+    void el.offsetWidth;
+    el.classList.add("visible");
+    const ttl = opts.ttl || 2200;
+    setTimeout(() => {
+      el.classList.remove("visible");
+      setTimeout(() => el.remove(), 250);
+    }, ttl);
+  };
+})();
 
 // Job Analytics swipe-left → reveal Edit action (3-line mode only)
 (function setupNjSwipe() {
@@ -6638,6 +6669,7 @@ document.getElementById("btn-add-trip").addEventListener("click", () => {
   document.getElementById("mileage-new-miles").value = "";
   document.getElementById("mileage-new-purpose").value = "";
   renderMileage();
+  if (window.toast) toast(`${miles} mile${miles === 1 ? "" : "s"} logged`, { kind: "success" });
 });
 
 document.getElementById("mileage-rate").addEventListener("input", e => {
@@ -11586,6 +11618,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     njResetForm();
     renderNjJobsTable();
     renderNjAnalytics();
+    if (window.toast) toast(`Job ${jobNo} saved`, { kind: "success" });
   });
 
   // ============================================================
@@ -12154,6 +12187,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     closeJobEditModal();
     renderNjJobsTable();
     renderNjAnalytics();
+    if (window.toast) toast(`Job ${newJobNo} updated`, { kind: "success" });
   });
 
   // Job Analytics — inline status select changes the job's status without
