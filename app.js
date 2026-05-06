@@ -162,6 +162,8 @@ if (typeof state.txMobile3Line !== "boolean") state.txMobile3Line = false;
 document.body.classList.toggle("tx-mobile-3line", state.txMobile3Line);
 if (typeof state.njMobile3Line !== "boolean") state.njMobile3Line = false;
 document.body.classList.toggle("nj-mobile-3line", state.njMobile3Line);
+if (typeof state.invMobile3Line !== "boolean") state.invMobile3Line = false;
+document.body.classList.toggle("inv-mobile-3line", state.invMobile3Line);
 
 // Startup preferences
 if (state.startupView !== "dashboard" && state.startupView !== "transactions") state.startupView = "dashboard";
@@ -3809,6 +3811,16 @@ if (_nj3lineBox) {
     saveState();
   });
 }
+// Settings: 3-line stacked layout for Invoices on mobile.
+const _inv3lineBox = document.getElementById("setting-inv-mobile-3line");
+if (_inv3lineBox) {
+  _inv3lineBox.checked = !!state.invMobile3Line;
+  _inv3lineBox.addEventListener("change", e => {
+    state.invMobile3Line = !!e.target.checked;
+    document.body.classList.toggle("inv-mobile-3line", state.invMobile3Line);
+    saveState();
+  });
+}
 
 // Settings: invert report colors on screen.
 const _invBox = document.getElementById("setting-reports-inverted");
@@ -6985,12 +6997,12 @@ function renderInvoicesList() {
       : `<div class="muted" style="padding:8px 4px">No line items on this invoice.</div>`;
     return `
       <tr data-id="${inv.id}" class="invoice-row${inv.paid ? " paid" : ""}">
-        <td><button type="button" class="invoice-expand-btn" aria-label="Expand line items">▸</button> ${escapeHtml(inv.number)}</td>
-        <td class="amount inv-total${inv.paid ? " paid" : ""}" style="text-align:right">${fmtMoney(invoiceTotal(inv))}</td>
-        <td>${fmtDate(inv.date)}</td>
-        <td>${escapeHtml(billToFirst)}</td>
-        <td>${escapeHtml(inv.job || "")}</td>
-        <td>${status}</td>
+        <td data-col="number"><button type="button" class="invoice-expand-btn" aria-label="Expand line items">▸</button> ${escapeHtml(inv.number)}</td>
+        <td data-col="total" class="amount inv-total${inv.paid ? " paid" : ""}" style="text-align:right">${fmtMoney(invoiceTotal(inv))}</td>
+        <td data-col="date">${fmtDate(inv.date)}</td>
+        <td data-col="billto">${escapeHtml(billToFirst)}</td>
+        <td data-col="job">${escapeHtml(inv.job || "")}</td>
+        <td data-col="status">${status}</td>
       </tr>
       <tr class="invoice-expand-row" data-for="${inv.id}" hidden>
         <td colspan="6" class="invoice-expand-cell">${lineRowsHtml}</td>
