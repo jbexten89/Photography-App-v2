@@ -6460,14 +6460,22 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   body.tx-mobile-3line #tx-table thead { display: none; }
   body.tx-mobile-3line #tx-table tbody { display: block; }
   /* In select mode, expose just the Select-all checkbox above the rows by
-     re-showing the thead but hiding every header cell except the checkbox col. */
-  body.tx-mobile-3line #tx-table.select-mode thead { display: block; }
+     re-showing the thead but hiding every header cell except the checkbox col.
+     The thead sticks just below the page-level sticky header band. */
+  body.tx-mobile-3line #tx-table.select-mode thead {
+    display: block;
+    position: sticky;
+    top: var(--tx-sticky-header-h, 120px);
+    z-index: 40;
+    background: var(--bg);
+  }
   body.tx-mobile-3line #tx-table.select-mode thead tr {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 8px 4px;
     border-bottom: 1px solid var(--border, rgba(0,0,0,0.08));
+    background: var(--bg);
   }
   body.tx-mobile-3line #tx-table.select-mode thead th { display: none; padding: 0; border: none; background: transparent; }
   body.tx-mobile-3line #tx-table.select-mode thead th.tx-select-col {

@@ -3478,7 +3478,19 @@ function ensureTxStickyHeader() {
 }
 window.addEventListener("DOMContentLoaded", ensureTxStickyHeader);
 setTimeout(ensureTxStickyHeader, 0);
-function syncTxStickyHeights() { /* no-op: header is now a single sticky block */ }
+// Measure the sticky header band's height and write it to a CSS variable so
+// the Select all bar (and other sub-headers) can stick just below it.
+function syncTxStickyHeights() {
+  const sect = document.getElementById("transactions");
+  if (!sect) return;
+  const wrap = sect.querySelector(":scope > .tx-sticky-header");
+  if (!wrap) return;
+  const h = Math.ceil(wrap.getBoundingClientRect().height);
+  sect.style.setProperty("--tx-sticky-header-h", `${h}px`);
+}
+window.addEventListener("resize", syncTxStickyHeights);
+window.addEventListener("DOMContentLoaded", () => setTimeout(syncTxStickyHeights, 50));
+setTimeout(syncTxStickyHeights, 200);
 const txSelectedIds = new Set();
 let txLastClickedId = null;
 let txVisibleIds = []; // ids in currently displayed order (for range selection)
