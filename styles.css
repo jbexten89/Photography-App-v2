@@ -6790,6 +6790,38 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .chart-account-add { grid-template-columns: 1fr; }
 }
 
+/* Mileage trips: swipe-left action panel (mobile) */
+@media (max-width: 768px) {
+  #mileage-trips-table tbody tr.trip-row {
+    position: relative;
+    transition: transform 0.18s ease;
+    will-change: transform;
+  }
+  #mileage-trips-table tbody tr.trip-row .trip-row-actions {
+    position: absolute;
+    top: 0;
+    right: -90px;
+    bottom: 0;
+    width: 90px;
+    display: flex;
+    align-items: stretch;
+    pointer-events: auto;
+  }
+  #mileage-trips-table tbody tr.trip-row .trip-row-actions .trip-action-delete {
+    flex: 1;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    background: #ef4444;
+  }
+  /* Hide the inline Delete column on mobile — swipe-left replaces it */
+  #mileage-trips-table .trip-del-btn { display: none !important; }
+}
+
 /* Toast — small floating confirmation near the bottom of the screen. */
 #toast-container {
   position: fixed;
