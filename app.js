@@ -13301,34 +13301,8 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     });
   }
 
-  // ============================================================
-  // INVOICE PAID → prompt to mark the linked Job complete.
-  // ============================================================
-  const btnInvoicePaid = document.getElementById("btn-invoice-paid");
-  if (btnInvoicePaid) {
-    let __wasPaidBefore = false;
-    btnInvoicePaid.addEventListener("click", () => {
-      __wasPaidBefore = !!(editingInvoice && editingInvoice.data && editingInvoice.data.paid);
-    }, true);
-    btnInvoicePaid.addEventListener("click", () => {
-      if (!editingInvoice || !editingInvoice.data) return;
-      if (__wasPaidBefore || !editingInvoice.data.paid) return; // only on the false → true transition
-      const num = (editingInvoice.data.number || "").trim();
-      const baseJobNo = (editingInvoice.data.jobNo || "").trim() || num.replace(/-\d+$/, "");
-      if (!baseJobNo) return;
-      const job = (state.jobs || []).find(j => j.jobNo === baseJobNo);
-      if (!job || getJobStatus(job) === "Paid") return;
-      const ok = confirm(`Invoice #${num} marked paid.\n\nMark Job ${baseJobNo} (${job.customer || ""}${job.category ? " — " + job.category : ""}) as Paid?`);
-      if (!ok) return;
-      setJobStatus(job, "Paid");
-      saveState();
-      // Refresh new-spec views that depend on completion state
-      renderNjJobsTable();
-      renderNjAnalytics();
-      // Refresh the invoice list page so the "Jobs not invoiced" updates too
-      if (typeof renderInvoicesList === "function") renderInvoicesList();
-    });
-  }
+  // (Marking an invoice paid no longer touches the linked Job's status —
+  // the user manages job status independently from invoice status.)
 
   // ============================================================
   // INVOICE EDITOR — tie new-spec Jobs into the Job picker.
