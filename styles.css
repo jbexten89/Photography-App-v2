@@ -20,10 +20,17 @@ html { touch-action: manipulation; }
   font-size: 13px;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  transition: opacity 0.2s ease;
+  /* Safety net: auto-fade-out after 3.5s no matter what JS does, so a
+     stalled network or a JS error can't leave the user staring at a
+     spinner forever. JS still hides faster on the happy path via .fading. */
+  animation: app-loading-auto-hide 3.8s ease 3.5s forwards;
 }
 .app-loading[hidden] { display: none; }
-.app-loading.fading { opacity: 0; pointer-events: none; }
+.app-loading.fading { opacity: 0; pointer-events: none; animation: none; }
+@keyframes app-loading-auto-hide {
+  0%   { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; pointer-events: none; }
+}
 .app-loading-spinner {
   width: 36px;
   height: 36px;
