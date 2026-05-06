@@ -6792,6 +6792,13 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 
 /* Mileage trips: swipe-left action panel (mobile) */
 @media (max-width: 768px) {
+  /* Stop the .table-wrap from claiming horizontal swipes (it's overflow-x:auto by default) */
+  #mileage .table-wrap:has(#mileage-trips-table) { overflow-x: visible !important; }
+  /* Tell the browser this row only handles vertical pans, leaving horizontal for our swipe handler */
+  #mileage-trips-table tbody tr.trip-row { touch-action: pan-y; }
+  /* Roomier rows on mobile (~2x default) */
+  #mileage-trips-table tbody tr.trip-row td { padding: 18px 10px; }
+
   #mileage-trips-table tbody tr.trip-row {
     position: relative;
     transition: transform 0.18s ease;
