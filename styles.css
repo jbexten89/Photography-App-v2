@@ -2851,10 +2851,16 @@ select option {
   cursor: not-allowed;
 }
 
-/* Mobile: give the prev/next arrows more tappable width + anchor the
-   Full Year / Year to Date slider to the right of its header row. */
+/* Mobile: prev/next arrows drop to their own row, far-left, BELOW the
+   Full Year / To Date toggle (which stays anchored to the right). */
 @media (max-width: 768px) {
-  .income-year-nav { gap: 8px; }
+  .income-year-nav {
+    order: 99;
+    flex: 0 0 100%;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 4px 0 0;
+  }
   .income-year-nav .year-pill {
     padding: 6px 22px;
     min-width: 60px;
