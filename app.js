@@ -369,9 +369,10 @@ function hideAppLoading() {
   el.classList.add("fading");
   setTimeout(() => { el.hidden = true; }, 220);
 }
-// Safety net: if Supabase isn't configured / user not signed in, hide the
-// veil after a short delay so the app isn't stuck behind it forever.
-setTimeout(hideAppLoading, 2000);
+// (No short timer here — the veil only hides when the cloud pull actually
+// completes, when the user is signed out, or when Supabase is unavailable.
+// A 15s catastrophic-failure safety net lives in the inline <head> script
+// in index.html and only fires if app.js itself failed to execute.)
 
 async function cloudSyncPush() {
   if (!supa || !supaUser) return;
