@@ -9651,9 +9651,9 @@ function renderIncomeByYearChart(years, opts = {}) {
   }
 
   const W = 900, H = 360;
-  // padL bumped from 40 → 90 so the y-axis money labels (e.g., "$10K") sit
-  // inside the SVG's viewBox instead of being clipped at the left edge.
-  const padL = 90, padR = 20, padT = 20, padB = 40;
+  // Tightened padding so the plot area uses more of the SVG (chart looks
+  // larger inside the same card). padL is sized to fit the y-axis labels.
+  const padL = 75, padR = 10, padT = 10, padB = 32;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 
@@ -9685,7 +9685,7 @@ function renderIncomeByYearChart(years, opts = {}) {
     const v = (yMax / ticks) * i;
     const y = yFor(v);
     gridLines.push(`<line class="trend-grid-line" x1="${padL}" y1="${y}" x2="${padL + plotW}" y2="${y}"></line>`);
-    gridLines.push(`<text class="trend-axis-label" x="${padL - 6}" y="${y + 4}" style="text-anchor:end;font-size:20px;fill:var(--muted)">${fmtMoneyCompact(v)}</text>`);
+    gridLines.push(`<text class="trend-axis-label" x="${padL - 6}" y="${y + 4}" style="text-anchor:end;font-size:16px;fill:var(--muted)">${fmtMoneyCompact(v)}</text>`);
   }
 
   const bars = totals.map((d, i) => {
