@@ -6794,16 +6794,38 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 @media (max-width: 768px) {
   /* Stop the .table-wrap from claiming horizontal swipes (it's overflow-x:auto by default) */
   #mileage .table-wrap:has(#mileage-trips-table) { overflow-x: visible !important; }
-  /* Tell the browser this row only handles vertical pans, leaving horizontal for our swipe handler */
-  #mileage-trips-table tbody tr.trip-row { touch-action: pan-y; }
-  /* Roomier rows on mobile (~2x default) */
-  #mileage-trips-table tbody tr.trip-row td { padding: 18px 10px; }
-
+  /* Restructure each row as a grid so position:relative actually creates a
+     containing block (a plain <tr> doesn't on most browsers, which makes the
+     absolute action panel anchor to the table instead of the row). */
+  #mileage-trips-table { display: block; }
+  #mileage-trips-table thead { display: none; }
+  #mileage-trips-table colgroup { display: none; }
+  #mileage-trips-table tbody { display: block; }
   #mileage-trips-table tbody tr.trip-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
+    column-gap: 12px;
+    align-items: center;
+    padding: 18px 12px;
+    border-bottom: 1px solid var(--border, rgba(0,0,0,0.08));
     position: relative;
     transition: transform 0.18s ease;
     will-change: transform;
+    touch-action: pan-y;
   }
+  #mileage-trips-table tbody tr.trip-row td {
+    display: block;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    width: auto !important;
+    text-align: left !important;
+  }
+  /* Map the visible cells (Purpose + Delete are display:none on mobile) */
+  #mileage-trips-table tbody tr.trip-row td:nth-child(1) { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  #mileage-trips-table tbody tr.trip-row td:nth-child(2) { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #mileage-trips-table tbody tr.trip-row td:nth-child(4) { font-weight: 700; font-size: 14px; text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
   #mileage-trips-table tbody tr.trip-row .trip-row-actions {
     position: absolute;
     top: 0;
