@@ -2333,6 +2333,7 @@ select option {
 }
 
 .btn:hover { background: var(--hover); }
+.btn[hidden] { display: none; }
 .btn.primary { background: var(--primary); border-color: var(--primary); color: white; }
 .btn.primary:hover { background: var(--primary-hover); }
 .btn.danger { background: var(--expense); border-color: var(--expense); color: white; }
@@ -3801,12 +3802,10 @@ select option {
 #invoices-table td.inv-total.paid { color: var(--income); font-weight: 700; }
 
 /* Back arrow on Transactions when navigated from Analytics */
-.tx-back-btn {
+#btn-tx-back {
   font-size: 16px;
   font-weight: 700;
-  padding: 8px 14px;
 }
-.tx-back-btn[hidden] { display: none; }
 
 /* A job card that's been single-tapped to select its donut slice (mobile) */
 .job-card.selected {
@@ -6640,7 +6639,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* Mobile toolbar order:
      - Back button takes the leftmost slot (where ... used to live)
      - ... more-actions moves to the right, inline with the magnifying glass */
-  #transactions .tx-back-btn { order: -1; margin-right: 4px; }
+  #transactions #btn-tx-back { order: -1; margin-right: 4px; }
   #transactions .tx-find-wrap { margin-left: auto; }
 
   /* Option A — search always visible on mobile. Magnifying-glass button
