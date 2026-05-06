@@ -10721,20 +10721,38 @@ function renderDonut(containerId, items, centerLabel, opts = {}) {
     `).join("");
   })();
 
+  // Draw each slice as an explicit arc <path>. Using the same angle math as
+  // the dividers guarantees they align exactly — no dash/circumference drift.
+  const polar = (deg) => {
+    const rad = deg * Math.PI / 180;
+    return { x: CX + Math.cos(rad) * R, y: CY + Math.sin(rad) * R };
+  };
+  const slicePath = (startPct, pct) => {
+    if (pct <= 0) return "";
+    const startDeg = startPct * 3.6 - 90;
+    const endDeg = (startPct + pct) * 3.6 - 90;
+    if (pct >= 99.999) {
+      // Full ring: two arcs to close the circle (single arc can't span 360°)
+      const top = polar(-90);
+      const bot = polar(90);
+      return `M ${top.x} ${top.y} A ${R} ${R} 0 0 1 ${bot.x} ${bot.y} A ${R} ${R} 0 0 1 ${top.x} ${top.y}`;
+    }
+    const start = polar(startDeg);
+    const end = polar(endDeg);
+    const largeArc = pct > 50 ? 1 : 0;
+    return `M ${start.x} ${start.y} A ${R} ${R} 0 ${largeArc} 1 ${end.x} ${end.y}`;
+  };
   el.innerHTML = `
     <svg class="donut-svg" viewBox="${viewBox}">
       <circle cx="${CX}" cy="${CY}" r="${R}" fill="transparent" stroke="var(--bg)" stroke-width="${STROKE}"></circle>
       ${slices.map(s => `
-        <circle class="donut-slice" data-cat="${escapeHtml(s.item.label)}"
+        <path class="donut-slice" data-cat="${escapeHtml(s.item.label)}"
           data-value="${s.item.value}" data-pct="${s.pct.toFixed(2)}"
-          cx="${CX}" cy="${CY}" r="${R}" fill="transparent"
-          stroke="${s.color}" stroke-width="${STROKE}"
-          pathLength="100"
-          stroke-dasharray="${s.dash}"
-          stroke-dashoffset="${s.dashOffset}"
-          transform="rotate(-90 ${CX} ${CY})">
+          d="${slicePath(s.startPct, s.pct)}"
+          fill="none"
+          stroke="${s.color}" stroke-width="${STROKE}">
           <title>${escapeHtml(s.item.label)}: ${s.pct.toFixed(1)}% (${fmtMoney(s.item.value)})</title>
-        </circle>
+        </path>
       `).join("")}
       ${dividers}
       <text class="donut-center" x="${CX}" y="${CY - 0.5}">${fmtMoney(total)}</text>
