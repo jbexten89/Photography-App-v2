@@ -2857,7 +2857,7 @@ select option {
   .income-year-nav {
     order: 99;
     flex: 0 0 100%;
-    justify-content: flex-start;
+    justify-content: flex-end;
     gap: 8px;
     margin: 4px 0 0;
   }
