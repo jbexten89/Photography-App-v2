@@ -5522,29 +5522,33 @@ th.tag-col, td.tag-cell { width: 32px; text-align: center; }
   align-items: end;
 }
 
-#tx-form .flow-row .swap-btn {
+#tx-form .flow-row .icon-btn {
   margin-bottom: 12px;
 }
 
-.swap-btn {
+/* Unified icon-only button used across the app (swap, find, expand, etc.) */
+.icon-btn {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 6px;
-  width: 38px;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
   color: var(--muted);
-  transition: all 0.15s;
-  padding: 9px 0;
-  margin-bottom: 0;
+  cursor: pointer;
   font-family: inherit;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.15s;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.swap-btn:hover {
+.icon-btn.lg { width: 40px; height: 40px; font-size: 18px; }
+.icon-btn:hover {
   background: var(--primary);
   border-color: var(--primary);
-  color: white;
+  color: #fff;
 }
 
 /* ==========================================================================
