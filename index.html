@@ -20,16 +20,15 @@
       document.documentElement.setAttribute("data-theme", t);
     } catch (e) {}
   })();
-  // Catastrophic-failure safety net: kill the loading veil after 15 seconds
-  // even if app.js fails to load. The veil is normally hidden by app.js
-  // exactly when the Supabase pull finishes, so this only fires if the
-  // script itself failed to execute.
+  // Belt-and-suspenders safety net: kill the loading veil after 4 seconds
+  // even if app.js fails to load. CSS already auto-fades it; this guarantees
+  // the element is removed from the layout regardless of any JS error.
   setTimeout(function () {
     var el = document.getElementById("app-loading");
     if (el) el.hidden = true;
-  }, 15000);
+  }, 4000);
 </script>
-<link rel="stylesheet" href="styles.css?v=380" />
+<link rel="stylesheet" href="styles.css?v=379" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2862,6 +2861,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=201"></script>
+  <script src="app.js?v=200"></script>
 </body>
 </html>
