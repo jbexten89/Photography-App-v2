@@ -165,6 +165,20 @@ document.body.classList.toggle("nj-mobile-3line", state.njMobile3Line);
 if (typeof state.invMobile3Line !== "boolean") state.invMobile3Line = false;
 document.body.classList.toggle("inv-mobile-3line", state.invMobile3Line);
 
+// One-time migration: collapse any chartAccount value that's literally
+// "Cost of Goods Sold" (or matching variations) down to "CoGS" so the rest
+// of the app — analytics, Schedule C mapping, etc. — sees a single label.
+(function migrateCogsLabel() {
+  let changed = 0;
+  (state.transactions || []).forEach(t => {
+    if (t && typeof t.chartAccount === "string" && /^cost of goods sold$/i.test(t.chartAccount.trim())) {
+      t.chartAccount = "CoGS";
+      changed++;
+    }
+  });
+  if (changed > 0) saveState();
+})();
+
 // Startup preferences
 if (state.startupView !== "dashboard" && state.startupView !== "transactions") state.startupView = "dashboard";
 if (state.startupDashboardYear !== "all" && state.startupDashboardYear !== "current") state.startupDashboardYear = "current";
