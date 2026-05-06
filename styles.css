@@ -3,37 +3,6 @@
    pinch-to-zoom. Applies to every element so taps anywhere are snappy. */
 html { touch-action: manipulation; }
 
-/* App loading overlay — shown briefly on launch while Supabase pulls cloud
-   state, so the user doesn't see a flash of empty data. Hidden by JS once
-   the first cloud sync completes (or quickly if not signed in). */
-.app-loading {
-  position: fixed;
-  inset: 0;
-  z-index: 99998;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: var(--bg, #1a1f29);
-  color: var(--muted, #8b95a3);
-  font-size: 13px;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  transition: opacity 0.2s ease;
-}
-.app-loading[hidden] { display: none; }
-.app-loading.fading { opacity: 0; pointer-events: none; }
-.app-loading-spinner {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 3px solid var(--border, rgba(255,255,255,0.15));
-  border-top-color: var(--primary, #4a8fe0);
-  animation: app-loading-spin 0.9s linear infinite;
-}
-@keyframes app-loading-spin { to { transform: rotate(360deg); } }
-
 /* App password gate — full-screen overlay shown until the user enters the
    correct password. Configured in app.js. */
 .app-gate {

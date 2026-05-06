@@ -296,7 +296,6 @@ function initSupabase() {
   if (!window.supabase || typeof window.supabase.createClient !== "function") {
     console.warn("Supabase library not loaded — cloud sync disabled");
     setSyncStatus("offline", "● Offline");
-    hideAppLoading();
     return;
   }
   supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
@@ -310,7 +309,6 @@ function initSupabase() {
       cloudSyncPull(/*merge*/ true);
     } else {
       setSyncStatus("offline", "● Signed Out");
-      hideAppLoading();
     }
   });
   supa.auth.onAuthStateChange((_event, session) => {
@@ -357,21 +355,8 @@ async function cloudSyncPull(mergeFromLocal) {
   } catch (e) {
     console.warn("cloudSyncPull failed:", e);
     setSyncStatus("error", "● Error");
-  } finally {
-    hideAppLoading();
   }
 }
-
-// Hide the launch loading veil. Idempotent — safe to call multiple times.
-function hideAppLoading() {
-  const el = document.getElementById("app-loading");
-  if (!el || el.hidden) return;
-  el.classList.add("fading");
-  setTimeout(() => { el.hidden = true; }, 220);
-}
-// Safety net: if Supabase isn't configured / user not signed in, hide the
-// veil after a short delay so the app isn't stuck behind it forever.
-setTimeout(hideAppLoading, 2000);
 
 async function cloudSyncPush() {
   if (!supa || !supaUser) return;
