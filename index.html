@@ -300,7 +300,14 @@
         <button id="btn-new-tx" class="btn primary">+ New Transaction</button>
         <button id="btn-tx-clear-filters" class="btn" type="button">Clear filters</button>
         <select id="tx-filter-year"><option value="">All Years</option></select>
-        <select id="tx-filter-category"><option value="">All Categories</option></select>
+        <!-- Hidden source-of-truth select so existing render/filter code keeps working. -->
+        <select id="tx-filter-category" hidden><option value="">All Categories</option></select>
+        <div class="tx-filter-chart-wrap tx-filter-category-wrap">
+          <button type="button" id="tx-filter-category-btn" class="tx-filter-chart-btn">All Categories <span aria-hidden="true">▾</span></button>
+          <div id="tx-filter-category-panel" class="tx-filter-chart-panel" hidden>
+            <div class="tx-filter-chart-list" id="tx-filter-category-list"></div>
+          </div>
+        </div>
         <!-- Hidden source-of-truth select so existing render/filter code keeps working. -->
         <select id="tx-filter-jobno" hidden><option value="">All Jobs</option></select>
         <div class="tx-filter-chart-wrap tx-filter-jobno-wrap">
@@ -2905,6 +2912,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=213"></script>
+  <script src="app.js?v=214"></script>
 </body>
 </html>

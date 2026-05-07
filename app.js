@@ -3101,6 +3101,56 @@ function escapeHtml(s) {
 // any of the Transactions tab's own filters so it never sticks around.
 let __txDrillFilter = null;
 
+// All Categories filter — custom button + panel matching the All Charts /
+// All Jobs look, single-select. Backed by the hidden #tx-filter-category
+// select so existing render/filter code keeps reading its value.
+function rebuildTxFilterCategoryList() {
+  const list = document.getElementById("tx-filter-category-list");
+  const sel  = document.getElementById("tx-filter-category");
+  if (!list || !sel) return;
+  const cur = sel.value || "";
+  const cats = (state.categories || []).slice().sort((a, b) => a.localeCompare(b));
+  const items = [{ value: "", label: "All Categories" }, ...cats.map(c => ({ value: c, label: c }))];
+  list.innerHTML = items.map(it => {
+    const selCls = it.value === cur ? " is-selected" : "";
+    return `<button type="button" class="tx-filter-jobno-item${selCls}" data-value="${escapeHtml(it.value)}">${escapeHtml(it.label)}</button>`;
+  }).join("");
+}
+function refreshTxFilterCategoryButtonLabel() {
+  const btn = document.getElementById("tx-filter-category-btn");
+  const sel = document.getElementById("tx-filter-category");
+  if (!btn || !sel) return;
+  btn.firstChild.nodeValue = (sel.value || "All Categories") + " ";
+}
+(function wireTxFilterCategoryPanel() {
+  const btn = document.getElementById("tx-filter-category-btn");
+  const panel = document.getElementById("tx-filter-category-panel");
+  const list = document.getElementById("tx-filter-category-list");
+  const sel = document.getElementById("tx-filter-category");
+  if (!btn || !panel || !list || !sel) return;
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const opening = panel.hidden;
+    if (opening) rebuildTxFilterCategoryList();
+    panel.hidden = !opening;
+  });
+  document.addEventListener("click", (e) => {
+    if (panel.hidden) return;
+    if (e.target.closest("#tx-filter-category-panel") || e.target.closest("#tx-filter-category-btn")) return;
+    panel.hidden = true;
+  });
+  list.addEventListener("click", (e) => {
+    const item = e.target.closest(".tx-filter-jobno-item");
+    if (!item) return;
+    sel.value = item.dataset.value || "";
+    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    refreshTxFilterCategoryButtonLabel();
+    panel.hidden = true;
+  });
+  sel.addEventListener("change", refreshTxFilterCategoryButtonLabel);
+  refreshTxFilterCategoryButtonLabel();
+})();
+
 // All Jobs filter — custom button + panel matching the All Charts look,
 // but single-select. Backed by the hidden #tx-filter-jobno select so existing
 // render/filter code keeps reading its value.
@@ -10649,6 +10699,7 @@ function renderTransactions() {
   const fJobNo = document.getElementById("tx-filter-jobno")?.value || "";
   if (typeof refreshTxSortJobNoVisibility === "function") refreshTxSortJobNoVisibility();
   if (typeof refreshTxFilterJobNoButtonLabel === "function") refreshTxFilterJobNoButtonLabel();
+  if (typeof refreshTxFilterCategoryButtonLabel === "function") refreshTxFilterCategoryButtonLabel();
 
   // Populate the Job No. filter options each render so it stays in sync with
   // jobs that exist in state.jobs (newest first). Includes a synthetic
