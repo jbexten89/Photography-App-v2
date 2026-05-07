@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=387" />
+<link rel="stylesheet" href="styles.css?v=388" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -301,7 +301,14 @@
         <button id="btn-tx-clear-filters" class="btn" type="button">Clear filters</button>
         <select id="tx-filter-year"><option value="">All Years</option></select>
         <select id="tx-filter-category"><option value="">All Categories</option></select>
-        <select id="tx-filter-jobno"><option value="">All Jobs</option></select>
+        <!-- Hidden source-of-truth select so existing render/filter code keeps working. -->
+        <select id="tx-filter-jobno" hidden><option value="">All Jobs</option></select>
+        <div class="tx-filter-chart-wrap tx-filter-jobno-wrap">
+          <button type="button" id="tx-filter-jobno-btn" class="tx-filter-chart-btn">All Jobs <span aria-hidden="true">▾</span></button>
+          <div id="tx-filter-jobno-panel" class="tx-filter-chart-panel" hidden>
+            <div class="tx-filter-chart-list" id="tx-filter-jobno-list"></div>
+          </div>
+        </div>
         <select id="tx-filter-type">
           <option value="">All Types</option>
           <option value="income">Income</option>
@@ -2898,6 +2905,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=212"></script>
+  <script src="app.js?v=213"></script>
 </body>
 </html>

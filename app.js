@@ -3101,6 +3101,73 @@ function escapeHtml(s) {
 // any of the Transactions tab's own filters so it never sticks around.
 let __txDrillFilter = null;
 
+// All Jobs filter — custom button + panel matching the All Charts look,
+// but single-select. Backed by the hidden #tx-filter-jobno select so existing
+// render/filter code keeps reading its value.
+function rebuildTxFilterJobNoList() {
+  const list = document.getElementById("tx-filter-jobno-list");
+  const sel  = document.getElementById("tx-filter-jobno");
+  if (!list || !sel) return;
+  const cur = sel.value || "";
+  const jobs = (state.jobs || []).slice().sort((a, b) => (b.jobNo || "").localeCompare(a.jobNo || ""));
+  const items = [
+    { value: "",         label: "All Jobs" },
+    { value: "__any__",  label: "Only Jobs" },
+    { value: "__none__", label: "No Job" },
+    ...jobs.map(j => ({
+      value: j.jobNo,
+      label: `${j.jobNo} - ${j.customer || ""}${j.category ? " / " + j.category : ""}`,
+    })),
+  ];
+  list.innerHTML = items.map(it => {
+    const sel = it.value === cur ? " is-selected" : "";
+    return `<button type="button" class="tx-filter-jobno-item${sel}" data-value="${escapeHtml(it.value)}">${escapeHtml(it.label)}</button>`;
+  }).join("");
+}
+function refreshTxFilterJobNoButtonLabel() {
+  const btn = document.getElementById("tx-filter-jobno-btn");
+  const sel = document.getElementById("tx-filter-jobno");
+  if (!btn || !sel) return;
+  const v = sel.value || "";
+  let label = "All Jobs";
+  if (v === "__any__")  label = "Only Jobs";
+  else if (v === "__none__") label = "No Job";
+  else if (v) {
+    const job = (state.jobs || []).find(j => j.jobNo === v);
+    label = job ? `${job.jobNo}` : v;
+  }
+  btn.firstChild.nodeValue = label + " ";
+}
+(function wireTxFilterJobNoPanel() {
+  const btn = document.getElementById("tx-filter-jobno-btn");
+  const panel = document.getElementById("tx-filter-jobno-panel");
+  const list = document.getElementById("tx-filter-jobno-list");
+  const sel = document.getElementById("tx-filter-jobno");
+  if (!btn || !panel || !list || !sel) return;
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const opening = panel.hidden;
+    if (opening) rebuildTxFilterJobNoList();
+    panel.hidden = !opening;
+  });
+  document.addEventListener("click", (e) => {
+    if (panel.hidden) return;
+    if (e.target.closest("#tx-filter-jobno-panel") || e.target.closest("#tx-filter-jobno-btn")) return;
+    panel.hidden = true;
+  });
+  list.addEventListener("click", (e) => {
+    const item = e.target.closest(".tx-filter-jobno-item");
+    if (!item) return;
+    sel.value = item.dataset.value || "";
+    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    refreshTxFilterJobNoButtonLabel();
+    panel.hidden = true;
+  });
+  // Keep the button label fresh when something else changes the select.
+  sel.addEventListener("change", refreshTxFilterJobNoButtonLabel);
+  refreshTxFilterJobNoButtonLabel();
+})();
+
 // Sort by Job No. — only visible when the All Jobs filter = "Only Jobs".
 let txSortByJobNo = false;
 (function wireTxSortJobNo() {
@@ -10581,6 +10648,7 @@ function renderTransactions() {
   const fType = document.getElementById("tx-filter-type").value;
   const fJobNo = document.getElementById("tx-filter-jobno")?.value || "";
   if (typeof refreshTxSortJobNoVisibility === "function") refreshTxSortJobNoVisibility();
+  if (typeof refreshTxFilterJobNoButtonLabel === "function") refreshTxFilterJobNoButtonLabel();
 
   // Populate the Job No. filter options each render so it stays in sync with
   // jobs that exist in state.jobs (newest first). Includes a synthetic

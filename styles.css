@@ -8721,6 +8721,26 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 .tx-filter-chart-list label:hover { background: var(--hover); }
 .tx-filter-chart-list input[type="checkbox"] { margin: 0; cursor: pointer; }
 
+/* Single-select items inside the All Jobs panel */
+.tx-filter-jobno-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.tx-filter-jobno-item:hover { background: var(--hover); }
+.tx-filter-jobno-item.is-selected {
+  background: var(--primary);
+  color: #fff;
+}
+
 /* Sales income rows: tint the entire row green when the highlight setting
    is on (default). Toggle off via Settings → All Transactions Table. */
 body:not(.chart-sales-off) #tx-table tr.chart-sales td {
