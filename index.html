@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=384" />
+<link rel="stylesheet" href="styles.css?v=385" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -289,6 +289,16 @@
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
+        <div class="tx-filter-chart-wrap">
+          <button type="button" id="tx-filter-chart-btn" class="tx-filter-chart-btn">All Charts <span aria-hidden="true">▾</span></button>
+          <div id="tx-filter-chart-panel" class="tx-filter-chart-panel" hidden>
+            <div class="tx-filter-chart-header">
+              <button type="button" class="btn" data-act="all">All</button>
+              <button type="button" class="btn" data-act="none">None</button>
+            </div>
+            <div class="tx-filter-chart-list" id="tx-filter-chart-list"></div>
+          </div>
+        </div>
         <button id="btn-tx-drill-clear" type="button" class="tx-drill-clear" hidden title="Clear drill-down filter and show all">
           <span id="tx-drill-clear-label">Drill: —</span>
           <span aria-hidden="true">×</span>
@@ -2869,6 +2879,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=209"></script>
+  <script src="app.js?v=210"></script>
 </body>
 </html>

@@ -3098,6 +3098,71 @@ function escapeHtml(s) {
 // any of the Transactions tab's own filters so it never sticks around.
 let __txDrillFilter = null;
 
+// Chart of Accounts multi-select filter (between All Types and Search).
+// `null` means "no filter / all"; an empty Set means "none selected".
+let txFilterCharts = null;
+function refreshTxFilterChartUi() {
+  const btn = document.getElementById("tx-filter-chart-btn");
+  if (!btn) return;
+  if (!txFilterCharts || !txFilterCharts.size) {
+    btn.firstChild.nodeValue = "All Charts ";
+  } else if (txFilterCharts.size === 1) {
+    btn.firstChild.nodeValue = `${[...txFilterCharts][0]} `;
+  } else {
+    btn.firstChild.nodeValue = `${txFilterCharts.size} Charts `;
+  }
+}
+function rebuildTxFilterChartList() {
+  const list = document.getElementById("tx-filter-chart-list");
+  if (!list) return;
+  const charts = Array.from(new Set(
+    (state.transactions || []).map(t => (t.chartAccount || "").trim()).filter(Boolean)
+  )).sort();
+  list.innerHTML = charts.map(c => {
+    const checked = txFilterCharts && txFilterCharts.has(c) ? " checked" : "";
+    return `<label><input type="checkbox" value="${escapeHtml(c)}"${checked} /> ${escapeHtml(c)}</label>`;
+  }).join("") || `<div class="muted" style="padding:8px;font-size:12px">No Chart of Accounts in transactions yet.</div>`;
+}
+(function wireTxFilterChart() {
+  const btn = document.getElementById("tx-filter-chart-btn");
+  const panel = document.getElementById("tx-filter-chart-panel");
+  const list = document.getElementById("tx-filter-chart-list");
+  if (!btn || !panel || !list) return;
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const opening = panel.hidden;
+    if (opening) rebuildTxFilterChartList();
+    panel.hidden = !opening;
+  });
+  document.addEventListener("click", (e) => {
+    if (panel.hidden) return;
+    if (e.target.closest("#tx-filter-chart-panel") || e.target.closest("#tx-filter-chart-btn")) return;
+    panel.hidden = true;
+  });
+  list.addEventListener("change", (e) => {
+    const cb = e.target.closest('input[type="checkbox"]');
+    if (!cb) return;
+    if (!txFilterCharts) txFilterCharts = new Set();
+    if (cb.checked) txFilterCharts.add(cb.value);
+    else txFilterCharts.delete(cb.value);
+    if (!txFilterCharts.size) txFilterCharts = null;
+    refreshTxFilterChartUi();
+    if (typeof renderTransactions === "function") renderTransactions();
+  });
+  panel.querySelector('[data-act="all"]').addEventListener("click", () => {
+    txFilterCharts = null;
+    list.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+    refreshTxFilterChartUi();
+    if (typeof renderTransactions === "function") renderTransactions();
+  });
+  panel.querySelector('[data-act="none"]').addEventListener("click", () => {
+    txFilterCharts = new Set(); // empty set = "none"
+    list.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+    refreshTxFilterChartUi();
+    if (typeof renderTransactions === "function") renderTransactions();
+  });
+})();
+
 ["tx-search-all", "tx-filter-year", "tx-filter-category", "tx-filter-type", "tx-filter-jobno"].forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
@@ -3435,6 +3500,9 @@ let txSelectMode = false;
     });
     const search = document.getElementById("tx-search-all");
     if (search) { search.value = ""; search.dispatchEvent(new Event("input", { bubbles: true })); }
+    // Reset the multi-select Chart filter too.
+    txFilterCharts = null;
+    if (typeof refreshTxFilterChartUi === "function") refreshTxFilterChartUi();
     if (typeof refreshTxDrillChip === "function") {
       window.__txDrillFilter = null;
       window.__txDrillLabel = "";
@@ -10470,6 +10538,11 @@ function renderTransactions() {
       if (fJobNo === "__any__") {
         if (!t.jobNo) return false;
       } else if (fJobNo && (t.jobNo || "") !== fJobNo) return false;
+      // Chart of Accounts multi-select (null = no filter, empty Set = match nothing)
+      if (txFilterCharts) {
+        if (!txFilterCharts.size) return false;
+        if (!txFilterCharts.has((t.chartAccount || "").trim())) return false;
+      }
       if (qAll) {
         const reconLabel = t.reconciled === "R" ? "reconciled" : t.reconciled === "C" ? "cleared" : "uncleared";
         const hay = [
