@@ -6677,6 +6677,13 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 
   /* Prevent iOS zoom-in when focusing form fields (requires 16px+) */
   input, select, textarea, button { font-size: 16px; }
+  /* Specific tx-form / sched-form / trip-form / nj-edit-form rules at
+     line ~3627 win on desktop with 14px; bump back to 16px on mobile so
+     iOS doesn't auto-zoom when those inputs receive focus. */
+  #tx-form input, #tx-form select,
+  #sched-form input, #sched-form select, #sched-form textarea,
+  #trip-form input,
+  #nj-edit-form input, #nj-edit-form select { font-size: 16px !important; }
   .toolbar input, .toolbar select,
   .dashboard-toolbar select, .dashboard-toolbar input,
   .date-range input[type="date"], .date-range input[type="number"] {
@@ -8624,6 +8631,40 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
    Job No., Customer, and Payee cells on the same row also light up so the
    full record context is obvious at a glance. Solid fill, no per-cell border
    so adjacent highlighted cells read as one continuous block. */
+/* Mark-as-Paid date picker modal */
+.paid-date-modal-content { max-width: 380px; }
+.paid-date-modal-content label {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px;
+  margin: 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.paid-date-modal-content input {
+  width: 100% !important;
+  height: 40px !important;
+  padding: 0 10px !important;
+  font-size: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.paid-date-modal-content #paid-date-picker {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  -webkit-min-logical-width: 0;
+}
+
 /* All Transactions — Chart of Accounts multi-select filter */
 .tx-filter-chart-wrap { position: relative; display: inline-block; }
 .tx-filter-chart-btn {

@@ -555,6 +555,9 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     const backBtn = document.getElementById("btn-tx-back");
     if (backBtn) backBtn.hidden = true;
     render();
+    // Scroll to the top whenever a tab is opened so the user always sees
+    // the heading first instead of landing wherever the previous page ended.
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     // On mobile, close the left-slide drawer after picking a tab
     setSidebarOpen(false);
     // Also close the bottom-nav right flyout if it was open
@@ -8024,20 +8027,63 @@ document.getElementById("btn-invoice-paid").addEventListener("click", () => {
   if (editingInvoice.data.paid) {
     editingInvoice.data.paid = false;
     editingInvoice.data.paidDate = "";
-  } else {
-    const today = new Date().toISOString().slice(0, 10);
-    const entered = prompt("Date this invoice was paid (YYYY-MM-DD):", today);
-    if (entered === null) return; // user cancelled
-    const dateVal = entered.trim() || today;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
-      alert("Please enter a valid date in YYYY-MM-DD format.");
+    updatePaidUI();
+    return;
+  }
+  // Open the calendar-picker modal instead of a plain prompt.
+  const modal = document.getElementById("paid-date-modal");
+  const picker = document.getElementById("paid-date-picker");
+  const manual = document.getElementById("paid-date-manual");
+  if (!modal || !picker) return;
+  const today = new Date().toISOString().slice(0, 10);
+  picker.value = today;
+  if (manual) manual.value = "";
+  modal.classList.remove("hidden");
+  setTimeout(() => picker.focus(), 0);
+});
+
+// Wire the paid-date modal once.
+(function wirePaidDateModal() {
+  const modal = document.getElementById("paid-date-modal");
+  if (!modal) return;
+  const picker = document.getElementById("paid-date-picker");
+  const manual = document.getElementById("paid-date-manual");
+  const cancel = document.getElementById("btn-paid-date-cancel");
+  const save   = document.getElementById("btn-paid-date-save");
+
+  function close() { modal.classList.add("hidden"); }
+  function parseManual(s) {
+    s = (s || "").trim();
+    if (!s) return null;
+    // Accept MM-DD-YYYY, MM/DD/YYYY, or YYYY-MM-DD
+    let m = s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+    if (m) {
+      const mm = m[1].padStart(2, "0");
+      const dd = m[2].padStart(2, "0");
+      return `${m[3]}-${mm}-${dd}`;
+    }
+    m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return s;
+    return null;
+  }
+
+  cancel?.addEventListener("click", close);
+  modal.addEventListener("click", e => { if (e.target === modal) close(); });
+
+  save?.addEventListener("click", () => {
+    if (!editingInvoice) { close(); return; }
+    let dateVal = parseManual(manual?.value || "");
+    if (!dateVal && picker?.value) dateVal = picker.value;
+    if (!dateVal || !/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
+      alert("Please pick a date or type a valid MM-DD-YYYY.");
       return;
     }
     editingInvoice.data.paid = true;
     editingInvoice.data.paidDate = dateVal;
-  }
-  updatePaidUI();
-});
+    if (typeof updatePaidUI === "function") updatePaidUI();
+    close();
+  });
+})();
 
 document.getElementById("btn-invoice-delete").addEventListener("click", () => {
   if (!editingInvoice || editingInvoice.isNew) return;
@@ -10522,11 +10568,12 @@ function renderTransactions() {
     jobNoSel.innerHTML =
       `<option value="">All Jobs</option>` +
       `<option value="__any__">Only Jobs</option>` +
+      `<option value="__none__">No Job</option>` +
       jobs.map(j => {
         const lbl = `${j.jobNo} - ${j.customer || ""}${j.category ? " / " + j.category : ""}`;
         return `<option value="${escapeHtml(j.jobNo)}">${escapeHtml(lbl)}</option>`;
       }).join("");
-    if (cur === "__any__" || jobs.some(j => j.jobNo === cur)) jobNoSel.value = cur;
+    if (cur === "__any__" || cur === "__none__" || jobs.some(j => j.jobNo === cur)) jobNoSel.value = cur;
   }
 
   const list = state.transactions
@@ -10537,6 +10584,8 @@ function renderTransactions() {
       if (fType && t.type !== fType) return false;
       if (fJobNo === "__any__") {
         if (!t.jobNo) return false;
+      } else if (fJobNo === "__none__") {
+        if (t.jobNo) return false;
       } else if (fJobNo && (t.jobNo || "") !== fJobNo) return false;
       // Chart of Accounts multi-select (null = no filter, empty Set = match nothing)
       if (txFilterCharts) {

@@ -25,13 +25,31 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=385" />
+<link rel="stylesheet" href="styles.css?v=386" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
 </head>
 <body>
+  <!-- Mark-as-Paid date picker modal (replaces a prompt() so users get a
+       calendar picker; also accepts MM-DD-YYYY manual entry). -->
+  <div id="paid-date-modal" class="modal hidden">
+    <div class="modal-content paid-date-modal-content">
+      <h2>Mark Invoice as Paid</h2>
+      <label>Paid date
+        <input type="date" id="paid-date-picker" />
+      </label>
+      <label>Or type manually (MM-DD-YYYY)
+        <input type="text" id="paid-date-manual" placeholder="MM-DD-YYYY" autocomplete="off" inputmode="numeric" />
+      </label>
+      <div class="form-actions">
+        <button type="button" class="btn" id="btn-paid-date-cancel">Cancel</button>
+        <button type="button" class="btn primary" id="btn-paid-date-save">Mark Paid</button>
+      </div>
+    </div>
+  </div>
+
   <!-- App-level password gate — shown until the user enters the correct password.
        Hash is configured in app.js (APP_GATE_HASH). Default password: "changeme". -->
   <div id="app-gate" class="app-gate" hidden>
@@ -2788,10 +2806,10 @@
 
         <div class="form-row form-row-2">
           <label>Memo
-            <input type="text" id="tx-memo" placeholder="Optional note" />
+            <input type="text" id="tx-memo" placeholder="Optional note" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
           </label>
           <label>Tags
-            <input type="text" id="tx-tags" placeholder="Comma-separated (optional)" />
+            <input type="text" id="tx-tags" placeholder="Comma-separated (optional)" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
           </label>
         </div>
 
@@ -2879,6 +2897,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=210"></script>
+  <script src="app.js?v=211"></script>
 </body>
 </html>
