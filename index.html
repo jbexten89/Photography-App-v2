@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Photography" />
@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=386" />
+<link rel="stylesheet" href="styles.css?v=387" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -317,6 +317,7 @@
             <div class="tx-filter-chart-list" id="tx-filter-chart-list"></div>
           </div>
         </div>
+        <button type="button" id="tx-sort-jobno" class="tx-filter-chart-btn" hidden title="Sort by Job No.">Sort: Date</button>
         <button id="btn-tx-drill-clear" type="button" class="tx-drill-clear" hidden title="Clear drill-down filter and show all">
           <span id="tx-drill-clear-label">Drill: —</span>
           <span aria-hidden="true">×</span>
@@ -2897,6 +2898,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=211"></script>
+  <script src="app.js?v=212"></script>
 </body>
 </html>

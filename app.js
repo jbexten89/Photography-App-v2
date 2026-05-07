@@ -3101,6 +3101,29 @@ function escapeHtml(s) {
 // any of the Transactions tab's own filters so it never sticks around.
 let __txDrillFilter = null;
 
+// Sort by Job No. — only visible when the All Jobs filter = "Only Jobs".
+let txSortByJobNo = false;
+(function wireTxSortJobNo() {
+  const btn = document.getElementById("tx-sort-jobno");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    txSortByJobNo = !txSortByJobNo;
+    btn.textContent = txSortByJobNo ? "Sort: Job No." : "Sort: Date";
+    if (typeof renderTransactions === "function") renderTransactions();
+  });
+})();
+function refreshTxSortJobNoVisibility() {
+  const btn = document.getElementById("tx-sort-jobno");
+  const sel = document.getElementById("tx-filter-jobno");
+  if (!btn || !sel) return;
+  const onlyJobs = sel.value === "__any__";
+  btn.hidden = !onlyJobs;
+  if (!onlyJobs && txSortByJobNo) {
+    txSortByJobNo = false;
+    btn.textContent = "Sort: Date";
+  }
+}
+
 // Chart of Accounts multi-select filter (between All Types and Search).
 // `null` means "no filter / all"; an empty Set means "none selected".
 let txFilterCharts = null;
@@ -10557,6 +10580,7 @@ function renderTransactions() {
   const fCat = document.getElementById("tx-filter-category").value;
   const fType = document.getElementById("tx-filter-type").value;
   const fJobNo = document.getElementById("tx-filter-jobno")?.value || "";
+  if (typeof refreshTxSortJobNoVisibility === "function") refreshTxSortJobNoVisibility();
 
   // Populate the Job No. filter options each render so it stays in sync with
   // jobs that exist in state.jobs (newest first). Includes a synthetic
@@ -10587,6 +10611,8 @@ function renderTransactions() {
       } else if (fJobNo === "__none__") {
         if (t.jobNo) return false;
       } else if (fJobNo && (t.jobNo || "") !== fJobNo) return false;
+      // Refresh the Sort: Job No. toggle visibility on every render.
+      // (Cheap idempotent UI tweak — safe to run inside the filter callback.)
       // Chart of Accounts multi-select (null = no filter, empty Set = match nothing)
       if (txFilterCharts) {
         if (!txFilterCharts.size) return false;
@@ -10612,7 +10638,16 @@ function renderTransactions() {
       if (hideReconciled && t.reconciled === "R") return false;
       return true;
     })
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort((a, b) => {
+      if (txSortByJobNo) {
+        const ja = (a.jobNo || "").trim();
+        const jb = (b.jobNo || "").trim();
+        const cmp = ja.localeCompare(jb);
+        if (cmp !== 0) return cmp;
+        // Same job → newest first
+      }
+      return b.date.localeCompare(a.date);
+    });
 
   // Running balance — respects current filters
   let rbIn = 0, rbOut = 0;
@@ -10691,7 +10726,7 @@ function renderTransactions() {
     const h = hex.replace("#", "");
     const n = parseInt(h.length === 3 ? h.split("").map(c => c + c).join("") : h, 16);
     const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
-    return `rgba(${r}, ${g}, ${b}, 0.18)`;
+    return `rgba(${r}, ${g}, ${b}, 0.42)`;
   }
 
   body.innerHTML = list.map(t => {
