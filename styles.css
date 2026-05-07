@@ -8648,6 +8648,19 @@ body.tx-mobile-3line.tx-job-expense-highlight #tx-table tbody tr.tx-row:has(td[d
   background: rgba(192, 57, 43, 0.18);
 }
 
+/* Per-job color tint (matches donut palette). Only takes effect when BOTH
+   the green Sales-row highlight is OFF and the red job-expense highlight
+   is OFF — otherwise those explicit highlights win. The per-row color is
+   set via the inline --row-tint CSS variable in renderTransactions. */
+body.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highlight) #tx-table tr.tx-row[style*="--row-tint"] td {
+  background: var(--row-tint);
+  box-shadow: none;
+  border-color: transparent;
+}
+body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highlight) #tx-table tbody tr.tx-row[style*="--row-tint"] {
+  background: var(--row-tint);
+}
+
 .nj-badge {
   display: inline-block;
   width: 8px;

@@ -170,6 +170,10 @@ document.body.classList.toggle("chart-sales-off", !state.chartSalesHighlight);
 // Default OFF; toggle in Settings → All Transactions Table.
 if (typeof state.txJobExpenseHighlight !== "boolean") state.txJobExpenseHighlight = false;
 document.body.classList.toggle("tx-job-expense-highlight", state.txJobExpenseHighlight);
+// Default OFF; only takes effect when both Sales-row green and job-expense
+// red highlights are off (CSS scopes it that way).
+if (typeof state.txJobColorRows !== "boolean") state.txJobColorRows = false;
+document.body.classList.toggle("tx-job-color-rows", state.txJobColorRows);
 
 // Startup preferences
 if (state.startupView !== "dashboard" && state.startupView !== "transactions") state.startupView = "dashboard";
@@ -3998,6 +4002,17 @@ if (_jobExpenseBox) {
     state.txJobExpenseHighlight = !!e.target.checked;
     document.body.classList.toggle("tx-job-expense-highlight", state.txJobExpenseHighlight);
     saveState();
+  });
+}
+// Settings: per-job color tint on All Transactions rows (matches donut palette).
+const _jobColorBox = document.getElementById("setting-tx-job-color-rows");
+if (_jobColorBox) {
+  _jobColorBox.checked = !!state.txJobColorRows;
+  _jobColorBox.addEventListener("change", e => {
+    state.txJobColorRows = !!e.target.checked;
+    document.body.classList.toggle("tx-job-color-rows", state.txJobColorRows);
+    saveState();
+    if (typeof renderTransactions === "function") renderTransactions();
   });
 }
 
@@ -10537,6 +10552,26 @@ function renderTransactions() {
     });
   });
 
+  // Per-job color map for the optional "Color rows by Job No." setting.
+  // Sorted unique jobNos so the color ↔ jobNo mapping is stable across renders.
+  const txJobColorMap = new Map();
+  if (state.txJobColorRows) {
+    const uniqueJobs = Array.from(new Set(
+      list.map(t => (t.jobNo || "").trim()).filter(Boolean)
+    )).sort();
+    uniqueJobs.forEach((jn, i) => {
+      txJobColorMap.set(jn, DONUT_PALETTE[i % DONUT_PALETTE.length]);
+    });
+  }
+  // Convert a hex like "#4a8fe0" → "rgba(74, 143, 224, 0.18)" so the row tint
+  // is subtle and text remains readable on top.
+  function hexToRowTint(hex) {
+    const h = hex.replace("#", "");
+    const n = parseInt(h.length === 3 ? h.split("").map(c => c + c).join("") : h, 16);
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return `rgba(${r}, ${g}, ${b}, 0.18)`;
+  }
+
   body.innerHTML = list.map(t => {
     const rState = t.reconciled || "";
     const rClass = rState === "C" ? "cleared" : rState === "R" ? "reconciled" : "";
@@ -10550,8 +10585,10 @@ function renderTransactions() {
       (isNonJob ? " nonjob" : "") +
       (expincMatchesCat ? " expinc-cat-match" : "") +
       (isSalesChart ? " chart-sales" : "");
+    const tintColor = (t.jobNo && txJobColorMap.get(t.jobNo)) || "";
+    const rowStyle = tintColor ? ` style="--row-tint: ${hexToRowTint(tintColor)}"` : "";
     return `
-    <tr data-id="${t.id}" class="${rowCls}">
+    <tr data-id="${t.id}" class="${rowCls}"${rowStyle}>
       ${checkboxCell}
       <td data-col="date">${fmtDate(t.date)}</td>
       <td data-col="vendor">${t.vendor ? escapeHtml(t.vendor) : "&nbsp;"}</td>
