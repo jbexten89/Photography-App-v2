@@ -11866,11 +11866,37 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     if (!exists) state.customerCategories.push({ name: customer, category });
 
     state.jobs.push({ date, jobNo, customer, category, hours, complete });
+
+    // Auto-create a paired invoice for this job. Number is INV-<jobNo> (with
+    // -N suffix if that's already taken). Bill To = customer, Job = category.
+    if (!Array.isArray(state.invoices)) state.invoices = [];
+    const usedInvNums = new Set(state.invoices.map(i => (i.number || "").trim()).filter(Boolean));
+    const baseInvNum = `INV-${jobNo}`;
+    let invNum = baseInvNum;
+    if (usedInvNums.has(invNum)) {
+      let n = 2;
+      while (usedInvNums.has(`${baseInvNum}-${n}`)) n++;
+      invNum = `${baseInvNum}-${n}`;
+    }
+    state.invoices.push({
+      id: uid(),
+      number: invNum,
+      date,
+      billTo: customer,
+      job: category,
+      jobNo,
+      lineItems: [{ item: "", qty: "", description: "", price: "" }],
+      taxMode: "nontax",
+      taxLabel: "Ohio Sales Tax",
+      taxRate: 7.25
+    });
+
     saveState();
     njResetForm();
     renderNjJobsTable();
     renderNjAnalytics();
-    if (window.toast) toast(`Job ${jobNo} saved`, { kind: "success" });
+    if (typeof renderInvoicesList === "function") renderInvoicesList();
+    if (window.toast) toast(`Job ${jobNo} saved (invoice ${invNum} created)`, { kind: "success" });
   });
 
   // ============================================================
