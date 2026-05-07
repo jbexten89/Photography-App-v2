@@ -3,6 +3,14 @@
    pinch-to-zoom. Applies to every element so taps anywhere are snappy. */
 html { touch-action: manipulation; }
 
+/* Subtle fade-in on launch so the app appears smoothly instead of popping
+   in. Pure CSS animation, no JS — runs once per page load. */
+body {
+  opacity: 0;
+  animation: app-fade-in 0.35s ease 0.05s forwards;
+}
+@keyframes app-fade-in { to { opacity: 1; } }
+
 /* App password gate — full-screen overlay shown until the user enters the
    correct password. Configured in app.js. */
 .app-gate {
