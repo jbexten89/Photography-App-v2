@@ -8681,6 +8681,9 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   gap: 6px;
   white-space: nowrap;
 }
+/* Honor the HTML [hidden] attribute — without this the .tx-filter-chart-btn
+   `display: inline-flex` rule above wins over the user-agent [hidden] rule. */
+.tx-filter-chart-btn[hidden] { display: none !important; }
 .tx-filter-chart-btn:hover { background: var(--hover); }
 .tx-filter-chart-panel {
   position: absolute;
