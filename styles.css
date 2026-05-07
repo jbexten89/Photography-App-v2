@@ -4955,17 +4955,16 @@ select option {
   #transactions .toolbar #btn-tx-clear-filters  { order: -18; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
   #transactions .toolbar #tx-filter-year        { order: -17; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
-  /* Row 2 — More on left, All Types on far right (margin-left:auto pushes
-     it across the empty middle 1/3). */
+  /* Row 2 — More · All Charts · All Types (each 1/3) */
   #transactions .toolbar .tx-more-wrap          { order: -16; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
-  #transactions .toolbar #tx-filter-type        { order: -15; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
+  #transactions .toolbar .tx-filter-chart-wrap  { order: -15; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+  #transactions .toolbar #tx-filter-type        { order: -14; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
   /* Row 3 — Categories 2/3, + New Tx 1/3 */
-  #transactions .toolbar .tx-filter-category-wrap { order: -14; flex: 0 0 calc(66.667% - 4px); min-width: 0; }
-  #transactions .toolbar #btn-new-tx              { order: -13; flex: 0 0 calc(33.333% - 4px); min-width: 0; margin-left: auto; }
+  #transactions .toolbar .tx-filter-category-wrap { order: -13; flex: 0 0 calc(66.667% - 4px); min-width: 0; }
+  #transactions .toolbar #btn-new-tx              { order: -12; flex: 0 0 calc(33.333% - 4px); min-width: 0; margin-left: auto; }
 
-  /* Row 4 — Charts · Jobs · Sort */
-  #transactions .toolbar .tx-filter-chart-wrap  { order: -12; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+  /* Row 4 — All Jobs · Sort (Sort visible only when filter = Only Jobs) */
   #transactions .toolbar .tx-filter-jobno-wrap  { order: -11; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
   #transactions .toolbar #tx-sort-jobno         { order: -10; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
 }
