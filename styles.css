@@ -8637,6 +8637,17 @@ body.tx-mobile-3line:not(.chart-sales-off) #tx-table tbody tr.chart-sales {
   background: rgba(39, 174, 96, 0.22);
 }
 
+/* Job-linked expense rows: tint red when the highlight setting is on
+   (off by default). Match expense rows whose jobno cell has content. */
+body.tx-job-expense-highlight #tx-table tr.tx-row:has(td[data-col="amount"].expense):has(td[data-col="jobno"]:not(:empty)) td {
+  background: rgba(192, 57, 43, 0.18);
+  box-shadow: none;
+  border-color: transparent;
+}
+body.tx-mobile-3line.tx-job-expense-highlight #tx-table tbody tr.tx-row:has(td[data-col="amount"].expense):has(td[data-col="jobno"]:not(:empty)) {
+  background: rgba(192, 57, 43, 0.18);
+}
+
 .nj-badge {
   display: inline-block;
   width: 8px;

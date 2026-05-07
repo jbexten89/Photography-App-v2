@@ -167,6 +167,9 @@ document.body.classList.toggle("inv-mobile-3line", state.invMobile3Line);
 // Default ON; toggle in Settings → All Transactions Table.
 if (typeof state.chartSalesHighlight !== "boolean") state.chartSalesHighlight = true;
 document.body.classList.toggle("chart-sales-off", !state.chartSalesHighlight);
+// Default OFF; toggle in Settings → All Transactions Table.
+if (typeof state.txJobExpenseHighlight !== "boolean") state.txJobExpenseHighlight = false;
+document.body.classList.toggle("tx-job-expense-highlight", state.txJobExpenseHighlight);
 
 // Startup preferences
 if (state.startupView !== "dashboard" && state.startupView !== "transactions") state.startupView = "dashboard";
@@ -3984,6 +3987,16 @@ if (_chartSalesBox) {
   _chartSalesBox.addEventListener("change", e => {
     state.chartSalesHighlight = !!e.target.checked;
     document.body.classList.toggle("chart-sales-off", !state.chartSalesHighlight);
+    saveState();
+  });
+}
+// Settings: red highlight for expenses linked to a Job No.
+const _jobExpenseBox = document.getElementById("setting-job-expense-highlight");
+if (_jobExpenseBox) {
+  _jobExpenseBox.checked = !!state.txJobExpenseHighlight;
+  _jobExpenseBox.addEventListener("change", e => {
+    state.txJobExpenseHighlight = !!e.target.checked;
+    document.body.classList.toggle("tx-job-expense-highlight", state.txJobExpenseHighlight);
     saveState();
   });
 }
