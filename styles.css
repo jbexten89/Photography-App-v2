@@ -7,7 +7,7 @@ html { touch-action: manipulation; }
    in. Pure CSS animation, no JS — runs once per page load. */
 body {
   opacity: 0;
-  animation: app-fade-in 0.35s ease 0.05s forwards;
+  animation: app-fade-in 0.95s ease 0.05s forwards;
 }
 @keyframes app-fade-in { to { opacity: 1; } }
 
