@@ -4941,21 +4941,33 @@ select option {
   /* Mobile-only ordering for the relocated toggle (desktop styling lives
      outside this @media block so it applies everywhere). */
 
-  /* Three-row layout. Each row's items split 2/3 + 1/3 of the toolbar
-     width, less half the 8px row gap each, so a pair sums to exactly the
-     row width and the next pair wraps to the next row. */
-  /* Row 1 — Find (2/3) · Year (1/3) */
-  #transactions .toolbar .tx-find-wrap    { order: -6; flex: 0 0 calc(66.667% - 4px); min-width: 0; margin: 0; }
-  #transactions .toolbar #tx-filter-year  { order: -5; flex: 0 0 calc(33.333% - 4px); min-width: 0; }
-  /* Row 2 — Categories (2/3) · Type (1/3) */
-  #transactions .toolbar #tx-filter-category { order: -4; flex: 0 0 calc(66.667% - 4px); min-width: 0; }
-  #transactions .toolbar #tx-filter-type     { order: -3; flex: 0 0 calc(33.333% - 4px); min-width: 0; }
-  /* Row 3 — More (1/3) · Clear filters (1/3) · + New Transaction (1/3) */
-  #transactions .toolbar .tx-more-wrap         { order: -3; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
-  #transactions .toolbar #btn-tx-clear-filters { order: -2; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
-  #transactions .toolbar #btn-new-tx           { order: -1; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
-  /* Back — full-width when visible (rare; only after drilling in from Analytics) */
-  #transactions .toolbar #btn-tx-back     { order: -7; flex: 1 1 100%; }
+  /* Four-row layout.
+     Row 1 — Search (1/3) · Clear Filters (1/3) · All Years (1/3)
+     Row 2 — More actions (left 1/3) · gap · All Types (right 1/3)
+     Row 3 — All Categories (2/3) · + New Transaction (right 1/3)
+     Row 4 — All Charts (1/3) · All Jobs (1/3) · Sort (1/3, hidden until Only Jobs) */
+
+  /* Back arrow — full-width when visible (rare drill-in from Analytics). */
+  #transactions .toolbar #btn-tx-back           { order: -20; flex: 1 1 100%; }
+
+  /* Row 1 */
+  #transactions .toolbar .tx-find-wrap          { order: -19; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin: 0; }
+  #transactions .toolbar #btn-tx-clear-filters  { order: -18; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
+  #transactions .toolbar #tx-filter-year        { order: -17; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+
+  /* Row 2 — More on left, All Types on far right (margin-left:auto pushes
+     it across the empty middle 1/3). */
+  #transactions .toolbar .tx-more-wrap          { order: -16; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+  #transactions .toolbar #tx-filter-type        { order: -15; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
+
+  /* Row 3 — Categories 2/3, + New Tx 1/3 */
+  #transactions .toolbar .tx-filter-category-wrap { order: -14; flex: 0 0 calc(66.667% - 4px); min-width: 0; }
+  #transactions .toolbar #btn-new-tx              { order: -13; flex: 0 0 calc(33.333% - 4px); min-width: 0; margin-left: auto; }
+
+  /* Row 4 — Charts · Jobs · Sort */
+  #transactions .toolbar .tx-filter-chart-wrap  { order: -12; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+  #transactions .toolbar .tx-filter-jobno-wrap  { order: -11; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+  #transactions .toolbar #tx-sort-jobno         { order: -10; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
 }
 
 /* Hide selected columns at every viewport when the user has unchecked them
