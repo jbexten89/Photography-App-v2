@@ -4950,19 +4950,19 @@ select option {
   /* Back arrow — full-width when visible (rare drill-in from Analytics). */
   #transactions .toolbar #btn-tx-back           { order: -20; flex: 1 1 100%; }
 
-  /* Row 1 — Search · (gap) · All Years */
+  /* Row 1 */
   #transactions .toolbar .tx-find-wrap          { order: -19; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin: 0; }
-  #transactions .toolbar #tx-filter-year        { order: -17; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
+  #transactions .toolbar #btn-tx-clear-filters  { order: -18; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
+  #transactions .toolbar #tx-filter-year        { order: -17; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
-  /* Row 2 — Clear Filters · Filters · All Types */
-  #transactions .toolbar #btn-tx-clear-filters  { order: -16; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
+  /* Row 2 — More · Filters · All Types (each 1/3) */
+  #transactions .toolbar .tx-more-wrap          { order: -16; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
   #transactions .toolbar .tx-filter-combined-wrap { order: -15; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
   #transactions .toolbar #tx-filter-type        { order: -14; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
-  /* Row 3 — More · Sort (when Only Jobs) · + New Tx */
-  #transactions .toolbar .tx-more-wrap          { order: -13; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
-  #transactions .toolbar #tx-sort-jobno         { order: -12; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
-  #transactions .toolbar #btn-new-tx            { order: -11; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
+  /* Row 3 — Sort (only visible when Only Jobs is picked) · + New Tx (right) */
+  #transactions .toolbar #tx-sort-jobno         { order: -13; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
+  #transactions .toolbar #btn-new-tx            { order: -12; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
 }
 
 /* Hide selected columns at every viewport when the user has unchecked them
