@@ -4958,7 +4958,7 @@ select option {
   /* Row 2 — More · Filters · All Types (each 1/3) */
   #transactions .toolbar .tx-more-wrap          { order: -16; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
   #transactions .toolbar .tx-filter-combined-wrap { order: -15; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
-  #transactions .toolbar #tx-filter-combined-btn { width: 100%; height: 40px; min-height: 40px; justify-content: space-between; }
+  #transactions .toolbar #tx-filter-combined-btn { width: 100%; height: 40px; min-height: 40px; justify-content: space-between; font-size: 14px; font-weight: 500; }
   #transactions .toolbar #tx-filter-type        { order: -14; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
   /* Row 3 — Sort (only visible when Only Jobs is picked) · + New Tx (right) */
