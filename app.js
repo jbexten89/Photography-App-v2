@@ -2355,7 +2355,9 @@ function renderBreakdown() {
     .nodePadding(8)
     .nodeAlign(d3.sankeyJustify)
     // Wide left/right gutters so customer + payee labels never clip on long names.
-    .extent([[230, 16], [width - 200, height - 16]]);
+    // Right gutter widened (was 200) so long labels like "25001 - Montpelier Schools / Spring Sports"
+    // have room without wrapping or clipping at the edge.
+    .extent([[230, 16], [width - 340, height - 16]]);
 
   const graph = sankeyGen({
     nodes: nodes.map((d, i) => ({ ...d, index: i })),
