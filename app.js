@@ -7472,7 +7472,7 @@ function renderInvoicesList() {
 
   const fYear = yearSel.value;
   const fCustomer = jobSel.value;
-  const qBillTo = (document.getElementById("inv-filter-billto").value || "").toLowerCase();
+  const qAll = (document.getElementById("inv-filter-billto").value || "").toLowerCase().trim();
 
   const tbody = document.querySelector("#invoices-table tbody");
   if (!tbody) return;
@@ -7487,7 +7487,28 @@ function renderInvoicesList() {
         const c = (inv.billTo || "").split("\n")[0].trim();
         if (c !== fCustomer) return false;
       }
-      if (qBillTo && !(inv.billTo || "").toLowerCase().includes(qBillTo)) return false;
+      // Free-text search runs against every visible/searchable field on the invoice.
+      if (qAll) {
+        const lineHay = (inv.lineItems || []).map(l =>
+          [l.item, l.description, l.qty, l.price].filter(Boolean).join(" ")
+        ).join(" ");
+        const totalStr = (() => {
+          try { return String(invoiceTotal(inv) || ""); } catch (e) { return ""; }
+        })();
+        const hay = [
+          inv.number,
+          inv.date,
+          fmtDate(inv.date || ""),
+          inv.billTo,
+          inv.job,
+          inv.jobNo,
+          inv.paid ? "paid" : "unpaid",
+          inv.paidDate || "",
+          totalStr,
+          lineHay,
+        ].map(x => (x || "").toString().toLowerCase()).join(" ");
+        if (!hay.includes(qAll)) return false;
+      }
       return true;
     })
     // Highest invoice number at the top; fall back to date desc if numbers tie or aren't numeric.
