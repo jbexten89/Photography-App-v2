@@ -174,6 +174,20 @@ document.body.classList.toggle("tx-job-expense-highlight", state.txJobExpenseHig
 // red highlights are off (CSS scopes it that way).
 if (typeof state.txJobColorRows !== "boolean") state.txJobColorRows = false;
 document.body.classList.toggle("tx-job-color-rows", state.txJobColorRows);
+// Locked years — array of "YYYY" strings. Transactions/invoices whose date
+// falls in a locked year cannot be edited or deleted from the UI.
+if (!Array.isArray(state.lockedYears)) state.lockedYears = [];
+
+function isLockedDate(dateStr) {
+  if (!dateStr) return false;
+  const m = String(dateStr).match(/^(\d{4})/);
+  if (!m) return false;
+  return (state.lockedYears || []).includes(m[1]);
+}
+function blockedToast(year) {
+  if (window.toast) toast(`Year ${year} is locked — unlock in Settings to make changes`, { kind: "error", ttl: 3500 });
+  else alert(`Year ${year} is locked — unlock in Settings to make changes.`);
+}
 
 // Startup preferences
 if (state.startupView !== "dashboard" && state.startupView !== "transactions") state.startupView = "dashboard";
@@ -2696,6 +2710,8 @@ modal.addEventListener("click", e => { if (e.target === modal) closeTxModal(); }
 document.getElementById("btn-delete-tx").addEventListener("click", () => {
   const id = document.getElementById("tx-id").value;
   if (!id) return;
+  const orig = state.transactions.find(t => t.id === id);
+  if (orig && isLockedDate(orig.date)) { blockedToast(orig.date.slice(0, 4)); return; }
   if (!confirm("Delete this transaction?")) return;
   state.transactions = state.transactions.filter(t => t.id !== id);
   saveState();
@@ -2949,6 +2965,17 @@ txForm.addEventListener("submit", e => {
   const vendor = document.getElementById("tx-vendor").value.trim();
   const customer = document.getElementById("tx-customer").value.trim();
   const tagsRaw = document.getElementById("tx-tags").value.trim();
+  const newDateRaw = document.getElementById("tx-date").value;
+
+  // Locked-year guard: block edits where either the original or new date
+  // falls in a locked year so users can't move tx into/out of a locked year.
+  const lockedYearOld = id ? (() => {
+    const orig = state.transactions.find(t => t.id === id);
+    return orig && isLockedDate(orig.date) ? orig.date.slice(0, 4) : null;
+  })() : null;
+  const lockedYearNew = isLockedDate(newDateRaw) ? newDateRaw.slice(0, 4) : null;
+  if (lockedYearOld) { blockedToast(lockedYearOld); return; }
+  if (lockedYearNew) { blockedToast(lockedYearNew); return; }
 
   // Customer is required only when Payee is "Job"
   if (payee.toLowerCase() === "job" && !customer) {
@@ -4215,6 +4242,41 @@ if (_jobExpenseBox) {
     saveState();
   });
 }
+// Settings: locked-years list — render checkboxes for every year that has
+// data, with the current locked state checked. Toggling persists to state.
+function renderLockedYearsList() {
+  const el = document.getElementById("locked-years-list");
+  if (!el) return;
+  const years = new Set();
+  (state.transactions || []).forEach(t => { const m = (t.date || "").match(/^(\d{4})/); if (m) years.add(m[1]); });
+  (state.invoices || []).forEach(i => { const m = (i.date || "").match(/^(\d{4})/); if (m) years.add(m[1]); });
+  const sorted = Array.from(years).sort((a, b) => b.localeCompare(a)); // newest first
+  if (!sorted.length) {
+    el.innerHTML = `<div class="muted" style="font-size:12px;padding:6px">No years with data yet.</div>`;
+    return;
+  }
+  el.innerHTML = sorted.map(y => {
+    const checked = (state.lockedYears || []).includes(y) ? " checked" : "";
+    return `<label class="check-pill"><input type="checkbox" data-year="${y}"${checked} /> ${y}</label>`;
+  }).join("");
+}
+(function wireLockedYears() {
+  const el = document.getElementById("locked-years-list");
+  if (!el) return;
+  renderLockedYearsList();
+  el.addEventListener("change", (e) => {
+    const cb = e.target.closest('input[type="checkbox"][data-year]');
+    if (!cb) return;
+    const y = cb.dataset.year;
+    if (!Array.isArray(state.lockedYears)) state.lockedYears = [];
+    const set = new Set(state.lockedYears);
+    if (cb.checked) set.add(y); else set.delete(y);
+    state.lockedYears = Array.from(set).sort();
+    saveState();
+    if (window.toast) toast(cb.checked ? `Year ${y} locked` : `Year ${y} unlocked`, { kind: "success" });
+  });
+})();
+
 // Settings: per-job color tint on All Transactions rows (matches donut palette).
 const _jobColorBox = document.getElementById("setting-tx-job-color-rows");
 if (_jobColorBox) {
@@ -8132,6 +8194,13 @@ document.getElementById("btn-invoice-save").addEventListener("click", () => {
   if (!editingInvoice) return;
   ensureInvoiceState();
   const inv = { ...editingInvoice.data };
+  // Locked-year guard: block saves if either the original or new invoice
+  // date falls in a locked year.
+  const oldDate = !editingInvoice.isNew
+    ? (state.invoices.find(x => x.id === inv.id) || {}).date
+    : null;
+  if (oldDate && isLockedDate(oldDate)) { blockedToast(oldDate.slice(0, 4)); return; }
+  if (isLockedDate(inv.date)) { blockedToast((inv.date || "").slice(0, 4)); return; }
   // Prune any linkedTransactionIds that no longer match an existing transaction
   if (Array.isArray(inv.linkedTransactionIds)) {
     const liveIds = new Set(state.transactions.map(t => t.id));
@@ -8248,6 +8317,8 @@ document.getElementById("btn-invoice-paid").addEventListener("click", () => {
 
 document.getElementById("btn-invoice-delete").addEventListener("click", () => {
   if (!editingInvoice || editingInvoice.isNew) return;
+  const d = editingInvoice.data.date;
+  if (isLockedDate(d)) { blockedToast(d.slice(0, 4)); return; }
   if (!confirm(`Delete invoice #${editingInvoice.data.number}?`)) return;
   state.invoices = state.invoices.filter(i => i.id !== editingInvoice.data.id);
   saveState();
@@ -13378,6 +13449,10 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const txId = row && row.dataset.id;
     const tx = (state.transactions || []).find(t => t.id === txId);
     if (!tx) return;
+    if (typeof isLockedDate === "function" && isLockedDate(tx.date)) {
+      blockedToast(tx.date.slice(0, 4));
+      return;
+    }
 
     const oldHtml = cell.innerHTML;
     cell.dataset.editing = "1";

@@ -8642,6 +8642,14 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
    Job No., Customer, and Payee cells on the same row also light up so the
    full record context is obvious at a glance. Solid fill, no per-cell border
    so adjacent highlighted cells read as one continuous block. */
+/* Locked years list (Settings) */
+.locked-years-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.locked-years-list label.check-pill { font-size: 13px; }
+
 /* Mark-as-Paid date picker modal */
 .paid-date-modal-content { max-width: 380px; }
 .paid-date-modal-content label {

@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=391" />
+<link rel="stylesheet" href="styles.css?v=392" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2383,6 +2383,11 @@
             <label class="check-pill"><input type="checkbox" id="setting-tx-job-color-rows" /> Color rows by Job No.</label>
           </div>
           <div class="settings-field">
+            <span>Locked Years</span>
+            <p class="muted" style="margin:4px 0 6px;font-size:12px">Lock a tax year so transactions and invoices in that year can't be edited or deleted. Useful once you've filed.</p>
+            <div class="locked-years-list" id="locked-years-list"></div>
+          </div>
+          <div class="settings-field">
             <span>Mobile Layout</span>
             <p class="muted" style="margin:4px 0 6px;font-size:12px">Switch from the side-scrolling table to a 3-line stacked card per transaction (mobile only).</p>
             <label class="check-pill"><input type="checkbox" id="setting-tx-mobile-3line" /> 3 lines per row on mobile</label>
@@ -2912,6 +2917,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=215"></script>
+  <script src="app.js?v=216"></script>
 </body>
 </html>
