@@ -4244,6 +4244,36 @@ if (_jobExpenseBox) {
     saveState();
   });
 }
+// Settings: collapsible cards. Each .settings-col becomes click-to-expand
+// on its h2; collapsed state is persisted per-card in localStorage so the
+// user's choices survive refresh.
+(function setupSettingsCollapsibles() {
+  const SETTINGS_COLLAPSE_KEY = "photo-settings-collapsed-v1";
+  const sect = document.getElementById("settings");
+  if (!sect) return;
+  let stored = {};
+  try { stored = JSON.parse(localStorage.getItem(SETTINGS_COLLAPSE_KEY) || "{}") || {}; }
+  catch (e) { stored = {}; }
+  const cards = sect.querySelectorAll(".settings-col");
+  cards.forEach((card, idx) => {
+    const h2 = card.querySelector(":scope > h2");
+    if (!h2) return;
+    card.classList.add("settings-collapsible");
+    // Stable per-card key based on the h2 text (falls back to index).
+    const key = (h2.textContent || "").trim().toLowerCase().replace(/\s+/g, "-") || `card-${idx}`;
+    card.dataset.collapseKey = key;
+    // Default: collapsed unless localStorage says expanded for this card.
+    const collapsed = stored[key] !== false; // missing or true → collapsed
+    card.classList.toggle("collapsed", collapsed);
+    h2.addEventListener("click", () => {
+      const nowCollapsed = !card.classList.contains("collapsed");
+      card.classList.toggle("collapsed", nowCollapsed);
+      stored[key] = !nowCollapsed; // store true = expanded
+      try { localStorage.setItem(SETTINGS_COLLAPSE_KEY, JSON.stringify(stored)); } catch (e) {}
+    });
+  });
+})();
+
 // Settings: locked-years list — render checkboxes for every year that has
 // data, with the current locked state checked. Toggling persists to state.
 function renderLockedYearsList() {
