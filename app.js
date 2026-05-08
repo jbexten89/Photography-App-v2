@@ -3258,20 +3258,8 @@ function refreshTxFilterJobNoButtonLabel() {
   const jobsWrap  = document.querySelector(".tx-filter-jobno-wrap");
   const chartsWrap = document.querySelector(".tx-filter-chart-wrap.tx-filter-chart-wrap-original")
                   || document.querySelector(".toolbar > .tx-filter-chart-wrap:not(.tx-filter-combined-wrap):not(.tx-filter-category-wrap):not(.tx-filter-jobno-wrap)");
-  if (jobsRow && jobsWrap) {
-    const lbl = document.createElement("span");
-    lbl.className = "tx-filter-combined-label";
-    lbl.textContent = "Jobs";
-    jobsRow.appendChild(lbl);
-    jobsRow.appendChild(jobsWrap);
-  }
-  if (chartsRow && chartsWrap) {
-    const lbl = document.createElement("span");
-    lbl.className = "tx-filter-combined-label";
-    lbl.textContent = "Charts";
-    chartsRow.appendChild(lbl);
-    chartsRow.appendChild(chartsWrap);
-  }
+  if (jobsRow && jobsWrap)     jobsRow.appendChild(jobsWrap);
+  if (chartsRow && chartsWrap) chartsRow.appendChild(chartsWrap);
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
     panel.hidden = !panel.hidden;
