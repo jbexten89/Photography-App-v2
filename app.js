@@ -11359,9 +11359,13 @@ function renderYearPills(containerId, selectEl, years, onChange) {
     moreHTML = `<button class="year-pill year-pill-more" data-nav="more" aria-label="More years">More ▾</button>`;
   }
 
+  const lockedSet = new Set(state.lockedYears || []);
   el.innerHTML =
     `<button class="year-pill ${allActive}" data-year="">All</button>` +
-    visibleYears.map(y => `<button class="year-pill ${current === y ? "active" : ""}" data-year="${y}">${y}</button>`).join("") +
+    visibleYears.map(y => {
+      const lockedCls = lockedSet.has(y) ? " is-locked" : "";
+      return `<button class="year-pill ${current === y ? "active" : ""}${lockedCls}" data-year="${y}">${y}</button>`;
+    }).join("") +
     moreHTML;
 
   el.querySelectorAll(".year-pill").forEach(btn => {

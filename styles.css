@@ -1707,6 +1707,22 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   margin-right: auto;
 }
 
+/* Locked-year indicator: small red dot in the bottom-left corner of any
+   year pill whose year is in state.lockedYears. */
+.year-pill.is-locked { position: relative; }
+.year-pill.is-locked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+
 .year-pill {
   background: var(--surface);
   border: 1px solid var(--border);
