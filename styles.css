@@ -8761,6 +8761,14 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 .tx-filter-combined-panel {
   min-width: 280px;
   padding: 10px;
+  /* Let nested filter panels (Category / Jobs / Charts) overflow outside
+     this container — without this they get clipped by the outer scroll. */
+  max-height: none;
+  overflow: visible;
+}
+/* Nested panels float just below their button inside the combined panel. */
+.tx-filter-combined-panel .tx-filter-chart-panel {
+  z-index: 200;
 }
 .tx-filter-combined-row {
   display: flex;
