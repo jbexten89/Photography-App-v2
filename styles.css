@@ -8672,6 +8672,53 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   padding-bottom: 12px;
 }
 
+/* Add Job modal — always stack each field on its own row regardless of
+   viewport. Without this, the form inherits the wide 5-column .mileage-add-row
+   grid on desktop and overflows the modal. */
+#nj-add-modal .modal-content #nj-form {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+#nj-add-modal .modal-content #nj-form > label { grid-column: 1; }
+#nj-add-modal .modal-content #nj-form > label:has(#nj-date)     { grid-row: 1; }
+#nj-add-modal .modal-content #nj-form > label:has(#nj-jobno)    { grid-row: 2; }
+#nj-add-modal .modal-content #nj-form > label:has(#nj-customer) { grid-row: 3; }
+#nj-add-modal .modal-content #nj-form > label:has(#nj-category) { grid-row: 4; }
+#nj-add-modal .modal-content #nj-form > label:has(#nj-hours)    { grid-row: 5; }
+#nj-add-modal .modal-content #nj-form > .form-actions { grid-column: 1; grid-row: 6; }
+#nj-add-modal #nj-form input,
+#nj-add-modal #nj-form select {
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* Add Trip modal — same treatment so it doesn't inherit the wide mileage grid. */
+#mileage-add-modal .modal-content #mileage-add-form {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+#mileage-add-modal #mileage-add-form > label { grid-column: 1; }
+#mileage-add-modal #mileage-add-form input {
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+}
+
 /* Locked years list (Settings) */
 .locked-years-list {
   display: flex;
