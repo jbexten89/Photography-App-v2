@@ -11305,6 +11305,7 @@ function openYearPickerSheet(years, current, onPick) {
   // Remove any existing sheet
   document.querySelectorAll(".year-sheet-backdrop").forEach(el => el.remove());
 
+  const lockedSet = new Set(state.lockedYears || []);
   const backdrop = document.createElement("div");
   backdrop.className = "year-sheet-backdrop";
   backdrop.innerHTML = `
@@ -11313,7 +11314,10 @@ function openYearPickerSheet(years, current, onPick) {
       <div class="year-sheet-title">Choose year</div>
       <div class="year-sheet-grid">
         <button class="year-sheet-item ${current === "" ? "active" : ""}" data-year="">All</button>
-        ${years.map(y => `<button class="year-sheet-item ${current === y ? "active" : ""}" data-year="${y}">${y}</button>`).join("")}
+        ${years.map(y => {
+          const lockedCls = lockedSet.has(y) ? " is-locked" : "";
+          return `<button class="year-sheet-item ${current === y ? "active" : ""}${lockedCls}" data-year="${y}">${y}</button>`;
+        }).join("")}
       </div>
     </div>
   `;
@@ -11359,13 +11363,9 @@ function renderYearPills(containerId, selectEl, years, onChange) {
     moreHTML = `<button class="year-pill year-pill-more" data-nav="more" aria-label="More years">More ▾</button>`;
   }
 
-  const lockedSet = new Set(state.lockedYears || []);
   el.innerHTML =
     `<button class="year-pill ${allActive}" data-year="">All</button>` +
-    visibleYears.map(y => {
-      const lockedCls = lockedSet.has(y) ? " is-locked" : "";
-      return `<button class="year-pill ${current === y ? "active" : ""}${lockedCls}" data-year="${y}">${y}</button>`;
-    }).join("") +
+    visibleYears.map(y => `<button class="year-pill ${current === y ? "active" : ""}" data-year="${y}">${y}</button>`).join("") +
     moreHTML;
 
   el.querySelectorAll(".year-pill").forEach(btn => {
