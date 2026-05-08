@@ -4955,18 +4955,14 @@ select option {
   #transactions .toolbar #btn-tx-clear-filters  { order: -18; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
   #transactions .toolbar #tx-filter-year        { order: -17; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
-  /* Row 2 — More · All Charts · All Types (each 1/3) */
+  /* Row 2 — More · Filters · All Types (each 1/3) */
   #transactions .toolbar .tx-more-wrap          { order: -16; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
-  #transactions .toolbar .tx-filter-chart-wrap  { order: -15; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+  #transactions .toolbar .tx-filter-combined-wrap { order: -15; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
   #transactions .toolbar #tx-filter-type        { order: -14; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
-  /* Row 3 — Categories 2/3, + New Tx 1/3 */
-  #transactions .toolbar .tx-filter-category-wrap { order: -13; flex: 0 0 calc(66.667% - 4px); min-width: 0; }
-  #transactions .toolbar #btn-new-tx              { order: -12; flex: 0 0 calc(33.333% - 4px); min-width: 0; margin-left: auto; }
-
-  /* Row 4 — All Jobs · Sort (Sort visible only when filter = Only Jobs) */
-  #transactions .toolbar .tx-filter-jobno-wrap  { order: -11; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
-  #transactions .toolbar #tx-sort-jobno         { order: -10; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
+  /* Row 3 — Sort (only visible when Only Jobs is picked) · + New Tx (right) */
+  #transactions .toolbar #tx-sort-jobno         { order: -13; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
+  #transactions .toolbar #btn-new-tx            { order: -12; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
 }
 
 /* Hide selected columns at every viewport when the user has unchecked them
@@ -8760,6 +8756,34 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   min-width: 0;
   -webkit-min-logical-width: 0;
 }
+
+/* Combined Filters panel — wraps Category / Jobs / Charts into one dropdown */
+.tx-filter-combined-panel {
+  min-width: 280px;
+  padding: 10px;
+}
+.tx-filter-combined-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+.tx-filter-combined-row + .tx-filter-combined-row {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+.tx-filter-combined-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  width: 70px;
+  flex-shrink: 0;
+}
+.tx-filter-combined-row .tx-filter-chart-wrap { flex: 1 1 auto; }
+.tx-filter-combined-row .tx-filter-chart-btn { width: 100%; justify-content: space-between; }
 
 /* All Transactions — Chart of Accounts multi-select filter */
 .tx-filter-chart-wrap { position: relative; display: inline-block; }

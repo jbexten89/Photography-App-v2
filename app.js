@@ -3247,6 +3247,45 @@ function refreshTxFilterJobNoButtonLabel() {
   refreshTxFilterJobNoButtonLabel();
 })();
 
+// Combined Filters dropdown — moves the existing All Jobs + All Charts
+// wraps into the merged panel so the toolbar shows just one "Filters" button.
+(function setupCombinedFiltersPanel() {
+  const panel = document.getElementById("tx-filter-combined-panel");
+  const btn   = document.getElementById("tx-filter-combined-btn");
+  if (!panel || !btn) return;
+  const jobsRow   = document.getElementById("tx-filter-combined-row-jobs");
+  const chartsRow = document.getElementById("tx-filter-combined-row-charts");
+  const jobsWrap  = document.querySelector(".tx-filter-jobno-wrap");
+  const chartsWrap = document.querySelector(".tx-filter-chart-wrap.tx-filter-chart-wrap-original")
+                  || document.querySelector(".toolbar > .tx-filter-chart-wrap:not(.tx-filter-combined-wrap):not(.tx-filter-category-wrap):not(.tx-filter-jobno-wrap)");
+  if (jobsRow && jobsWrap) {
+    const lbl = document.createElement("span");
+    lbl.className = "tx-filter-combined-label";
+    lbl.textContent = "Jobs";
+    jobsRow.appendChild(lbl);
+    jobsRow.appendChild(jobsWrap);
+  }
+  if (chartsRow && chartsWrap) {
+    const lbl = document.createElement("span");
+    lbl.className = "tx-filter-combined-label";
+    lbl.textContent = "Charts";
+    chartsRow.appendChild(lbl);
+    chartsRow.appendChild(chartsWrap);
+  }
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    panel.hidden = !panel.hidden;
+  });
+  document.addEventListener("click", (e) => {
+    if (panel.hidden) return;
+    if (e.target.closest("#tx-filter-combined-panel") || e.target.closest("#tx-filter-combined-btn")) return;
+    // Don't close if a nested filter panel (Category/Jobs/Charts) is open.
+    const nestedOpen = panel.querySelector(".tx-filter-chart-panel:not([hidden])");
+    if (nestedOpen && (e.target.closest(".tx-filter-chart-panel") || e.target.closest(".tx-filter-chart-btn"))) return;
+    panel.hidden = true;
+  });
+})();
+
 // Sort by Job No. — only visible when the All Jobs filter = "Only Jobs".
 let txSortByJobNo = false;
 (function wireTxSortJobNo() {

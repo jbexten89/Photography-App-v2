@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=394" />
+<link rel="stylesheet" href="styles.css?v=395" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -302,10 +302,21 @@
         <select id="tx-filter-year"><option value="">All Years</option></select>
         <!-- Hidden source-of-truth select so existing render/filter code keeps working. -->
         <select id="tx-filter-category" hidden><option value="">All Categories</option></select>
-        <div class="tx-filter-chart-wrap tx-filter-category-wrap">
-          <button type="button" id="tx-filter-category-btn" class="tx-filter-chart-btn">All Categories <span aria-hidden="true">▾</span></button>
-          <div id="tx-filter-category-panel" class="tx-filter-chart-panel" hidden>
-            <div class="tx-filter-chart-list" id="tx-filter-category-list"></div>
+        <!-- Combined Filters dropdown — wraps Category / Jobs / Charts into one menu -->
+        <div class="tx-filter-chart-wrap tx-filter-combined-wrap">
+          <button type="button" id="tx-filter-combined-btn" class="tx-filter-chart-btn">Filters <span aria-hidden="true">▾</span></button>
+          <div id="tx-filter-combined-panel" class="tx-filter-chart-panel tx-filter-combined-panel" hidden>
+            <div class="tx-filter-combined-row">
+              <span class="tx-filter-combined-label">Category</span>
+              <div class="tx-filter-chart-wrap tx-filter-category-wrap">
+                <button type="button" id="tx-filter-category-btn" class="tx-filter-chart-btn">All Categories <span aria-hidden="true">▾</span></button>
+                <div id="tx-filter-category-panel" class="tx-filter-chart-panel" hidden>
+                  <div class="tx-filter-chart-list" id="tx-filter-category-list"></div>
+                </div>
+              </div>
+            </div>
+            <div class="tx-filter-combined-row" id="tx-filter-combined-row-jobs"></div>
+            <div class="tx-filter-combined-row" id="tx-filter-combined-row-charts"></div>
           </div>
         </div>
         <!-- Hidden source-of-truth select so existing render/filter code keeps working. -->
@@ -2917,6 +2928,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=218"></script>
+  <script src="app.js?v=219"></script>
 </body>
 </html>
