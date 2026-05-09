@@ -5160,6 +5160,18 @@ document.getElementById("btn-delete-range").addEventListener("click", () => {
     return;
   }
 
+  // Locked-year guard — refuse if any matched tx falls in a locked year.
+  const lockedYears = new Set();
+  matches.forEach(t => {
+    if (typeof isLockedDate === "function" && isLockedDate(t.date)) {
+      lockedYears.add(t.date.slice(0, 4));
+    }
+  });
+  if (lockedYears.size > 0) {
+    alert(`Cannot delete — the range includes transactions in locked year${lockedYears.size === 1 ? "" : "s"} (${[...lockedYears].sort().join(", ")}). Unlock the year(s) in Settings first.`);
+    return;
+  }
+
   const rangeLabel = `${startDate || "beginning"} to ${endDate || "end"}`;
   const confirmAnswer = prompt(
     `This will permanently delete ${matches.length} transaction(s) dated ${rangeLabel}.\n\n` +
@@ -13743,6 +13755,12 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       panel.querySelector(".tx-action-delete").addEventListener("click", (e) => {
         e.preventDefault(); e.stopPropagation();
         const id = row.dataset.id;
+        const tx = (state.transactions || []).find(t => t.id === id);
+        if (tx && typeof isLockedDate === "function" && isLockedDate(tx.date)) {
+          if (typeof blockedToast === "function") blockedToast(tx.date.slice(0, 4));
+          closeSwipe();
+          return;
+        }
         if (!confirm("Delete this transaction?")) { closeSwipe(); return; }
         state.transactions = (state.transactions || []).filter(t => t.id !== id);
         saveState();
