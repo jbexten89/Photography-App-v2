@@ -1009,10 +1009,7 @@ function populateAnalyticsFilters() {
   const dateState = filterStates["date-range"];
   if (dateState && dateState.selected === null) {
     const years = FILTER_DEFS["date-range"].getOptions();
-    const thisYear = String(new Date().getFullYear());
-    if (years.includes(thisYear)) dateState.selected = new Set([thisYear]);
-    else if (years.length) dateState.selected = new Set([years[0]]);
-    else dateState.selected = new Set();
+    dateState.selected = new Set(years);
   }
   refreshFilterTriggers();
 }
