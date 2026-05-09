@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=405" />
+<link rel="stylesheet" href="styles.css?v=406" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -519,42 +519,18 @@
               <span id="filter-count-badge" class="filter-count-badge" hidden>0</span>
             </button>
             <div id="analytics-filters-panel" class="analytics-filters-panel" hidden>
-          <div class="filter-field">
-            <span class="filter-field-label">Date Range</span>
-            <button type="button" class="filter-trigger" data-filter="date-range">
-              <span class="filter-summary">All</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          </div>
-          <div class="filter-field">
-            <span class="filter-field-label">Customer</span>
-            <button type="button" class="filter-trigger" data-filter="customer">
-              <span class="filter-summary">All</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          </div>
-          <div class="filter-field">
-            <span class="filter-field-label">Job</span>
-            <button type="button" class="filter-trigger" data-filter="job">
-              <span class="filter-summary">All</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          </div>
-          <div class="filter-field">
-            <span class="filter-field-label">Category</span>
-            <button type="button" class="filter-trigger" data-filter="category">
-              <span class="filter-summary">All</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          </div>
-          <div class="filter-field">
-            <span class="filter-field-label">Payee</span>
-            <button type="button" class="filter-trigger" data-filter="payees">
-              <span class="filter-summary">All</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          </div>
-          <button type="button" id="btn-analytics-clear-filters" class="analytics-clear-btn">Clear all filters</button>
+              <div class="filter-field">
+                <span class="filter-field-label">Date Range</span>
+                <button type="button" class="filter-trigger" data-filter="date-range">
+                  <span class="filter-summary">All</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+              </div>
+              <div class="filter-add-section">
+                <span class="filter-add-heading">Add filter</span>
+                <div id="filter-add-list" class="filter-add-list"></div>
+              </div>
+              <button type="button" id="btn-analytics-clear-filters" class="analytics-clear-btn">Clear all filters</button>
             </div>
             <!-- Floating multi-select popover, anchored to whichever .filter-trigger was clicked -->
             <div id="filter-popover" class="filter-popover" hidden>
@@ -2927,6 +2903,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=229"></script>
+  <script src="app.js?v=230"></script>
 </body>
 </html>

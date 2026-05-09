@@ -950,7 +950,38 @@ function refreshFilterTriggers() {
       </button>
     `).join("");
   }
+  renderFilterAddList();
 }
+
+// Render the "+ Add filter" list inside the panel — only filters that are
+// currently inactive (i.e., not already shown as a chip in the toolbar).
+function renderFilterAddList() {
+  const host = document.getElementById("filter-add-list");
+  if (!host) return;
+  const inactive = Object.keys(FILTER_DEFS).filter(k => {
+    if (k === "date-range") return false;
+    return summarizeFilter(k) === "All";
+  });
+  if (!inactive.length) {
+    host.innerHTML = `<div class="filter-add-empty muted">All filters applied</div>`;
+    return;
+  }
+  host.innerHTML = inactive.map(id => `
+    <button type="button" class="filter-add-row" data-filter="${escapeHtml(id)}">
+      <span class="filter-add-plus">+</span>
+      <span>${escapeHtml(FILTER_DEFS[id].label)}</span>
+    </button>
+  `).join("");
+}
+
+document.getElementById("filter-add-list")?.addEventListener("click", (e) => {
+  const row = e.target.closest(".filter-add-row");
+  if (!row) return;
+  e.stopPropagation();
+  const id = row.dataset.filter;
+  if (activeFilterId === id) { closeFilterPopover(); return; }
+  openFilterPopover(id, row);
+});
 
 // Delegated handlers for the inline filter chips.
 document.getElementById("analytics-filter-summary")?.addEventListener("click", (e) => {

@@ -8584,6 +8584,60 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 }
 .filter-chip .chip-x:hover { background: rgba(239, 68, 68, 0.20); color: #fca5a5; }
 
+.filter-add-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.filter-add-heading {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.filter-add-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.filter-add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 13px;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.filter-add-row:hover { background: rgba(96, 165, 250, 0.12); }
+.filter-add-plus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: rgba(96, 165, 250, 0.20);
+  color: #93c5fd;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+}
+.filter-add-empty {
+  padding: 8px 10px;
+  font-size: 12px;
+  font-style: italic;
+}
+
 /* Year-over-year delta cards on the Overview */
 .yoy-cards { margin-top: 12px; }
 .yoy-card .yoy-value {
