@@ -904,6 +904,11 @@ function summarizeFilter(filterId) {
   if (s.mode === "include" && s.selected.size === opts.length) return "All";
   if (s.mode === "exclude" && s.selected.size === 0) return "All";
   if (s.mode === "include" && s.selected.size === 1) return [...s.selected][0];
+  // Years are short (4 chars) — list them inline when there aren't too many,
+  // so the user can see exactly which years are filtered.
+  if (filterId === "date-range" && s.mode === "include" && s.selected.size <= 6) {
+    return [...s.selected].sort().join(", ");
+  }
   const verb = s.mode === "include" ? "of" : "excluded";
   return s.mode === "include"
     ? `${s.selected.size} of ${opts.length}`
