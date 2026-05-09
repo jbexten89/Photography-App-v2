@@ -3162,6 +3162,7 @@ function refreshTxFilterCategoryButtonLabel() {
     const opening = panel.hidden;
     if (opening) rebuildTxFilterCategoryList();
     panel.hidden = !opening;
+    if (!panel.hidden) requestAnimationFrame(() => positionNestedFilterPanel(btn, panel));
   });
   document.addEventListener("click", (e) => {
     if (panel.hidden) return;
@@ -3228,6 +3229,7 @@ function refreshTxFilterJobNoButtonLabel() {
     const opening = panel.hidden;
     if (opening) rebuildTxFilterJobNoList();
     panel.hidden = !opening;
+    if (!panel.hidden) requestAnimationFrame(() => positionNestedFilterPanel(btn, panel));
   });
   document.addEventListener("click", (e) => {
     if (panel.hidden) return;
@@ -3246,6 +3248,33 @@ function refreshTxFilterJobNoButtonLabel() {
   sel.addEventListener("change", refreshTxFilterJobNoButtonLabel);
   refreshTxFilterJobNoButtonLabel();
 })();
+
+// Position a nested filter panel (Categories/Jobs/Charts) at fixed viewport
+// coordinates anchored to its trigger button. Picks the side with the most
+// room (right by default; left if the panel would overflow off-screen).
+function positionNestedFilterPanel(btn, panel) {
+  if (!btn || !panel) return;
+  const r = btn.getBoundingClientRect();
+  const vpW = window.innerWidth;
+  const vpH = window.innerHeight;
+  const panelW = Math.min(panel.offsetWidth || 240, vpW - 24);
+  panel.style.minWidth = "220px";
+  panel.style.maxWidth = `${vpW - 24}px`;
+  // Prefer placing to the right of the button; fall back to left if it
+  // would overflow, or below it if neither side fits.
+  let left = r.right + 8;
+  if (left + panelW + 8 > vpW) {
+    left = Math.max(12, r.left - panelW - 8);
+  }
+  // Vertical: align top of panel near top of button, but clamp inside viewport.
+  let top = Math.max(12, r.top - 4);
+  const panelH = panel.offsetHeight || 240;
+  if (top + panelH + 12 > vpH) {
+    top = Math.max(12, vpH - panelH - 12);
+  }
+  panel.style.left = `${left}px`;
+  panel.style.top  = `${top}px`;
+}
 
 // Combined Filters dropdown — moves the existing All Jobs + All Charts
 // wraps into the merged panel so the toolbar shows just one "Filters" button.
@@ -3332,6 +3361,7 @@ function rebuildTxFilterChartList() {
     const opening = panel.hidden;
     if (opening) rebuildTxFilterChartList();
     panel.hidden = !opening;
+    if (!panel.hidden) requestAnimationFrame(() => positionNestedFilterPanel(btn, panel));
   });
   document.addEventListener("click", (e) => {
     if (panel.hidden) return;

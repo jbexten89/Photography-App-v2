@@ -8796,28 +8796,14 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   max-height: none;
   overflow: visible;
 }
-/* Nested filter panels float to the right of the combined panel so they
-   never get clipped by scroll bounds and don't overlap the rows below. */
+/* Nested filter panels are positioned via JS at fixed viewport coordinates
+   when their button is clicked (see openNestedFilterPanel). This avoids any
+   parent-clip / containing-block surprises. */
 .tx-filter-combined-panel .tx-filter-chart-panel {
-  top: -10px;
-  left: calc(100% + 8px);
+  position: fixed;
   z-index: 200;
   max-height: 360px;
   overflow-y: auto;
-}
-/* On narrow viewports there isn't room to the right — drop the nested panel
-   below its button and float it via fixed positioning so nothing clips it. */
-@media (max-width: 768px) {
-  .tx-filter-combined-panel .tx-filter-chart-panel {
-    position: fixed;
-    top: auto;
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    width: auto;
-    max-width: none;
-    max-height: 60vh;
-  }
 }
 .tx-filter-combined-row {
   display: flex;
