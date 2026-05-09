@@ -9196,7 +9196,10 @@ function renderTrends() {
   }
 
   // Aggregate net per (year, job, payee) across selected jobs, respecting the year filter.
+  // Also track raw income totals per (year, job, payee) so "Gross" mode reports
+  // actual income (not income netted against expenses to the same payee).
   const byYearJob = {};
+  const byYearJobGross = {};
   const payeeTotals = {};
   state.transactions
     .filter(t => activeJobs.includes(t.category))
@@ -9209,6 +9212,11 @@ function renderTrends() {
       if (!byYearJob[y]) byYearJob[y] = {};
       if (!byYearJob[y][t.category]) byYearJob[y][t.category] = {};
       byYearJob[y][t.category][payee] = (byYearJob[y][t.category][payee] || 0) + signed;
+      if (t.type === "income") {
+        if (!byYearJobGross[y]) byYearJobGross[y] = {};
+        if (!byYearJobGross[y][t.category]) byYearJobGross[y][t.category] = {};
+        byYearJobGross[y][t.category][payee] = (byYearJobGross[y][t.category][payee] || 0) + t.amount;
+      }
       payeeTotals[payee] = (payeeTotals[payee] || 0) + Math.abs(signed);
     });
 
@@ -9323,14 +9331,20 @@ function renderTrends() {
   const yearData = years.map(y => {
     const jobBars = activeJobs.map(job => {
       const payees = (byYearJob[y] && byYearJob[y][job]) || {};
+      const grossPayees = (byYearJobGross[y] && byYearJobGross[y][job]) || {};
       const entries = Object.entries(payees)
         .filter(([p, v]) => v !== 0 && isSelected(p))
         .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
-      const posSum = entries.filter(([, v]) => v > 0).reduce((s, [, v]) => s + v, 0);
+      // Gross = raw income to selected payees; not reduced by expenses to the
+      // same payee. Net = signed sum (income − expense) per selected payee.
+      const posSum = Object.entries(grossPayees)
+        .filter(([p]) => isSelected(p))
+        .reduce((s, [, v]) => s + v, 0);
       const negSum = entries.filter(([, v]) => v < 0).reduce((s, [, v]) => s + v, 0);
       const grossTotal = entries.reduce((s, [, v]) => s + Math.abs(v), 0);
       const slotIndex = trendMode === "job" ? 0 : jobsOnly.indexOf(job);
-      return { job, slotIndex, segs: entries, posSum, negSum, grossTotal, net: posSum + negSum };
+      const netSum = entries.reduce((s, [, v]) => s + v, 0);
+      return { job, slotIndex, segs: entries, posSum, negSum, grossTotal, net: netSum };
     });
     return { year: y, jobBars };
   });
