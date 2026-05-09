@@ -8533,14 +8533,56 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 .analytics-filter-summary {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   font-size: 12px;
   color: var(--muted);
   margin-left: 4px;
+  max-width: 70vw;
+}
+.analytics-filter-summary.has-chips { color: inherit; }
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 4px 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  background: rgba(96, 165, 250, 0.12);
+  color: #e5e7eb;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
   white-space: nowrap;
+  max-width: 240px;
+}
+.filter-chip:hover { background: rgba(96, 165, 250, 0.20); border-color: rgba(96, 165, 250, 0.7); }
+.filter-chip .chip-label { color: var(--muted); font-weight: 400; }
+.filter-chip .chip-value {
+  color: #93c5fd;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 60vw;
+  max-width: 160px;
 }
+.filter-chip .chip-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--muted);
+  background: transparent;
+  margin-left: 2px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.filter-chip .chip-x:hover { background: rgba(239, 68, 68, 0.20); color: #fca5a5; }
 
 /* Year-over-year delta cards on the Overview */
 .yoy-cards { margin-top: 12px; }

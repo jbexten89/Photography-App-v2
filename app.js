@@ -931,18 +931,44 @@ function refreshFilterTriggers() {
       badge.hidden = true;
     }
   }
-  // Plain-text summary of active filters next to the Filters/Presets buttons.
+  // Render active filters as inline chips next to the Filters/Presets buttons.
+  // Click the chip body to re-open its popover; click × to clear that one filter.
   const sumEl = document.getElementById("analytics-filter-summary");
   if (sumEl) {
     const parts = [];
     Object.keys(FILTER_DEFS).forEach(k => {
       if (k === "date-range") return;
       const txt = summarizeFilter(k);
-      if (txt && txt !== "All") parts.push(`${FILTER_DEFS[k].label}: ${txt}`);
+      if (txt && txt !== "All") parts.push({ id: k, label: FILTER_DEFS[k].label, value: txt });
     });
-    sumEl.textContent = parts.length ? "Showing: " + parts.join(" · ") : "";
+    sumEl.classList.toggle("has-chips", parts.length > 0);
+    sumEl.innerHTML = parts.map(p => `
+      <button type="button" class="filter-chip" data-filter="${escapeHtml(p.id)}">
+        <span class="chip-label">${escapeHtml(p.label)}:</span>
+        <span class="chip-value">${escapeHtml(p.value)}</span>
+        <span class="chip-x" data-act="clear-filter" aria-label="Clear ${escapeHtml(p.label)} filter">×</span>
+      </button>
+    `).join("");
   }
 }
+
+// Delegated handlers for the inline filter chips.
+document.getElementById("analytics-filter-summary")?.addEventListener("click", (e) => {
+  const x = e.target.closest('[data-act="clear-filter"]');
+  const chip = e.target.closest(".filter-chip");
+  if (!chip) return;
+  const id = chip.dataset.filter;
+  if (x) {
+    e.stopPropagation();
+    filterStates[id] = { mode: "include", selected: null };
+    refreshFilterTriggers();
+    if (typeof rerenderActiveAnalyticsView === "function") rerenderActiveAnalyticsView();
+    return;
+  }
+  e.stopPropagation();
+  if (activeFilterId === id) { closeFilterPopover(); return; }
+  openFilterPopover(id, chip);
+});
 
 // Initial trigger summaries (run once on load and on populate)
 function populateAnalyticsFilters() {
