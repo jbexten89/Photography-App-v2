@@ -9558,11 +9558,33 @@ function renderTrends() {
     monthsSet.add((t.date || "").slice(0, 7));
   });
 
+  // In One Job (trendMode === "job") view, the items are years — compute a
+  // year-over-year % delta for each row by comparing to the immediately
+  // preceding calendar year's value. No delta if the previous year is absent
+  // or has a zero value (would be ±∞%).
+  const yearValueMap = trendMode === "job"
+    ? new Map(flowItems.map(it => [it.name, it.value]))
+    : null;
+  const yoyHtmlFor = (it) => {
+    if (!yearValueMap) return "";
+    const yr = parseInt(it.name, 10);
+    if (!yr) return "";
+    const prev = yearValueMap.get(String(yr - 1));
+    if (prev === undefined || prev === 0) return "";
+    const pct = ((it.value - prev) / Math.abs(prev)) * 100;
+    const cls = pct >= 0 ? "yoy-up" : "yoy-down";
+    const arrow = pct >= 0 ? "▲" : "▼";
+    const sign = pct >= 0 ? "+" : "";
+    return `<span class="flow-source-yoy ${cls}" title="vs ${yr - 1}">${arrow} ${sign}${pct.toFixed(1)}%</span>`;
+  };
   const sourcesListHtml = flowItems.map(it => `
     <li class="flow-source-row">
       <span class="flow-source-dot" style="background:${it.color}"></span>
       <span class="flow-source-name">${escapeHtml(it.name)}</span>
-      <span class="flow-source-value">${fmtMoney(it.value)}</span>
+      <span class="flow-source-end">
+        ${yoyHtmlFor(it)}
+        <span class="flow-source-value">${fmtMoney(it.value)}</span>
+      </span>
     </li>
   `).join("");
 
