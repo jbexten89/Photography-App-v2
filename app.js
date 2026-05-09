@@ -3160,7 +3160,10 @@ function refreshTxFilterCategoryButtonLabel() {
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
     const opening = panel.hidden;
-    if (opening) rebuildTxFilterCategoryList();
+    if (opening) {
+      rebuildTxFilterCategoryList();
+      closeOtherNestedFilterPanels("tx-filter-category-panel");
+    }
     panel.hidden = !opening;
     if (!panel.hidden) requestAnimationFrame(() => positionNestedFilterPanel(btn, panel));
   });
@@ -3227,7 +3230,10 @@ function refreshTxFilterJobNoButtonLabel() {
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
     const opening = panel.hidden;
-    if (opening) rebuildTxFilterJobNoList();
+    if (opening) {
+      rebuildTxFilterJobNoList();
+      closeOtherNestedFilterPanels("tx-filter-jobno-panel");
+    }
     panel.hidden = !opening;
     if (!panel.hidden) requestAnimationFrame(() => positionNestedFilterPanel(btn, panel));
   });
@@ -3252,6 +3258,13 @@ function refreshTxFilterJobNoButtonLabel() {
 // Position a nested filter panel (Categories/Jobs/Charts) at fixed viewport
 // coordinates anchored to its trigger button. Picks the side with the most
 // room (right by default; left if the panel would overflow off-screen).
+function closeOtherNestedFilterPanels(exceptId) {
+  ["tx-filter-category-panel", "tx-filter-jobno-panel", "tx-filter-chart-panel"].forEach(id => {
+    if (id === exceptId) return;
+    const p = document.getElementById(id);
+    if (p && !p.hidden) p.hidden = true;
+  });
+}
 function positionNestedFilterPanel(btn, panel) {
   if (!btn || !panel) return;
   const r = btn.getBoundingClientRect();
@@ -3359,7 +3372,10 @@ function rebuildTxFilterChartList() {
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
     const opening = panel.hidden;
-    if (opening) rebuildTxFilterChartList();
+    if (opening) {
+      rebuildTxFilterChartList();
+      closeOtherNestedFilterPanels("tx-filter-chart-panel");
+    }
     panel.hidden = !opening;
     if (!panel.hidden) requestAnimationFrame(() => positionNestedFilterPanel(btn, panel));
   });
