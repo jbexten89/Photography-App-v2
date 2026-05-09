@@ -3493,6 +3493,12 @@ let txSelectMode = false;
       e.preventDefault(); e.stopPropagation();
       const jobNo = row.dataset.jobno;
       if (!jobNo) { closeSwipe(); return; }
+      const job = (state.jobs || []).find(j => j.jobNo === jobNo);
+      if (job && typeof isLockedDate === "function" && isLockedDate(job.date)) {
+        if (typeof blockedToast === "function") blockedToast(job.date.slice(0, 4));
+        closeSwipe();
+        return;
+      }
       if (!confirm(`Delete job ${jobNo}? (Job number ${jobNo} will become reusable.)`)) { closeSwipe(); return; }
       state.jobs = (state.jobs || []).filter(j => j.jobNo !== jobNo);
       (state.transactions || []).forEach(t => { if (t.jobNo === jobNo) delete t.jobNo; });
@@ -3601,6 +3607,12 @@ let txSelectMode = false;
       e.preventDefault(); e.stopPropagation();
       const id = row.dataset.id;
       if (!id) { closeSwipe(); return; }
+      const trip = (state.trips || []).find(t => t.id === id);
+      if (trip && typeof isLockedDate === "function" && isLockedDate(trip.date)) {
+        if (typeof blockedToast === "function") blockedToast(trip.date.slice(0, 4));
+        closeSwipe();
+        return;
+      }
       if (!confirm("Delete this trip?")) { closeSwipe(); return; }
       state.trips = (state.trips || []).filter(t => t.id !== id);
       saveState();
@@ -4831,6 +4843,11 @@ function importMoneyStatsCSV(text, accountFilter) {
     let memo = (usage || "").trim();
     if (!memo && title && title !== categoryRaw) memo = title.trim();
 
+    if (typeof isLockedDate === "function" && isLockedDate(date)) {
+      skipped++;
+      skippedDetails.push({ lineNo, reason: `year ${date.slice(0,4)} is locked`, line: line.slice(0, 120) });
+      return;
+    }
     const tx = {
       id: uid(),
       type,
@@ -5011,6 +5028,7 @@ document.getElementById("file-import-expenses-csv")?.addEventListener("change", 
         }
         const key = `${date}|${vendor.toLowerCase()}|${Math.abs(amount).toFixed(2)}`;
         if (existingKey.has(key)) { skipped++; continue; }
+        if (typeof isLockedDate === "function" && isLockedDate(date)) { skipped++; continue; }
 
         // Apply vendor-specific overrides + Split → CoGS shorthand
         const vendorMap = EXPENSE_IMPORT_VENDOR_MAP[vendor.toLowerCase()] || {};
@@ -5098,6 +5116,15 @@ function refreshExpenseImportUndoUi() {
 document.getElementById("btn-undo-expense-import")?.addEventListener("click", () => {
   const last = state.lastExpenseImport;
   if (!last || !last.batchId) return;
+  // Refuse if any transaction in the batch falls in a locked year.
+  const lockedHits = new Set();
+  (state.transactions || []).forEach(t => {
+    if (t.importBatch === last.batchId && isLockedDate(t.date)) lockedHits.add(t.date.slice(0, 4));
+  });
+  if (lockedHits.size) {
+    alert(`Cannot undo — the import includes transactions in locked year${lockedHits.size === 1 ? "" : "s"} (${[...lockedHits].sort().join(", ")}). Unlock first.`);
+    return;
+  }
   if (!confirm(`Remove the ${last.count} transaction${last.count === 1 ? "" : "s"} from the most recent expense import? This can't be re-done without importing the CSV again.`)) return;
   const before = state.transactions.length;
   state.transactions = state.transactions.filter(t => t.importBatch !== last.batchId);
@@ -7172,6 +7199,8 @@ function renderMileage() {
   tripsBody.querySelectorAll(".trip-del-btn").forEach(b => b.addEventListener("click", e => {
     e.stopPropagation();
     const id = e.target.closest("tr").dataset.id;
+    const trip = (state.trips || []).find(x => x.id === id);
+    if (trip && isLockedDate(trip.date)) { blockedToast(trip.date.slice(0, 4)); return; }
     if (!confirm("Delete this trip?")) return;
     state.trips = state.trips.filter(t => t.id !== id);
     saveState();
@@ -7248,6 +7277,8 @@ document.getElementById("trip-modal").addEventListener("click", e => {
 document.getElementById("btn-trip-delete").addEventListener("click", () => {
   const id = document.getElementById("trip-id").value;
   if (!id) return;
+  const trip = (state.trips || []).find(t => t.id === id);
+  if (trip && isLockedDate(trip.date)) { blockedToast(trip.date.slice(0, 4)); return; }
   if (!confirm("Delete this trip?")) return;
   state.trips = state.trips.filter(t => t.id !== id);
   saveState();
@@ -7269,6 +7300,9 @@ document.getElementById("trip-form").addEventListener("submit", e => {
 
   const idx = state.trips.findIndex(t => t.id === id);
   if (idx >= 0) {
+    const oldDate = state.trips[idx].date;
+    if (isLockedDate(oldDate)) { blockedToast(oldDate.slice(0, 4)); return; }
+    if (isLockedDate(date)) { blockedToast(date.slice(0, 4)); return; }
     state.trips[idx] = { ...state.trips[idx], date, vehicle, miles, purpose };
     saveState();
   }
@@ -7285,6 +7319,7 @@ document.getElementById("btn-add-trip").addEventListener("click", () => {
   if (!date) { alert("Please enter a date."); return; }
   if (!vehicle) { alert("Please enter a vehicle."); return; }
   if (isNaN(miles) || miles <= 0) { alert("Please enter a positive number of miles."); return; }
+  if (isLockedDate(date)) { blockedToast(date.slice(0, 4)); return; }
   state.trips.push({ id: uid(), date, vehicle, miles, purpose });
   saveState();
   // Clear inputs but keep date and vehicle for quick multi-entry
@@ -8325,6 +8360,7 @@ document.getElementById("btn-invoice-save").addEventListener("click", () => {
 
 document.getElementById("btn-invoice-paid").addEventListener("click", () => {
   if (!editingInvoice) return;
+  if (isLockedDate(editingInvoice.data.date)) { blockedToast(editingInvoice.data.date.slice(0, 4)); return; }
   if (editingInvoice.data.paid) {
     editingInvoice.data.paid = false;
     editingInvoice.data.paidDate = "";
@@ -8373,12 +8409,14 @@ document.getElementById("btn-invoice-paid").addEventListener("click", () => {
 
   save?.addEventListener("click", () => {
     if (!editingInvoice) { close(); return; }
+    if (isLockedDate(editingInvoice.data.date)) { blockedToast(editingInvoice.data.date.slice(0, 4)); close(); return; }
     let dateVal = parseManual(manual?.value || "");
     if (!dateVal && picker?.value) dateVal = picker.value;
     if (!dateVal || !/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
       alert("Please pick a date or type a valid MM-DD-YYYY.");
       return;
     }
+    if (isLockedDate(dateVal)) { blockedToast(dateVal.slice(0, 4)); return; }
     editingInvoice.data.paid = true;
     editingInvoice.data.paidDate = dateVal;
     if (typeof updatePaidUI === "function") updatePaidUI();
@@ -11169,6 +11207,10 @@ function renderTransactions() {
     const id = e.target.closest("tr").dataset.id;
     const tx = state.transactions.find(t => t.id === id);
     if (!tx) return;
+    if (typeof isLockedDate === "function" && isLockedDate(tx.date)) {
+      blockedToast(tx.date.slice(0, 4));
+      return;
+    }
     const cur = tx.reconciled || "";
     tx.reconciled = cur === "" ? "C" : cur === "C" ? "R" : "";
     saveState();
@@ -12338,6 +12380,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   if (njForm) njForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const date = njDate.value;
+    if (isLockedDate(date)) { blockedToast(date.slice(0, 4)); return; }
     let jobNo = (njJobNo.value || "").trim();
     const customer = njCustomer.value;
     const category = njCategory.value;
@@ -12909,6 +12952,8 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   if ($("nj-edit-delete")) $("nj-edit-delete").addEventListener("click", () => {
     const orig = $("nj-edit-orig-jobno").value;
     if (!orig) return;
+    const job = (state.jobs || []).find(j => j.jobNo === orig);
+    if (job && isLockedDate(job.date)) { blockedToast(job.date.slice(0, 4)); return; }
     if (!confirm(`Delete job ${orig}? (Job number ${orig} will become reusable.)`)) return;
     state.jobs = (state.jobs || []).filter(j => j.jobNo !== orig);
     (state.transactions || []).forEach(t => { if (t.jobNo === orig) delete t.jobNo; });
@@ -12923,6 +12968,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const orig = $("nj-edit-orig-jobno").value;
     const job = (state.jobs || []).find(j => j.jobNo === orig);
     if (!job) { closeJobEditModal(); return; }
+    const newDate = $("nj-edit-date").value;
+    if (isLockedDate(job.date)) { blockedToast(job.date.slice(0, 4)); return; }
+    if (isLockedDate(newDate)) { blockedToast((newDate || "").slice(0, 4)); return; }
     const newJobNo = ($("nj-edit-jobno").value || "").trim();
     if (!newJobNo) { alert("Job Number is required."); return; }
     if (newJobNo !== orig && (state.jobs || []).some(j => j.jobNo === newJobNo)) {
@@ -12967,6 +13015,11 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const jobNo = sel.dataset.jobno;
     const job = (state.jobs || []).find(j => j.jobNo === jobNo);
     if (!job) return;
+    if (isLockedDate(job.date)) {
+      blockedToast(job.date.slice(0, 4));
+      sel.value = sel.dataset.status || ""; // revert UI
+      return;
+    }
     setJobStatus(job, sel.value);
     sel.dataset.status = sel.value || ""; // re-tint immediately before re-render
     saveState();
@@ -13390,6 +13443,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   document.getElementById("nj-backfill-apply")?.addEventListener("click", () => {
     const rows = document.querySelectorAll("#nj-backfill-tbody tr");
     const changes = []; // { txId, prevJobNo, newJobNo }
+    const lockedHits = new Set();
     rows.forEach(row => {
       const cb = row.querySelector(".nj-backfill-check");
       if (!cb || !cb.checked) return;
@@ -13398,11 +13452,15 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       if (!txId || !jobNo) return;
       const tx = (state.transactions || []).find(t => t.id === txId);
       if (!tx) return;
+      if (isLockedDate(tx.date)) { lockedHits.add(tx.date.slice(0, 4)); return; }
       // Snapshot the prior value so undo can restore it (most are undefined,
       // but on re-apply some may already have a different jobNo).
       changes.push({ txId, prevJobNo: tx.jobNo || null, newJobNo: jobNo });
       tx.jobNo = jobNo;
     });
+    if (lockedHits.size) {
+      alert(`Skipped checked rows in locked year${lockedHits.size === 1 ? "" : "s"} (${[...lockedHits].sort().join(", ")}). Unlock the year(s) in Settings to backfill those.`);
+    }
     if (changes.length === 0) { alert("No rows selected."); return; }
     state.lastBackfillUndo = { at: Date.now(), changes };
     saveState();
@@ -13420,9 +13478,11 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     if (!snap || !Array.isArray(snap.changes) || snap.changes.length === 0) return;
     if (!confirm(`Undo backfill of ${snap.changes.length} transaction(s)?`)) return;
     let reverted = 0;
+    const undoLockedHits = new Set();
     snap.changes.forEach(c => {
       const tx = (state.transactions || []).find(t => t.id === c.txId);
       if (!tx) return;
+      if (isLockedDate(tx.date)) { undoLockedHits.add(tx.date.slice(0, 4)); return; }
       // Only revert if the current value still matches what we set — don't
       // clobber edits the user may have made since the backfill.
       if (tx.jobNo === c.newJobNo) {
@@ -13431,6 +13491,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
         reverted++;
       }
     });
+    if (undoLockedHits.size) {
+      alert(`Skipped undo for transactions in locked year${undoLockedHits.size === 1 ? "" : "s"} (${[...undoLockedHits].sort().join(", ")}).`);
+    }
     delete state.lastBackfillUndo;
     saveState();
     if (typeof renderTransactions === "function") renderTransactions();
