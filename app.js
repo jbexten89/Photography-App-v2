@@ -8917,17 +8917,13 @@ function renderTrends() {
   const chart = document.getElementById("trend-chart");
   const title = document.getElementById("trend-title");
 
-  // Only include real photography "Jobs": exclude savings and non-job bookkeeping categories,
-  // and require a positive overall net.
+  // A "Job" = any user category, minus savings and bookkeeping carry-forward
+  // categories. We intentionally do NOT require positive lifetime net so that
+  // categories which had a one-off loss still appear here.
   const jobsOnly = state.categories.filter(c => {
     if (SAVINGS_CATEGORIES.includes(c)) return false;
     if (NON_JOB_CATEGORIES.includes(c)) return false;
-    let net = 0;
-    state.transactions.forEach(t => {
-      if (t.category !== c) return;
-      net += (t.type === "income" ? 1 : -1) * t.amount;
-    });
-    return net > 0;
+    return true;
   }).sort((a, b) => {
     const ai = JOB_ORDER.indexOf(a);
     const bi = JOB_ORDER.indexOf(b);
