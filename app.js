@@ -10511,15 +10511,23 @@ function renderIncomeByYearChart(years, opts = {}) {
 
 function renderDashboardJobsDonut(yearFilter) {
   // Match the Trends "jobsOnly" order so DONUT_PALETTE indices line up with Trends colors.
+  // A category counts as a "job" if it has any income — either lifetime
+  // net-positive (the historical heuristic) OR any income in the
+  // currently-selected year. The year-aware test catches legacy categories
+  // whose lifetime net is negative but whose income still belongs on the chart.
   const jobsOnly = state.categories.filter(c => {
     if (SAVINGS_CATEGORIES.includes(c)) return false;
     if (NON_JOB_CATEGORIES.includes(c)) return false;
     let net = 0;
+    let yearIncome = 0;
     state.transactions.forEach(t => {
       if (t.category !== c) return;
       net += (t.type === "income" ? 1 : -1) * t.amount;
+      if (yearFilter && t.type === "income" && (t.date || "").startsWith(yearFilter)) {
+        yearIncome += t.amount;
+      }
     });
-    return net > 0;
+    return net > 0 || yearIncome > 0;
   }).sort((a, b) => {
     const ai = JOB_ORDER.indexOf(a);
     const bi = JOB_ORDER.indexOf(b);
