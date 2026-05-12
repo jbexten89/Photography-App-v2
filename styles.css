@@ -4408,7 +4408,8 @@ select option {
   font-weight: 600;
 }
 
-.invoice-tax-controls .tax-field input {
+.invoice-tax-controls .tax-field input,
+.invoice-tax-controls .tax-field select {
   border: 1px solid #333;
   padding: 5px 8px;
   font: inherit;
@@ -4420,7 +4421,7 @@ select option {
   font-weight: 400;
 }
 
-.invoice-tax-controls #invoice-tax-rate { width: 70px; text-align: right; }
+.invoice-tax-controls #invoice-tax-rate { width: 90px; text-align: right; }
 .invoice-tax-controls #invoice-tax-label { width: 140px; }
 
 .invoice-tax-controls.nontax .tax-field { opacity: 0.4; pointer-events: none; }
