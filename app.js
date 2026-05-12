@@ -8917,10 +8917,16 @@ function renderTrends() {
   const chart = document.getElementById("trend-chart");
   const title = document.getElementById("trend-title");
 
-  // A "Job" = any user category, minus savings and bookkeeping carry-forward
-  // categories. We intentionally do NOT require positive lifetime net so that
-  // categories which had a one-off loss still appear here.
-  const jobsOnly = state.categories.filter(c => {
+  // A "Job" = any category that exists either in the saved category registry
+  // OR in any transaction, minus savings and bookkeeping carry-forward
+  // categories. Pulling from transactions too ensures categories used in the
+  // data but never registered (legacy imports) still appear as Jobs.
+  const jobUniverse = new Set(state.categories || []);
+  (state.transactions || []).forEach(t => {
+    if (t.category) jobUniverse.add(t.category);
+  });
+  const jobsOnly = [...jobUniverse].filter(c => {
+    if (!c) return false;
     if (SAVINGS_CATEGORIES.includes(c)) return false;
     if (NON_JOB_CATEGORIES.includes(c)) return false;
     return true;
