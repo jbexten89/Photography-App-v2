@@ -7938,7 +7938,21 @@ function openInvoiceEditor(inv) {
     r.checked = r.value === mode;
   });
   document.getElementById("invoice-tax-label").value = editingInvoice.data.taxLabel || "";
-  document.getElementById("invoice-tax-rate").value = editingInvoice.data.taxRate;
+  // Normalize saved tax rate to 2 decimals so it matches a select option
+  // (e.g., "7" or 7 → "7.00"). If it isn't 7.00 / 7.25, inject a one-off
+  // option so the existing rate persists on save.
+  const _rateSel = document.getElementById("invoice-tax-rate");
+  const _rawRate = editingInvoice.data.taxRate;
+  const _normRate = (_rawRate === "" || _rawRate == null || isNaN(Number(_rawRate)))
+    ? ""
+    : Number(_rawRate).toFixed(2);
+  if (_normRate && _rateSel && ![..._rateSel.options].some(o => o.value === _normRate)) {
+    const opt = document.createElement("option");
+    opt.value = _normRate;
+    opt.textContent = _normRate;
+    _rateSel.appendChild(opt);
+  }
+  if (_rateSel) _rateSel.value = _normRate;
   document.querySelector(".invoice-tax-controls").classList.toggle("nontax", mode !== "tax");
 
   renderInvoiceItems();
@@ -8394,7 +8408,7 @@ document.getElementById("invoice-tax-label").addEventListener("input", e => {
   }
 });
 
-document.getElementById("invoice-tax-rate").addEventListener("input", e => {
+document.getElementById("invoice-tax-rate").addEventListener("change", e => {
   if (editingInvoice) {
     editingInvoice.data.taxRate = e.target.value;
     renderInvoiceTotals();
