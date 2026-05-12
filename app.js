@@ -9120,11 +9120,10 @@ function renderTrends() {
 
   if (trendSelectedYears !== null) {
     const kept = [...trendSelectedYears].filter(y => allYearsSet.has(y));
-    if (trendMode === "year") {
-      trendSelectedYears = new Set(kept.slice(0, 1));
-    } else {
-      trendSelectedYears = new Set(kept);
-    }
+    // Both modes honor the full multi-year selection from the universal Date
+    // Range filter. (Legacy behavior collapsed Year mode to a single year for
+    // the old in-card single-select picker, which no longer applies.)
+    trendSelectedYears = new Set(kept);
   }
   if ((!trendSelectedYears || trendSelectedYears.size === 0) && allYearsList.length) {
     // If the universal Date Range filter has no narrowing, honor "all years"
