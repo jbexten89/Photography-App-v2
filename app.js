@@ -8917,18 +8917,22 @@ function renderTrends() {
   const chart = document.getElementById("trend-chart");
   const title = document.getElementById("trend-title");
 
-  // A "Job" = any category that exists either in the saved category registry
-  // OR in any transaction, minus savings and bookkeeping carry-forward
-  // categories. Pulling from transactions too ensures categories used in the
-  // data but never registered (legacy imports) still appear as Jobs.
-  const jobUniverse = new Set(state.categories || []);
+  // A "Job" = any category that has had at least one income transaction
+  // (pulling from the registry too so a registered job with no income yet
+  // still appears), minus savings and bookkeeping carry-forward categories.
+  // The income-required check filters out pure-expense categories like
+  // "Cost of Goods Sold" or "Office Supplies".
+  const incomeCats = new Set();
   (state.transactions || []).forEach(t => {
-    if (t.category) jobUniverse.add(t.category);
+    if (t.type === "income" && t.category) incomeCats.add(t.category);
   });
+  const jobUniverse = new Set([...(state.categories || []), ...incomeCats]);
   const jobsOnly = [...jobUniverse].filter(c => {
     if (!c) return false;
     if (SAVINGS_CATEGORIES.includes(c)) return false;
     if (NON_JOB_CATEGORIES.includes(c)) return false;
+    // Must have at least one income transaction to be considered a Job.
+    if (!incomeCats.has(c)) return false;
     return true;
   }).sort((a, b) => {
     const ai = JOB_ORDER.indexOf(a);
