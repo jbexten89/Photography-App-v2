@@ -6162,11 +6162,6 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #mileage .toolbar > span[style*="flex:1"] { display: none; }
   #mileage .toolbar .date-range { flex: 1 1 0; min-width: 0; }
   #mileage .toolbar .mileage-total-display { width: auto; flex: 1 1 0; min-width: 0; }
-  /* Mileage action row (year nav + New Trip) overrides the global rule that
-     hides flex-spacers inside .schedule-toolbar — we need the spacer to push
-     "+ New Trip" to the right edge of the row. */
-  .mileage-action-row > span[style*="flex"] { display: block !important; }
-  .mileage-action-row h2 { min-width: 0 !important; flex: 0 0 auto; padding: 0 4px; }
 
   /* New Job: hide the "Job Analytics" heading on mobile */
   #newjob .nj-analytics-heading { display: none !important; }
