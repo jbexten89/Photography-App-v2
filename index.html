@@ -1923,7 +1923,14 @@
           </div>
         </div>
 
-        <h2 style="margin-top:24px">Summary by Vehicle</h2>
+        <div class="schedule-toolbar" style="margin-top:18px">
+          <button id="mileage-prev-year" class="btn" type="button" aria-label="Previous year">‹</button>
+          <h2 id="mileage-year-label">Year</h2>
+          <button id="mileage-next-year" class="btn" type="button" aria-label="Next year">›</button>
+          <button id="mileage-this-year" class="btn" type="button">Today</button>
+        </div>
+
+        <h2 id="mileage-summary-heading" style="margin-top:24px">Summary by Vehicle</h2>
         <div class="table-wrap">
           <table id="mileage-summary-table" class="fixed-cols">
             <colgroup>
@@ -1944,7 +1951,7 @@
           </table>
         </div>
 
-        <h2 style="margin-top:24px">All Trips</h2>
+        <h2 id="mileage-trips-heading" style="margin-top:24px">All Trips</h2>
         <div class="table-wrap">
           <table id="mileage-trips-table" class="fixed-cols">
             <colgroup>
@@ -2906,6 +2913,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=240"></script>
+  <script src="app.js?v=241"></script>
 </body>
 </html>

@@ -7239,6 +7239,7 @@ function ensureMileageState() {
   if (typeof state.mileageRate !== "number") state.mileageRate = 0.70;
 }
 
+let mileageViewYear = String(new Date().getFullYear());
 function renderMileage() {
   ensureMileageState();
 
@@ -7255,28 +7256,35 @@ function renderMileage() {
   const dl = document.getElementById("mileage-vehicle-datalist");
   if (dl) dl.innerHTML = vehicles.map(v => `<option value="${escapeHtml(v)}"></option>`).join("");
 
-  // Summary by vehicle (all-time) + grand total for the CURRENT year only
+  // Year navigation — Summary, All Trips and Total Miles all scope to this year.
+  const viewYear = String(mileageViewYear);
+  const yearLabelEl = document.getElementById("mileage-year-label");
+  if (yearLabelEl) yearLabelEl.textContent = viewYear;
+  const summaryHeading = document.getElementById("mileage-summary-heading");
+  if (summaryHeading) summaryHeading.textContent = `Summary by Vehicle — ${viewYear}`;
+  const tripsHeading = document.getElementById("mileage-trips-heading");
+  if (tripsHeading) tripsHeading.textContent = `All Trips — ${viewYear}`;
+
+  // Summary by vehicle (filtered to the viewed year) + grand total for that year
   const summary = {};
-  const currentYear = String(new Date().getFullYear());
-  let grandMilesCurrentYear = 0;
+  let grandMilesYear = 0;
   state.trips.forEach(t => {
+    if (!(t.date || "").startsWith(viewYear)) return;
     const v = t.vehicle || "(no vehicle)";
     if (!summary[v]) summary[v] = { miles: 0, trips: 0 };
     const miles = parseFloat(t.miles) || 0;
     summary[v].miles += miles;
     summary[v].trips++;
-    if ((t.date || "").startsWith(currentYear)) {
-      grandMilesCurrentYear += miles;
-    }
+    grandMilesYear += miles;
   });
   const grandEl = document.getElementById("mileage-grand-total");
-  if (grandEl) grandEl.textContent = grandMilesCurrentYear.toFixed(2);
+  if (grandEl) grandEl.textContent = grandMilesYear.toFixed(2);
   const grandLabel = document.querySelector(".mileage-total-display .mileage-total-label");
-  if (grandLabel) grandLabel.textContent = `Total Miles ${currentYear}`;
+  if (grandLabel) grandLabel.textContent = `Total Miles ${viewYear}`;
   const summaryBody = document.querySelector("#mileage-summary-table tbody");
   const vehList = Object.keys(summary).sort();
   if (!vehList.length) {
-    summaryBody.innerHTML = `<tr><td colspan="4" class="empty">No trips logged yet.</td></tr>`;
+    summaryBody.innerHTML = `<tr><td colspan="4" class="empty">No trips logged in ${escapeHtml(viewYear)}.</td></tr>`;
   } else {
     summaryBody.innerHTML = vehList.map(v => {
       const s = summary[v];
@@ -7292,13 +7300,14 @@ function renderMileage() {
     }).join("");
   }
 
-  // All trips table
+  // All trips for the viewed year only
   const tripsBody = document.querySelector("#mileage-trips-table tbody");
-  if (!state.trips.length) {
-    tripsBody.innerHTML = `<tr><td colspan="5" class="empty">No trips yet. Add your first trip above.</td></tr>`;
+  const tripsInYear = (state.trips || []).filter(t => (t.date || "").startsWith(viewYear));
+  if (!tripsInYear.length) {
+    tripsBody.innerHTML = `<tr><td colspan="5" class="empty">No trips in ${escapeHtml(viewYear)}.</td></tr>`;
     return;
   }
-  const sorted = state.trips.slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  const sorted = tripsInYear.slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
   tripsBody.innerHTML = sorted.map(t => `
     <tr data-id="${t.id}" class="trip-row">
       <td>${fmtDate(t.date)}</td>
@@ -7449,6 +7458,20 @@ document.getElementById("mileage-rate").addEventListener("input", e => {
     saveState();
     renderMileage();
   }
+});
+
+// Year navigation — mirrors the Calendar page pattern
+document.getElementById("mileage-prev-year")?.addEventListener("click", () => {
+  mileageViewYear = String(Number(mileageViewYear) - 1);
+  renderMileage();
+});
+document.getElementById("mileage-next-year")?.addEventListener("click", () => {
+  mileageViewYear = String(Number(mileageViewYear) + 1);
+  renderMileage();
+});
+document.getElementById("mileage-this-year")?.addEventListener("click", () => {
+  mileageViewYear = String(new Date().getFullYear());
+  renderMileage();
 });
 
 // ============ MILEAGE REPORT ============
