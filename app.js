@@ -7240,8 +7240,22 @@ function ensureMileageState() {
 }
 
 let mileageViewYear = String(new Date().getFullYear());
+let mileageYearInitialized = false;
 function renderMileage() {
   ensureMileageState();
+  // On first render, jump to the most recent year that has trips so the page
+  // isn't blank when the current calendar year has no entries yet.
+  if (!mileageYearInitialized) {
+    mileageYearInitialized = true;
+    const tripYears = (state.trips || [])
+      .map(t => (t.date || "").slice(0, 4))
+      .filter(y => /^\d{4}$/.test(y));
+    if (tripYears.length) {
+      const latest = tripYears.sort().slice(-1)[0];
+      const thisYear = String(new Date().getFullYear());
+      mileageViewYear = tripYears.includes(thisYear) ? thisYear : latest;
+    }
+  }
 
   // Sync rate input
   const rateEl = document.getElementById("mileage-rate");
