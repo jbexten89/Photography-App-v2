@@ -7622,7 +7622,7 @@ function renderMileageReport() {
 document.getElementById("mileage-include-detail")?.addEventListener("change", renderMileageReport);
 document.getElementById("mileage-include-expense")?.addEventListener("change", renderMileageReport);
 
-document.getElementById("btn-open-mileage-report").addEventListener("click", openMileageReport);
+document.getElementById("btn-open-mileage-report")?.addEventListener("click", openMileageReport);
 document.getElementById("btn-mileage-report-print").addEventListener("click", () => window.print());
 document.getElementById("mileage-report-from").addEventListener("change", () => {
   document.getElementById("mileage-report-preset").value = "custom";
