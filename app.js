@@ -355,7 +355,11 @@ async function cloudSyncPull(mergeFromLocal) {
       cloudSyncLastAt = new Date(data.updated_at || Date.now());
       setSyncStatus("synced", "● Synced");
       refreshCloudSyncUI();
-      if (typeof render === "function") render();
+      // Defer render() to after the current task so any top-level let/const
+      // declarations below this point in the file have time to initialize
+      // (TDZ-safe). Otherwise an auth-restore-triggered render during initial
+      // script parse can throw on dashboardYearInitialized / CHART_ACCOUNT_TYPES.
+      if (typeof render === "function") setTimeout(() => { try { render(); } catch (e) { console.error("post-pull render failed", e); } }, 0);
     } else if (mergeFromLocal) {
       // First sign-in on this account — seed the remote row from local state.
       await cloudSyncPush();
