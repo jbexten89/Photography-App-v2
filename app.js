@@ -5484,7 +5484,15 @@ function renderScheduleList() {
   const heading = document.getElementById("sched-list-heading");
   if (!tbody || !heading) return;
 
-  const currentYear = String(new Date().getFullYear());
+  // Track the year currently being viewed in the calendar so prev/next year
+  // buttons drive this list too. Fall back to the current calendar year on
+  // first render before scheduleViewMonth is set.
+  const currentYear = String(
+    (typeof scheduleViewMonth !== "undefined" && scheduleViewMonth
+      ? scheduleViewMonth
+      : new Date()
+    ).getFullYear()
+  );
   heading.textContent = `Scheduled Jobs — ${currentYear}`;
 
   const fmtTime = t => {
