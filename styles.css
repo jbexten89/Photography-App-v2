@@ -5051,6 +5051,9 @@ select option {
 
 /* Mobile-only row-break sibling inside the All Transactions toolbar. */
 .tx-toolbar-row-break { display: none; }
+/* Generic mobile-only row-break sibling for any toolbar that needs an
+   explicit flex-wrap break (e.g., Reports toolbars). */
+.toolbar-row-break { display: none; }
 
 /* Hide selected columns at every viewport when the user has unchecked them
    in Settings. !important keeps this winning over the sticky-column /
@@ -7113,6 +7116,42 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #mileage-list-view .toolbar {
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  /* Reports toolbars (P&L, Sales Tax, Mileage Report) — mobile reflow:
+       Row 1: Print / PDF (right 1/3, alone on its row)
+       Row 2: From (1/2 left) · To (1/2 right)
+       Row 3+: presets / checkboxes / Expand All */
+  #pl-report-container .toolbar #btn-pl-print,
+  #tax-report-container .toolbar #btn-tax-report-print,
+  #mileage-report-container .toolbar #btn-mileage-report-print {
+    order: -3;
+    flex: 0 0 calc(33.333% - 6px);
+    margin-left: auto;
+    min-width: 0;
+  }
+  #pl-report-container .toolbar .toolbar-row-break,
+  #tax-report-container .toolbar .toolbar-row-break,
+  #mileage-report-container .toolbar .toolbar-row-break {
+    display: block;
+    order: -2;
+    flex: 0 0 100%;
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+  #pl-report-container .toolbar > label.date-range,
+  #tax-report-container .toolbar > label.date-range,
+  #mileage-report-container .toolbar > label.date-range {
+    flex: 0 0 calc(50% - 4px);
+    min-width: 0;
+    width: auto;
+  }
+  #pl-report-container .toolbar > label.date-range input,
+  #tax-report-container .toolbar > label.date-range input,
+  #mileage-report-container .toolbar > label.date-range input {
+    width: 100%;
+    min-width: 0;
   }
   /* Pin Mileage Report and Rate to the SAME row on mobile by shrinking
      them to their natural / compact widths. Total Miles still wraps to

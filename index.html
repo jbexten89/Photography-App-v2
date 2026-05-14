@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=420" />
+<link rel="stylesheet" href="styles.css?v=421" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1185,6 +1185,7 @@
           <option value="second-half">2nd Half of Year</option>        </select>
         <button id="btn-pl-toggle-all" class="btn" type="button">Expand All</button>
         <button id="btn-pl-print" class="btn" type="button">Print / PDF</button>
+        <div class="toolbar-row-break" aria-hidden="true"></div>
       </div>
 
       <div class="invoice-sheet tax-report-sheet pl-sheet" id="pl-sheet">
@@ -1240,6 +1241,7 @@
             <option value="second-half">2nd Half of Year</option>          </select>
           <label class="check-pill"><input type="checkbox" id="tax-report-include-detail" checked /> Include Invoice Detail</label>
           <button id="btn-tax-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
         </div>
 
         <div class="invoice-sheet tax-report-sheet" id="tax-report-sheet">
@@ -1740,6 +1742,7 @@
           <label class="check-pill"><input type="checkbox" id="mileage-include-detail" checked /> Include Trip Detail</label>
           <label class="check-pill"><input type="checkbox" id="mileage-include-expense" checked /> Include Mileage Expense</label>
           <button id="btn-mileage-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
         </div>
 
         <div class="invoice-sheet tax-report-sheet" id="mileage-report-sheet">
