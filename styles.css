@@ -7146,21 +7146,23 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #reports .rmvp-row .rmvp { flex: 1 1 calc(66.667% - 4px); min-width: 0; }
   #reports #rmvp-print-btn {
     /* Mirror the .amvp-trigger picker exactly so both buttons render at the
-       same height — same display model, padding, border, and font. No
-       line-height override (was making Print taller than the picker). */
-    display: flex;
+       same height. Use !important on padding/font to defeat the global
+       mobile-button overrides further down in this file. */
+    display: flex !important;
     align-items: center;
     justify-content: center;
     flex: 0 0 calc(33.333% - 4px);
     min-width: 0;
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    padding: 12px 14px !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
     background: var(--surface);
     color: var(--text);
     font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    height: auto;
   }
   #pl-report-container .toolbar > label.date-range,
   #tax-report-container .toolbar > label.date-range,
