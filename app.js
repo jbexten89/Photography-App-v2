@@ -10256,7 +10256,7 @@ function renderBcatDonut(el, items, total) {
   // anchored by direction (no fixed columns, no elbow, no overlap-resolution).
   const VB_W = 260, VB_H = 220;
   const CX = VB_W / 2, CY = VB_H / 2;
-  const R_OUT = 60, R_IN = 38;
+  const R_OUT = 45, R_IN = 28;
 
   let cum = 0;
   const segs = display.map(it => {
