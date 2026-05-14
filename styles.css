@@ -5797,7 +5797,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      SVG-unit fonts (default 22) read clearly when the 900-wide viewBox is
      squeezed onto a narrow phone screen. !important defeats the inline
      style="font-size:..." attributes set by the renderer. */
-  #dashboard-income-chart text { font-size: 40px !important; }
+  #dashboard-income-chart text { font-size: 28px !important; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
