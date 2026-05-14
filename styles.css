@@ -6193,7 +6193,20 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #mileage .toolbar { flex-wrap: nowrap; gap: 8px; align-items: flex-start; }
   #mileage .toolbar > span[style*="flex:1"] { display: none; }
   #mileage .toolbar .date-range { flex: 1 1 0; min-width: 0; }
-  #mileage .toolbar .mileage-total-display { width: auto; flex: 1 1 0; min-width: 0; }
+  #mileage .toolbar .mileage-total-display {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+    /* Drop the desktop card chrome on mobile so it visually matches the
+       compact Rate label/input on its left. */
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    gap: 4px;
+    align-items: flex-end;
+  }
+  #mileage .toolbar .mileage-total-value { font-size: 14px; }
 
   /* New Job: hide the "Job Analytics" heading on mobile */
   #newjob .nj-analytics-heading { display: none !important; }
