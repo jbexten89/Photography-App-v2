@@ -5803,16 +5803,16 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      slice labels and center totals read clearly on a phone. */
   #donut-jobs-m .donut-label,
   #donut-expenses-m .donut-label,
-  #donut-savings-m .donut-label { font-size: 5.5px !important; }
+  #donut-savings-m .donut-label { font-size: 7.5px !important; }
   #donut-jobs-m .donut-label-sub,
   #donut-expenses-m .donut-label-sub,
-  #donut-savings-m .donut-label-sub { font-size: 4.8px !important; }
+  #donut-savings-m .donut-label-sub { font-size: 6.5px !important; }
   #donut-jobs-m .donut-center,
   #donut-expenses-m .donut-center,
-  #donut-savings-m .donut-center { font-size: 5px !important; }
+  #donut-savings-m .donut-center { font-size: 7px !important; }
   #donut-jobs-m .donut-center-sub,
   #donut-expenses-m .donut-center-sub,
-  #donut-savings-m .donut-center-sub { font-size: 3px !important; }
+  #donut-savings-m .donut-center-sub { font-size: 4.2px !important; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
