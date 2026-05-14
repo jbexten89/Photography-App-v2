@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=421" />
+<link rel="stylesheet" href="styles.css?v=422" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1342,6 +1342,7 @@
           <label class="check-pill"><input type="checkbox" id="jobs-report-include-account"  checked /> Include Account</label>
           <button id="btn-jobs-report-toggle-all" class="btn" type="button">Expand All</button>
           <button id="btn-jobs-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
         </div>
 
         <div class="invoice-sheet tax-report-sheet" id="jobs-report-sheet">
@@ -1451,6 +1452,7 @@
           <label class="check-pill"><input type="checkbox" id="ie-report-include-expense" checked /> Include Expense</label>
           <button id="btn-ie-report-toggle-all" class="btn" type="button">Expand All</button>
           <button id="btn-ie-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
         </div>
 
         <div class="invoice-sheet tax-report-sheet ie-report-sheet" id="ie-report-sheet">
@@ -1558,6 +1560,7 @@
             <option value="landscape" selected>Landscape</option>
           </select>
           <button id="btn-tx-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
         </div>
 
         <div class="invoice-sheet tax-report-sheet" id="tx-report-sheet">
@@ -1625,6 +1628,7 @@
           <label class="check-pill"><input type="checkbox" id="hgb-report-include-helper"   checked /> Include Helper</label>
           <label class="check-pill"><input type="checkbox" id="hgb-report-include-giveback" checked /> Include Give Back</label>
           <button id="btn-hgb-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
         </div>
 
         <div class="invoice-sheet tax-report-sheet" id="hgb-report-sheet">
@@ -1818,6 +1822,7 @@
           </select>
           <span style="flex:1"></span>
           <button id="btn-sc-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
         </div>
         <div class="invoice-sheet tax-report-sheet" id="sc-report-sheet">
           <div class="invoice-header">
