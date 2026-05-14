@@ -2786,10 +2786,14 @@ document.getElementById("btn-delete-tx").addEventListener("click", () => {
 
 document.getElementById("btn-duplicate-tx").addEventListener("click", () => {
   // Snapshot the current form values (no id), then re-open the modal in "new" mode.
-  const outflow = parseFloat(document.getElementById("tx-outflow").value) || 0;
-  const inflow  = parseFloat(document.getElementById("tx-inflow").value)  || 0;
-  const type = inflow > 0 ? "income" : "expense";
-  const amount = type === "income" ? inflow : outflow;
+  // Detect type by which field has a value (so $0 amounts are allowed).
+  const outflowRaw = document.getElementById("tx-outflow").value.trim();
+  const inflowRaw  = document.getElementById("tx-inflow").value.trim();
+  const outflow = parseFloat(outflowRaw);
+  const inflow  = parseFloat(inflowRaw);
+  const hasInflow = inflowRaw !== "" && !isNaN(inflow);
+  const type = hasInflow ? "income" : "expense";
+  const amount = type === "income" ? (isNaN(inflow) ? 0 : inflow) : (isNaN(outflow) ? 0 : outflow);
   const dup = {
     // intentionally no id → modal treats as a duplicate / new
     date: document.getElementById("tx-date").value || new Date().toISOString().slice(0, 10),
@@ -3048,20 +3052,26 @@ txForm.addEventListener("submit", e => {
     document.getElementById("tx-customer").focus();
     return;
   }
-  const outflow = parseFloat(document.getElementById("tx-outflow").value) || 0;
-  const inflow = parseFloat(document.getElementById("tx-inflow").value) || 0;
+  // Detect "field has a value" (including 0) by checking the raw string,
+  // so the user can record a $0 transaction in either column.
+  const outflowRaw = document.getElementById("tx-outflow").value.trim();
+  const inflowRaw  = document.getElementById("tx-inflow").value.trim();
+  const outflow = parseFloat(outflowRaw);
+  const inflow  = parseFloat(inflowRaw);
+  const hasOutflow = outflowRaw !== "" && !isNaN(outflow);
+  const hasInflow  = inflowRaw  !== "" && !isNaN(inflow);
 
-  if (outflow <= 0 && inflow <= 0) {
+  if (!hasOutflow && !hasInflow) {
     alert("Enter an amount in either Outflow or Inflow.");
     return;
   }
-  if (outflow > 0 && inflow > 0) {
+  if (hasOutflow && hasInflow) {
     alert("Enter an amount in only one of Outflow or Inflow, not both.");
     return;
   }
 
-  const type = outflow > 0 ? "expense" : "income";
-  const amount = outflow > 0 ? outflow : inflow;
+  const type = hasOutflow ? "expense" : "income";
+  const amount = hasOutflow ? outflow : inflow;
   const category = document.getElementById("tx-category").value.trim();
   // This app only uses one Account — pick the first known account,
   // fall back to the default label so every tx still has a populated account.
