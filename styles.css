@@ -7137,6 +7137,18 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     flex: 0 0 80px;
   }
 
+  /* Invoices list toolbar (mobile):
+       Hide Sales Tax button
+       Row 1: All Customers (1/2 left) · All Years (1/2 right)
+       Row 2: Search (full width)
+       Row 3: + New Invoice (full width) */
+  #invoices-list-view .toolbar #btn-open-tax-report { display: none; }
+  #invoices-list-view .toolbar #inv-filter-job   { order: 1; flex: 0 0 calc(50% - 4px); min-width: 0; }
+  #invoices-list-view .toolbar #inv-filter-year  { order: 2; flex: 0 0 calc(50% - 4px); min-width: 0; }
+  #invoices-list-view .toolbar #inv-filter-billto { order: 3; flex: 1 1 100%; min-width: 0; }
+  #invoices-list-view .toolbar > span[style*="flex"] { display: none; }
+  #invoices-list-view .toolbar #btn-new-invoice  { order: 4; flex: 1 1 100%; }
+
   /* Report toolbars — date inputs take appropriate width */
   .date-range {
     flex: 1 1 45%;
