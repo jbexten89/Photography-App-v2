@@ -6206,7 +6206,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     gap: 4px;
     align-items: flex-end;
   }
-  #mileage .toolbar .mileage-total-value { font-size: 14px; }
+  #mileage .toolbar .mileage-total-value { font-size: 22px; font-weight: 700; }
 
   /* New Job: hide the "Job Analytics" heading on mobile */
   #newjob .nj-analytics-heading { display: none !important; }
