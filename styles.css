@@ -5793,6 +5793,11 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 
   /* Dashboard chart SVGs can overflow — let the card take full width */
   #dashboard-income-chart { height: 280px; }
+  /* Bump every text label inside the Income by Year chart on mobile so the
+     SVG-unit fonts (default 22) read clearly when the 900-wide viewBox is
+     squeezed onto a narrow phone screen. !important defeats the inline
+     style="font-size:..." attributes set by the renderer. */
+  #dashboard-income-chart text { font-size: 40px !important; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
