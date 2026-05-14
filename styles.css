@@ -5004,13 +5004,19 @@ select option {
   /* Back arrow — full-width when visible (rare drill-in from Analytics). */
   #transactions .toolbar #btn-tx-back           { order: -20; flex: 1 1 100%; }
 
-  /* Row 1 — New Transaction alone on its row, right-aligned */
-  #transactions .toolbar #btn-new-tx            {
+  /* Row 1 — empty 2/3 spacer (pseudo) + New Transaction (1/3, right) */
+  #transactions .toolbar::before {
+    content: "";
     order: -22;
-    flex: 0 0 100%;
-    max-width: calc(33.333% - 6px);
-    margin-left: auto;
+    flex: 0 0 calc(66.667% - 6px);
+    height: 0;          /* invisible — only consumes horizontal space */
     min-width: 0;
+  }
+  #transactions .toolbar #btn-new-tx            {
+    order: -21;
+    flex: 0 0 calc(33.333% - 6px);
+    min-width: 0;
+    margin-left: 0;
     height: 40px;
     min-height: 40px;
   }
