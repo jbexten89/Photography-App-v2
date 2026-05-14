@@ -10382,8 +10382,13 @@ function renderBcatTreemap(el, items) {
     const w = Math.max(0, c.w - pad * 2), h = Math.max(0, c.h - pad * 2);
     const showLabel = w > 70 && h > 32;
     const showValue = w > 70 && h > 50;
-    const labelFont = Math.max(11, Math.min(20, Math.sqrt(w * h) / 9));
-    const subFont   = Math.max(10, labelFont - 4);
+    // Bump label size on mobile so the SVG-unit text reads clearly when the
+    // 1000-wide viewBox is squeezed onto a phone screen.
+    const isMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+    const labelFont = isMobile
+      ? Math.max(20, Math.min(36, Math.sqrt(w * h) / 6))
+      : Math.max(11, Math.min(20, Math.sqrt(w * h) / 9));
+    const subFont   = Math.max(isMobile ? 16 : 10, labelFont - 4);
     const nameText = showLabel
       ? `<text x="${x + 10}" y="${y + 8 + labelFont}" fill="#fff" style="font-size:${labelFont}px;font-weight:700">${escapeHtml(shortLabel(c.item.name, Math.floor(w / (labelFont * 0.6))))}</text>`
       : "";
