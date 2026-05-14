@@ -7136,7 +7136,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #reports .toolbar { position: static; padding-right: 0; }
   #reports .toolbar [id$="-print"] { display: none !important; }
 
-  /* Shared rmvp + Print/PDF row */
+  /* Shared rmvp + Print/PDF row — both children pinned to a fixed 48px so
+     they always render at exactly the same height regardless of internal
+     padding/line-height differences. */
   #reports .rmvp-row {
     display: flex;
     align-items: stretch;
@@ -7144,16 +7146,22 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     margin-bottom: 10px;
   }
   #reports .rmvp-row .rmvp { flex: 1 1 calc(66.667% - 4px); min-width: 0; }
+  #reports .rmvp-row .amvp-trigger {
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 0 14px !important;
+    box-sizing: border-box !important;
+  }
   #reports #rmvp-print-btn {
-    /* Mirror the .amvp-trigger picker exactly so both buttons render at the
-       same height. Use !important on padding/font to defeat the global
-       mobile-button overrides further down in this file. */
     display: flex !important;
     align-items: center;
     justify-content: center;
     flex: 0 0 calc(33.333% - 4px);
     min-width: 0;
-    padding: 12px 14px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 0 14px !important;
+    box-sizing: border-box !important;
     border: 1px solid var(--border) !important;
     border-radius: 10px !important;
     background: var(--surface);
@@ -7161,8 +7169,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     font-family: inherit;
     font-size: 15px !important;
     font-weight: 600 !important;
-    line-height: 1.4 !important;
-    height: auto;
+    line-height: 1 !important;
   }
   #pl-report-container .toolbar > label.date-range,
   #tax-report-container .toolbar > label.date-range,
