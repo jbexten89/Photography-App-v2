@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=431" />
+<link rel="stylesheet" href="styles.css?v=432" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1559,7 +1559,7 @@
           <select id="tx-report-expense"  class="btn"><option value="">All Expenses</option></select>
           <select id="tx-report-customer" class="btn"><option value="">All Customers</option></select>
           <select id="tx-report-payee"    class="btn"><option value="">All Payees</option></select>
-          <input type="search" id="tx-report-search" class="btn" placeholder="Find…" autocomplete="off" />
+          <input type="search" id="tx-report-search" class="btn" placeholder="" aria-label="Find" autocomplete="off" />
           <select id="tx-report-orientation" class="btn">
             <option value="portrait">Portrait</option>
             <option value="landscape" selected>Landscape</option>
