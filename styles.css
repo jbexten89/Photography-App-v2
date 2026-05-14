@@ -5800,21 +5800,21 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #dashboard-income-chart text { font-size: 26px !important; }
 
   /* Analytics By Category donuts (mobile twins) — bump SVG-unit text so the
-     slice labels and center totals read clearly on a phone. The label now
-     includes the percentage on the same line; the dollar amount sits on
-     the sub line below. */
-  #donut-jobs-m .donut-label,
-  #donut-expenses-m .donut-label,
-  #donut-savings-m .donut-label { font-size: 9.5px !important; }
-  #donut-jobs-m .donut-label-sub,
-  #donut-expenses-m .donut-label-sub,
-  #donut-savings-m .donut-label-sub { font-size: 8px !important; }
-  #donut-jobs-m .donut-center,
-  #donut-expenses-m .donut-center,
-  #donut-savings-m .donut-center { font-size: 8.5px !important; }
-  #donut-jobs-m .donut-center-sub,
-  #donut-expenses-m .donut-center-sub,
-  #donut-savings-m .donut-center-sub { font-size: 5px !important; }
+     slice labels and center totals read clearly on a phone. Selectors
+     include .donut-svg so they match the specificity of the existing global
+     rules (~line 2840) that pin the centers to 3px / 1.8px. */
+  #donut-jobs-m     .donut-svg .donut-label,
+  #donut-expenses-m .donut-svg .donut-label,
+  #donut-savings-m  .donut-svg .donut-label { font-size: 5px !important; }
+  #donut-jobs-m     .donut-svg .donut-label-sub,
+  #donut-expenses-m .donut-svg .donut-label-sub,
+  #donut-savings-m  .donut-svg .donut-label-sub { font-size: 4.2px !important; }
+  #donut-jobs-m     .donut-svg .donut-center,
+  #donut-expenses-m .donut-svg .donut-center,
+  #donut-savings-m  .donut-svg .donut-center { font-size: 6px !important; }
+  #donut-jobs-m     .donut-svg .donut-center-sub,
+  #donut-expenses-m .donut-svg .donut-center-sub,
+  #donut-savings-m  .donut-svg .donut-center-sub { font-size: 3.5px !important; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
