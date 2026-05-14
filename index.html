@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=415" />
+<link rel="stylesheet" href="styles.css?v=416" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -298,6 +298,7 @@
       <div class="toolbar">
         <button id="btn-tx-back" class="btn" type="button" hidden aria-label="Back to Analytics">‹ Back</button>
         <button id="btn-new-tx" class="btn primary">+ New Transaction</button>
+        <div class="tx-toolbar-row-break" aria-hidden="true"></div>
         <button id="btn-tx-clear-filters" class="btn" type="button">Clear filters</button>
         <select id="tx-filter-year"><option value="">All Years</option></select>
         <!-- Hidden source-of-truth select so existing render/filter code keeps working. -->
