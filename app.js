@@ -10291,7 +10291,7 @@ function renderBcatDonut(el, items, total) {
     const lineX = CX + (R_OUT + 1) * cos;
     const lineY = CY + (R_OUT + 1) * sin;
     const line = `<line x1="${lineX}" y1="${lineY}" x2="${lx}" y2="${ly}" stroke="var(--muted)" stroke-width="0.2" opacity="0.6"/>`;
-    const labelTxt = `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="var(--text)" font-size="6" font-weight="600"><tspan>${escapeHtml(shortLabel(s.name, 22))}</tspan><tspan x="${lx}" dy="7" font-size="5" fill="var(--muted)" font-weight="500">${s.pct.toFixed(0)}%</tspan></text>`;
+    const labelTxt = `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="var(--text)" font-size="6" font-weight="600">${escapeHtml(shortLabel(s.name, 22))} ${s.pct.toFixed(0)}%</text>`;
     return `${line}${labelTxt}`;
   }).join("");
 

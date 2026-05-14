@@ -5793,6 +5793,15 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 
   /* Dashboard chart SVGs can overflow — let the card take full width */
   #dashboard-income-chart { height: 280px; }
+  /* Bump every text label inside the Income by Year chart on mobile so the
+     SVG-unit fonts (default 22) read clearly when the 900-wide viewBox is
+     squeezed onto a phone screen. */
+  #dashboard-income-chart text { font-size: 26px !important; }
+
+  /* Spending by Category donut (#bcat-chart) — bump slice labels on mobile
+     so they read clearly when the 260-wide viewBox is squeezed. The label
+     and percentage now share one line via the renderer. */
+  #bcat-chart text { font-size: 11px !important; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
