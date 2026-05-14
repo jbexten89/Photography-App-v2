@@ -4996,28 +4996,38 @@ select option {
      outside this @media block so it applies everywhere). */
 
   /* Four-row layout.
-     Row 1 — Search (1/3) · Clear Filters (1/3) · All Years (1/3)
-     Row 2 — More actions (left 1/3) · gap · All Types (right 1/3)
-     Row 3 — All Categories (2/3) · + New Transaction (right 1/3)
-     Row 4 — All Charts (1/3) · All Jobs (1/3) · Sort (1/3, hidden until Only Jobs) */
+     Row 1 — + New Transaction (right 1/3, alone on its row)
+     Row 2 — Search (1/3) · Clear Filters (1/3) · All Years (1/3)
+     Row 3 — More actions (1/3) · Filters (1/3) · All Types (1/3)
+     Row 4 — Sort (1/3, hidden until Only Jobs) · gap (right) */
 
   /* Back arrow — full-width when visible (rare drill-in from Analytics). */
   #transactions .toolbar #btn-tx-back           { order: -20; flex: 1 1 100%; }
 
-  /* Row 1 */
+  /* Row 1 — New Transaction alone on its row, right-aligned */
+  #transactions .toolbar #btn-new-tx            {
+    order: -22;
+    flex: 0 0 100%;
+    max-width: calc(33.333% - 6px);
+    margin-left: auto;
+    min-width: 0;
+    height: 40px;
+    min-height: 40px;
+  }
+
+  /* Row 2 */
   #transactions .toolbar .tx-find-wrap          { order: -19; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin: 0; }
   #transactions .toolbar #btn-tx-clear-filters  { order: -18; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
   #transactions .toolbar #tx-filter-year        { order: -17; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
-  /* Row 2 — More · Filters · All Types (each 1/3) */
+  /* Row 3 — More · Filters · All Types (each 1/3) */
   #transactions .toolbar .tx-more-wrap          { order: -16; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
   #transactions .toolbar .tx-filter-combined-wrap { order: -15; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
   #transactions .toolbar #tx-filter-combined-btn { width: 100%; height: 40px; min-height: 40px; justify-content: space-between; font-size: 14px; font-weight: 500; }
   #transactions .toolbar #tx-filter-type        { order: -14; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
 
-  /* Row 3 — Sort (only visible when Only Jobs is picked) · + New Tx (right) */
+  /* Row 4 — Sort (only visible when Only Jobs is picked) */
   #transactions .toolbar #tx-sort-jobno         { order: -13; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
-  #transactions .toolbar #btn-new-tx            { order: -12; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin-left: auto; }
 }
 
 /* Hide selected columns at every viewport when the user has unchecked them
