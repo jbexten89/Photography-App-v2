@@ -7196,6 +7196,15 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   }
   /* Hide any in-DOM flex:1 spacers so the From/To pair stays glued to row 2. */
   #sc-report-container .toolbar > span[style*="flex"] { display: none; }
+
+  /* Transactions report toolbar (mobile) — pair selects 50/50 per row so
+     Find sits to the right of All Payees instead of wrapping below alone. */
+  #tx-report-container .toolbar > select,
+  #tx-report-container .toolbar > #tx-report-search {
+    flex: 0 0 calc(50% - 4px);
+    min-width: 0;
+    width: auto;
+  }
   /* Pin Mileage Report and Rate to the SAME row on mobile by shrinking
      them to their natural / compact widths. Total Miles still wraps to
      its own full-width row beneath. */
