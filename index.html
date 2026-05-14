@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=429" />
+<link rel="stylesheet" href="styles.css?v=430" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1141,6 +1141,7 @@
         <p class="page-subtitle-mobile muted">Print or export financial summaries</p>
       </div>
       <div class="report-picker no-print">
+        <button type="button" class="report-picker-btn active" data-report="none">Select Report</button>
         <button type="button" class="report-picker-btn" data-report="jobs">Job/Category</button>
         <button type="button" class="report-picker-btn" data-report="ie">Income vs Expense</button>
         <button type="button" class="report-picker-btn" data-report="hgb">Helper / Give Back</button>
@@ -1151,17 +1152,17 @@
         <button type="button" class="report-picker-btn" data-report="sc">Schedule C</button>
       </div>
       <!-- Mobile pull-down (richer than native <select>, same look as Analytics amvp) -->
-      <div class="rmvp-row-label no-print">Select Report</div>
       <div class="rmvp-row no-print">
         <div class="rmvp" id="rmvp">
           <button type="button" class="amvp-trigger" id="rmvp-trigger" aria-haspopup="listbox" aria-expanded="false">
             <span class="amvp-current">
-              <span class="amvp-label" id="rmvp-current-label">Job/Category</span>
+              <span class="amvp-label" id="rmvp-current-label">Select Report</span>
             </span>
             <svg class="amvp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="amvp-menu" id="rmvp-menu" role="listbox" hidden>
-            <button type="button" class="amvp-item active" data-report="jobs"    role="option"><span>Job/Category</span></button>
+            <button type="button" class="amvp-item active" data-report="none"    role="option"><span>Select Report</span></button>
+            <button type="button" class="amvp-item"        data-report="jobs"    role="option"><span>Job/Category</span></button>
             <button type="button" class="amvp-item"        data-report="ie"      role="option"><span>Income vs Expense</span></button>
             <button type="button" class="amvp-item"        data-report="hgb"     role="option"><span>Helper / Give Back</span></button>
             <button type="button" class="amvp-item"        data-report="tx"      role="option"><span>Transactions</span></button>
@@ -2923,6 +2924,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=246"></script>
+  <script src="app.js?v=247"></script>
 </body>
 </html>

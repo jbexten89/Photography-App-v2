@@ -6055,6 +6055,9 @@ function showReport(which) {
     b.classList.toggle("active", b.dataset.report === which);
   });
 
+  // "none" is the default placeholder state — show no report.
+  if (which === "none") return;
+
   if (which === "sc") {
     populateReportPresetYears && populateReportPresetYears("sc-report-preset");
     const from = document.getElementById("sc-report-from");

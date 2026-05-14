@@ -562,7 +562,6 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 /* The mobile-only Reports row that pairs the rmvp picker with a shared
    Print/PDF button. Hidden on desktop (the inline pill picker handles it). */
 .rmvp-row { display: none; }
-.rmvp-row-label { display: none; }
 
 /* Custom Mobile View Picker (amvp) */
 .amvp { position: relative; }
@@ -5127,7 +5126,7 @@ body.tx-hide-tags     #tx-table th[data-col="tags"],     body.tx-hide-tags     #
   /* The mobile-only page heading and the report picker shouldn't print —
      they leak onto the printed sheet when print preview triggers the mobile
      breakpoint. */
-  .page-heading-mobile, .report-picker, .rmvp, .rmvp-row, .rmvp-row-label { display: none !important; }
+  .page-heading-mobile, .report-picker, .rmvp, .rmvp-row { display: none !important; }
   @page { size: letter; margin: 0.5in; }
   html, body { height: 100%; margin: 0; padding: 0; }
   #invoices-edit-view { height: 100%; }
@@ -7136,16 +7135,6 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      and their click is forwarded to the shared #rmvp-print-btn instead. */
   #reports .toolbar { position: static; padding-right: 0; }
   #reports .toolbar [id$="-print"] { display: none !important; }
-
-  #reports .rmvp-row-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
 
   /* Shared rmvp + Print/PDF row — both children pinned to a fixed 48px so
      they always render at exactly the same height regardless of internal
