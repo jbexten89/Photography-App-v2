@@ -7249,7 +7249,20 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #invoices-list-view .toolbar #btn-open-tax-report { display: none; }
   #invoices-list-view .toolbar #inv-filter-job   { order: 1; flex: 0 0 calc(50% - 4px); min-width: 0; }
   #invoices-list-view .toolbar #inv-filter-year  { order: 2; flex: 0 0 calc(50% - 4px); min-width: 0; }
-  #invoices-list-view .toolbar #inv-filter-billto { order: 3; flex: 1 1 100%; min-width: 0; }
+  #invoices-list-view .toolbar #inv-filter-billto {
+    order: 3;
+    flex: 1 1 100%;
+    min-width: 0;
+    /* Replace the "Search invoices..." placeholder with a magnifying-glass
+       icon and left-justify the cursor. */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    background-size: 16px 16px;
+    padding-left: 32px;
+    text-align: left;
+  }
+  #invoices-list-view .toolbar #inv-filter-billto::placeholder { color: transparent; }
   #invoices-list-view .toolbar > span[style*="flex"] { display: none; }
   #invoices-list-view .toolbar #btn-new-invoice  { order: 4; flex: 1 1 100%; }
 
