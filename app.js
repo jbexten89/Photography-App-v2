@@ -12055,11 +12055,10 @@ function renderJobs() {
   renderDonut("donut-jobs", jobsItems, "Total");
   renderDonut("donut-expenses", expensesItems, "Total");
   renderDonut("donut-savings", savingsItems, "Total");
-  // Mobile twins render WITH slice labels (showLabels:true) — desktop versions
-  // above stay label-free since the legend cards already list each slice.
-  renderDonut("donut-jobs-m",     jobsItems,     "Total", { showLabels: true });
-  renderDonut("donut-expenses-m", expensesItems, "Total", { showLabels: true });
-  renderDonut("donut-savings-m",  savingsItems,  "Total", { showLabels: true });
+  // Duplicate render for the mobile donut slots (hidden on desktop via CSS)
+  renderDonut("donut-jobs-m", jobsItems, "Total");
+  renderDonut("donut-expenses-m", expensesItems, "Total");
+  renderDonut("donut-savings-m", savingsItems, "Total");
 
   // Hide the parent card(s) entirely when a donut has no data
   const toggleDonutCard = (donutId, hasData) => {
