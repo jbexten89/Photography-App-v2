@@ -559,6 +559,9 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 .page-heading-mobile { display: none; }
 .amvp { display: none; }
 .rmvp { display: none; position: relative; }
+/* The mobile-only Reports row that pairs the rmvp picker with a shared
+   Print/PDF button. Hidden on desktop (the inline pill picker handles it). */
+.rmvp-row { display: none; }
 
 /* Custom Mobile View Picker (amvp) */
 .amvp { position: relative; }
@@ -5123,7 +5126,7 @@ body.tx-hide-tags     #tx-table th[data-col="tags"],     body.tx-hide-tags     #
   /* The mobile-only page heading and the report picker shouldn't print —
      they leak onto the printed sheet when print preview triggers the mobile
      breakpoint. */
-  .page-heading-mobile, .report-picker, .rmvp { display: none !important; }
+  .page-heading-mobile, .report-picker, .rmvp, .rmvp-row { display: none !important; }
   @page { size: letter; margin: 0.5in; }
   html, body { height: 100%; margin: 0; padding: 0; }
   #invoices-edit-view { height: 100%; }
@@ -7124,46 +7127,28 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   }
 
   /* Reports toolbars (all 8) — mobile reflow:
-       Row 1: Print / PDF (right 1/3, alone on its row)
-       Row 2: From (1/2 left) · To (1/2 right)
-       Row 3+: presets / checkboxes / Expand All
-     The desktop rule (#reports .toolbar [id$="-print"]) absolutely-positions
-     every Print/PDF button to the toolbar's top-right corner and reserves
-     110px of right-padding for it. Both have to be reset on mobile so the
-     button can flow with our flex order / row-break instead. */
+       Reports row: rmvp (left 2/3) · shared Print/PDF (right 1/3)
+       Toolbar row 1: From (1/2 left) · To (1/2 right)
+       Toolbar row 2+: presets / checkboxes / Expand All
+     The desktop rule pinning each per-toolbar Print button to the toolbar's
+     top-right corner is reset; the per-toolbar buttons are hidden entirely
+     and their click is forwarded to the shared #rmvp-print-btn instead. */
   #reports .toolbar { position: static; padding-right: 0; }
-  #reports .toolbar [id$="-print"] {
-    position: static;
-    top: auto;
-    right: auto;
+  #reports .toolbar [id$="-print"] { display: none !important; }
+
+  /* Shared rmvp + Print/PDF row */
+  #reports .rmvp-row {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 10px;
   }
-  #pl-report-container .toolbar #btn-pl-print,
-  #tax-report-container .toolbar #btn-tax-report-print,
-  #mileage-report-container .toolbar #btn-mileage-report-print,
-  #jobs-report-container .toolbar #btn-jobs-report-print,
-  #ie-report-container .toolbar #btn-ie-report-print,
-  #tx-report-container .toolbar #btn-tx-report-print,
-  #hgb-report-container .toolbar #btn-hgb-report-print,
-  #sc-report-container .toolbar #btn-sc-report-print {
-    order: -3;
-    flex: 0 0 calc(33.333% - 6px);
-    margin-left: auto;
+  #reports .rmvp-row .rmvp { flex: 1 1 calc(66.667% - 4px); min-width: 0; }
+  #reports #rmvp-print-btn {
+    flex: 0 0 calc(33.333% - 4px);
     min-width: 0;
-  }
-  #pl-report-container .toolbar .toolbar-row-break,
-  #tax-report-container .toolbar .toolbar-row-break,
-  #mileage-report-container .toolbar .toolbar-row-break,
-  #jobs-report-container .toolbar .toolbar-row-break,
-  #ie-report-container .toolbar .toolbar-row-break,
-  #tx-report-container .toolbar .toolbar-row-break,
-  #hgb-report-container .toolbar .toolbar-row-break,
-  #sc-report-container .toolbar .toolbar-row-break {
-    display: block;
-    order: -2;
-    flex: 0 0 100%;
-    height: 0;
-    margin: 0;
-    padding: 0;
+    height: auto;
+    min-height: 44px;
   }
   #pl-report-container .toolbar > label.date-range,
   #tax-report-container .toolbar > label.date-range,

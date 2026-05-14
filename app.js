@@ -7180,6 +7180,29 @@ document.querySelectorAll(".report-picker-btn").forEach(b => {
   b.addEventListener("click", () => showReport(b.dataset.report));
 });
 
+// Mobile shared Print/PDF — forwards to whichever report container is visible
+// (each container's own *-print button is hidden on mobile via CSS).
+document.getElementById("rmvp-print-btn")?.addEventListener("click", () => {
+  const containers = [
+    "pl-report-container",
+    "tax-report-container",
+    "mileage-report-container",
+    "jobs-report-container",
+    "ie-report-container",
+    "tx-report-container",
+    "hgb-report-container",
+    "sc-report-container",
+  ];
+  for (const id of containers) {
+    const el = document.getElementById(id);
+    if (el && !el.hidden) {
+      const printBtn = el.querySelector('[id$="-print"]');
+      if (printBtn) printBtn.click();
+      return;
+    }
+  }
+});
+
 // ===== Mobile Reports pull-down (rmvp) =====
 const rmvpEl       = document.getElementById("rmvp");
 const rmvpTrigger  = document.getElementById("rmvp-trigger");
