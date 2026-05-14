@@ -11791,8 +11791,8 @@ function renderDonut(containerId, items, centerLabel, opts = {}) {
       <line x1="${sliceX}" y1="${sliceY}" x2="${lx}" y2="${ly}" stroke="${s.color}" stroke-width="0.4" opacity="0.85"></line>
       <circle cx="${sliceX}" cy="${sliceY}" r="0.5" fill="${s.color}"></circle>
       <text x="${lx + textPadX}" y="${ly}" text-anchor="${anchor}" class="donut-label" dominant-baseline="middle">
-        <tspan font-weight="700">${escapeHtml(s.item.label)}</tspan>
-        <tspan x="${lx + textPadX}" dy="5.5" class="donut-label-sub">${s.pct.toFixed(1)}% · ${fmtMoneyCompact(s.item.value)}</tspan>
+        <tspan font-weight="700">${escapeHtml(s.item.label)} ${s.pct.toFixed(1)}%</tspan>
+        <tspan x="${lx + textPadX}" dy="1.2em" class="donut-label-sub">${fmtMoneyCompact(s.item.value)}</tspan>
       </text>
     `).join("");
   })();
