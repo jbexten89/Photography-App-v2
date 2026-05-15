@@ -5040,6 +5040,13 @@ select option {
     height: 44px;
     min-height: 44px;
   }
+  /* When Back is visible, drop the New Tx trailing 6px so the two items
+     fit edge-to-edge without sub-pixel rounding pushing New Tx onto a new
+     row. The trailing offset still aligns with row 2 because Back's left
+     edge starts at 0 and New Tx's right edge ends at 100% - 6 organically. */
+  #transactions .toolbar #btn-tx-back:not([hidden]) ~ #btn-new-tx {
+    margin-right: 0 !important;
+  }
 
   /* Row 1 — New Transaction (right 1/3, alone). The .tx-toolbar-row-break
      element below is a real flex-basis:100% sibling that forces all later
