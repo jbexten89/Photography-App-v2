@@ -5842,8 +5842,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .flow-bar-label,
   .flow-bar-label-outside { font-size: 11px !important; }
   .flow-axis-tick { font-size: 10px !important; }
-  /* Slimmer pill bars on mobile so the chart is less heavy. */
+  /* Slimmer, square-ended bars on mobile so the chart is less heavy. */
   .flow-bar-track { height: 12px; }
+  .flow-bar { border-radius: 0; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
