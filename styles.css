@@ -5824,6 +5824,15 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* Big top-of-card net total — too dominant on a phone, scale it down. */
   .cash-flow-total { font-size: 22px !important; }
 
+  /* Spending Trends (mobile): drop the desktop min-height that leaves the
+     bottom half of the card empty when the SVG scales down on a phone, bump
+     axis text so the SVG-unit fonts read clearly, and shrink the giant
+     top-of-card total. */
+  .spend-trends-main { min-height: 0 !important; }
+  .spend-trends-total { font-size: 22px !important; }
+  #st-chart .st-yaxis { font-size: 20px !important; }
+  #st-chart .st-xaxis { font-size: 20px !important; }
+
   /* --- Invoices --- */
   /* Mobile invoice summary:
        Row 1: Total Invoiced  · Total Paid

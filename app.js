@@ -2017,8 +2017,11 @@ function renderSpendingTrends() {
   document.getElementById("st-stat-months").textContent = String(monthsWithData);
 
   // ---- Build chart SVG ----
+  const stIsMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
   const baseWidth = 820, height = 360;
-  const padL = 56, padR = 12, padT = 18, padB = 36;
+  // On mobile we rotate month labels 45° to prevent overlap, so reserve more
+  // bottom padding for them.
+  const padL = 56, padR = 12, padT = 18, padB = stIsMobile ? 80 : 36;
   const basePlotW = baseWidth - padL - padR;
 
   // Lock the per-month slot at the 12-month width. When more than 12 months are
@@ -2044,14 +2047,17 @@ function renderSpendingTrends() {
   for (let v = 0; v <= yTop + 0.0001; v += tickStep) {
     const y = yFor(v);
     gridLines += `<line class="st-grid-line" x1="${padL}" y1="${y}" x2="${padL + plotW}" y2="${y}"/>`;
-    yLabels   += `<text class="st-axis-text" x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle">${fmtCashAxis(v)}</text>`;
+    yLabels   += `<text class="st-axis-text st-yaxis" x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle">${fmtCashAxis(v)}</text>`;
   }
 
-  // X-axis month labels
+  // X-axis month labels — rotate 45° on mobile so they don't overlap.
   let xLabels = "";
   monthKeys.forEach((k, i) => {
     const cx = padL + groupSlot * (i + 0.5);
-    xLabels += `<text class="st-axis-text" x="${cx}" y="${height - padB + 16}" text-anchor="middle">${escapeHtml(months[i].label)}</text>`;
+    const ly = height - padB + 16;
+    xLabels += stIsMobile
+      ? `<text class="st-axis-text st-xaxis" x="${cx}" y="${ly}" text-anchor="start" transform="rotate(45 ${cx} ${ly})">${escapeHtml(months[i].label)}</text>`
+      : `<text class="st-axis-text st-xaxis" x="${cx}" y="${ly}" text-anchor="middle">${escapeHtml(months[i].label)}</text>`;
   });
 
   let chartBody = "";
