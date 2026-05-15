@@ -2554,7 +2554,28 @@ function renderCashFlow() {
   const listEl  = document.getElementById("cf-list");
   if (!chartEl || !listEl) return;
 
-  const months = selectedMonths();
+  // Cash Flow only ever shows ONE year at a time. selectedMonths() can span
+  // multiple years if the user picked several in the universal Date Range
+  // filter, so pick a single year:
+  //   - selection present → most recent selected year
+  //   - no selection → current calendar year if it has any transactions,
+  //     otherwise the most recent year that does
+  const sel = selectedYears();
+  let cfYear;
+  if (sel && sel.length) {
+    cfYear = [...sel].sort()[sel.length - 1];
+  } else {
+    const thisYear = String(new Date().getFullYear());
+    const txYears = new Set();
+    state.transactions.forEach(t => {
+      const y = (t.date || "").slice(0, 4);
+      if (/^\d{4}$/.test(y)) txYears.add(y);
+    });
+    cfYear = txYears.has(thisYear)
+      ? thisYear
+      : ([...txYears].sort().pop() || thisYear);
+  }
+  const months = selectedMonths().filter(m => m.key.startsWith(cfYear));
   const data = months.map(m => ({ ...m, in: 0, out: 0 }));
   const dataMap = new Map(data.map(d => [d.key, d]));
 
