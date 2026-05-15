@@ -1582,15 +1582,26 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 }
 
 @media (max-width: 768px) {
-  /* Shrink the View By + Gross/Net switches on the Flow card so they fit
-     inside the card on narrow screens. */
-  .trend-card-head { gap: 8px; }
-  .trend-card-toolbar { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  /* Flow card mobile layout:
+       Row 1 — All Jobs/One Job switch (left) · Gross/Net switch (right)
+       Row 2 — Job pull-down (full width, only visible in One Job mode)
+     The h2 title sits above row 1 in its own line. */
+  .trend-card-head { gap: 8px; flex-direction: column; align-items: stretch; }
+  .trend-card-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: space-between;
+    align-items: center;
+  }
   .trend-card-toolbar .trend-filter-label { display: none; }
   .trend-card-toolbar .mode-switch-option {
     padding: 5px 10px;
     font-size: 12px;
   }
+  .trend-card-toolbar #trend-mode-pills      { order: 1; }
+  .trend-card-toolbar #trend-amount-pills    { order: 2; }
+  .trend-card-toolbar #trend-job-picker-wrap { order: 3; flex: 1 1 100%; }
 }
 
 /* --- Analytics Treemap tab --- */
