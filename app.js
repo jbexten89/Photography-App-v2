@@ -2620,8 +2620,11 @@ function renderCashFlow() {
   document.getElementById("cf-stat-out").textContent = fmtMoney(totalOut);
 
   // Build the chart SVG
+  const isMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
   const baseWidth = 800, height = 380;
-  const padL = 64, padR = 20, padT = 18, padB = 36;
+  // On mobile we rotate month labels 45° to prevent overlap, so reserve more
+  // bottom padding for them.
+  const padL = 64, padR = 20, padT = 18, padB = isMobile ? 80 : 36;
   const basePlotW = baseWidth - padL - padR;
   const groupCount = data.length || 1;
   const lockedSlot = basePlotW / 12;
@@ -2667,7 +2670,10 @@ function renderCashFlow() {
 
   const monthLabels = data.map((d, i) => {
     const cx = padL + groupSlot * (i + 0.5);
-    return `<text class="cf-xaxis" x="${cx}" y="${height - padB + 16}" text-anchor="middle" fill="var(--muted)" font-size="11">${escapeHtml(d.label)}</text>`;
+    const ly = height - padB + 16;
+    return isMobile
+      ? `<text class="cf-xaxis" x="${cx}" y="${ly}" text-anchor="start" transform="rotate(45 ${cx} ${ly})" fill="var(--muted)" font-size="11">${escapeHtml(d.label)}</text>`
+      : `<text class="cf-xaxis" x="${cx}" y="${ly}" text-anchor="middle" fill="var(--muted)" font-size="11">${escapeHtml(d.label)}</text>`;
   }).join("");
 
   const linePoints = data.map((d, i) => {
