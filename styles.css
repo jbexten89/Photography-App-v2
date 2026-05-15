@@ -1599,8 +1599,10 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
     padding: 5px 10px;
     font-size: 12px;
   }
-  .trend-card-toolbar #trend-mode-pills      { order: 1; width: auto; flex: 0 1 auto; }
-  .trend-card-toolbar #trend-amount-pills    { order: 2; width: auto; flex: 0 1 auto; }
+  /* Both switches split row 1 evenly so the Gross/Net pill matches the
+     All Jobs/One Job pill width. */
+  .trend-card-toolbar #trend-mode-pills      { order: 1; width: auto; flex: 1 1 0; min-width: 0; }
+  .trend-card-toolbar #trend-amount-pills    { order: 2; width: auto; flex: 1 1 0; min-width: 0; }
   .trend-card-toolbar #trend-job-picker-wrap { order: 3; flex: 1 1 100%; }
   /* Trim the switch buttons so the two pills fit on a single phone row. */
   .trend-card-toolbar .mode-switch-option { padding: 4px 8px; font-size: 11px; }
