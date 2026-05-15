@@ -1135,9 +1135,10 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 
   /* Sankey on mobile: render at full intrinsic width inside a horizontally
      scrollable container so the diagonal flows aren't squashed onto a phone
-     screen. User swipes left/right to see the full diagram. */
+     screen. Single-finger swipe = native scroll. Two-finger pinch = JS zoom
+     handler (in app.js) — single-finger drag pans when zoomed in. */
   .breakdown-chart {
-    overflow-x: auto;
+    overflow: auto;
     -webkit-overflow-scrolling: touch;
   }
   .breakdown-chart svg {

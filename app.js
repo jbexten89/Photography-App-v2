@@ -2514,7 +2514,90 @@ function renderBreakdown() {
 
   svg += `</svg>`;
   chartEl.innerHTML = svg;
+  // Re-apply any current pinch-zoom transform after each render so changing
+  // filters / stages doesn't reset the user's zoom level.
+  if (typeof _breakdownApplyZoom === "function") _breakdownApplyZoom();
 }
+
+// --------- Breakdown pinch-zoom + pan (mobile only) ---------
+// Two-finger pinch scales the SVG via CSS transform; single-finger drag pans
+// when zoomed in (>1x); double-tap resets to 1x.
+let _breakdownApplyZoom = null;
+(function setupBreakdownPinchZoom() {
+  if (typeof window === "undefined" || !("ontouchstart" in window)) return;
+  const container = document.getElementById("breakdown-chart");
+  if (!container) return;
+
+  let scale = 1, tx = 0, ty = 0;
+  let pinchStart = null;
+  let panStart = null;
+  let lastTapAt = 0;
+
+  const apply = () => {
+    const svg = container.querySelector("svg");
+    if (!svg) return;
+    svg.style.transformOrigin = "0 0";
+    svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    svg.style.willChange = "transform";
+  };
+  _breakdownApplyZoom = apply;
+
+  const dist = (a, b) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+  const mid  = (a, b) => ({ x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 });
+
+  container.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 2) {
+      pinchStart = {
+        d: dist(e.touches[0], e.touches[1]),
+        startScale: scale,
+        startTx: tx,
+        startTy: ty,
+        midPx: mid(e.touches[0], e.touches[1]),
+      };
+      panStart = null;
+    } else if (e.touches.length === 1 && scale > 1.001) {
+      panStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, startTx: tx, startTy: ty };
+    }
+  }, { passive: true });
+
+  container.addEventListener("touchmove", (e) => {
+    if (e.touches.length === 2 && pinchStart) {
+      e.preventDefault();
+      const d = dist(e.touches[0], e.touches[1]);
+      const ratio = d / pinchStart.d;
+      const newScale = Math.min(4, Math.max(0.5, pinchStart.startScale * ratio));
+      // Zoom around the pinch midpoint so content under fingers stays put.
+      const rect = container.getBoundingClientRect();
+      const mx = pinchStart.midPx.x - rect.left;
+      const my = pinchStart.midPx.y - rect.top;
+      tx = mx - (mx - pinchStart.startTx) * (newScale / pinchStart.startScale);
+      ty = my - (my - pinchStart.startTy) * (newScale / pinchStart.startScale);
+      scale = newScale;
+      apply();
+    } else if (e.touches.length === 1 && panStart) {
+      e.preventDefault();
+      tx = panStart.startTx + (e.touches[0].clientX - panStart.x);
+      ty = panStart.startTy + (e.touches[0].clientY - panStart.y);
+      apply();
+    }
+  }, { passive: false });
+
+  container.addEventListener("touchend", (e) => {
+    if (e.touches.length < 2) pinchStart = null;
+    if (e.touches.length === 0) panStart = null;
+    // Double-tap (within 300ms, single finger) resets zoom.
+    if (e.changedTouches.length === 1 && e.touches.length === 0) {
+      const now = Date.now();
+      if (now - lastTapAt < 300) {
+        scale = 1; tx = 0; ty = 0;
+        apply();
+        lastTapAt = 0;
+      } else {
+        lastTapAt = now;
+      }
+    }
+  });
+})();
 
 // --------- Cash Flow view ---------
 let cashFlowMode = "flow"; // "flow" or "trend"
