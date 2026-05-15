@@ -1774,7 +1774,23 @@ function renderSavingsRate() {
   const chartEl = document.getElementById("sr-chart");
   if (!chartEl) return;
 
-  const months = selectedMonths();
+  // Limit to ONE year (same rules as Cash Flow / Spending Trends).
+  const srSel = selectedYears();
+  let srYear;
+  if (srSel && srSel.length) {
+    srYear = [...srSel].sort()[srSel.length - 1];
+  } else {
+    const thisYear = String(new Date().getFullYear());
+    const txYears = new Set();
+    state.transactions.forEach(t => {
+      const y = (t.date || "").slice(0, 4);
+      if (/^\d{4}$/.test(y)) txYears.add(y);
+    });
+    srYear = txYears.has(thisYear)
+      ? thisYear
+      : ([...txYears].sort().pop() || thisYear);
+  }
+  const months = selectedMonths().filter(m => m.key.startsWith(srYear));
   const monthKeys = months.map(m => m.key);
   const monthIdx = new Map(monthKeys.map((k, i) => [k, i]));
 
@@ -1876,8 +1892,13 @@ function renderSavingsRate() {
     return d > 0 ? (sav[i] / d) * 100 : 0;
   });
 
-  const W = 820, H = 320;
-  const padL = 50, padR = 16, padT = 18, padB = 36;
+  const srIsMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+  // Match Cash Flow's chart dimensions (800x380 viewBox) so all the analytics
+  // chart cards render at the same height on mobile.
+  const W = 800, H = 380;
+  // On mobile we rotate month labels 45° to prevent overlap, so reserve more
+  // bottom padding for them.
+  const padL = 50, padR = 16, padT = 18, padB = srIsMobile ? 80 : 36;
   const plotW = W - padL - padR, plotH = H - padT - padB;
   const groupCount = monthKeys.length || 1;
   const slot = plotW / groupCount;
@@ -1893,7 +1914,7 @@ function renderSavingsRate() {
   for (let v = 0; v <= yTop + 0.001; v += tickStep) {
     const y = yFor(v);
     grid    += `<line x1="${padL}" y1="${y}" x2="${padL + plotW}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>`;
-    yLabels += `<text x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="var(--muted)" font-size="11">${v}%</text>`;
+    yLabels += `<text class="sr-yaxis" x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="var(--muted)" font-size="11">${v}%</text>`;
   }
 
   let bars = "";
@@ -1905,7 +1926,10 @@ function renderSavingsRate() {
     const h   = Math.max(0, yFor(0) - top);
     bars += `<rect x="${x}" y="${top}" width="${barW}" height="${h}" fill="var(--income)" rx="3"><title>${escapeHtml(months[i].label)}: ${r.toFixed(1)}% (saved ${fmtMoney(sav[i])})</title></rect>`;
     const label = months[i].label;
-    bars += `<text x="${cx}" y="${H - padB + 16}" text-anchor="middle" fill="var(--muted)" font-size="10">${escapeHtml(label)}</text>`;
+    const ly = H - padB + 16;
+    bars += srIsMobile
+      ? `<text class="sr-xaxis" x="${cx}" y="${ly}" text-anchor="start" transform="rotate(45 ${cx} ${ly})" fill="var(--muted)" font-size="10">${escapeHtml(label)}</text>`
+      : `<text class="sr-xaxis" x="${cx}" y="${ly}" text-anchor="middle" fill="var(--muted)" font-size="10">${escapeHtml(label)}</text>`;
   });
 
   chartEl.innerHTML = `

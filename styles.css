@@ -5832,9 +5832,12 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .spend-trends-total { font-size: 22px !important; }
   /* Match Spending by Category top total to the Trends total size. */
   .bcat-total { font-size: 22px !important; }
-  /* Savings Rate: same treatment — shrink the giant rate + reset card height. */
+  /* Savings Rate: same treatment — shrink the giant rate, reset card height,
+     bump axis text on the chart. */
   .sr-main { min-height: 0 !important; }
   .sr-rate { font-size: 22px !important; }
+  #sr-chart .sr-yaxis { font-size: 20px !important; }
+  #sr-chart .sr-xaxis { font-size: 20px !important; }
   #st-chart .st-yaxis { font-size: 20px !important; }
   #st-chart .st-xaxis { font-size: 20px !important; }
 
