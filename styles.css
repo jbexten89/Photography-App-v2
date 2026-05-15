@@ -5816,6 +5816,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      SVG-unit fonts read clearly when the 800-wide viewBox is squeezed. */
   #cf-chart .cf-yaxis { font-size: 16px !important; }
   #cf-chart .cf-xaxis { font-size: 16px !important; }
+  /* Big top-of-card net total — too dominant on a phone, scale it down. */
+  .cash-flow-total { font-size: 22px !important; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
