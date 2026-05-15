@@ -1142,7 +1142,7 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   }
   .breakdown-chart svg {
     width: auto !important;
-    min-width: 720px;
+    min-width: 1200px;
     max-width: none !important;
     height: auto !important;
   }

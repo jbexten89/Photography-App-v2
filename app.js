@@ -2462,7 +2462,11 @@ function renderBreakdown() {
 
   // Lay out with d3-sankey
   const containerW = chartEl.clientWidth || 1100;
-  const width  = Math.max(720, containerW);
+  // On mobile we render the Sankey inside a horizontal-scroll wrapper, so
+  // give it a generous fixed width regardless of container size to prevent
+  // node labels from overlapping each other / the next stage's column.
+  const breakdownIsMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+  const width  = breakdownIsMobile ? 1200 : Math.max(720, containerW);
   const height = Math.max(420, Math.min(720, nodes.length * 14));
 
   const sankeyGen = d3.sankey()
