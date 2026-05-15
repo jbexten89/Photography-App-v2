@@ -1968,7 +1968,28 @@ function renderSpendingTrends() {
   const listEl  = document.getElementById("st-list");
   if (!chartEl || !listEl) return;
 
-  const months = selectedMonths();
+  // Spending Trends only shows ONE year at a time — selectedMonths() can span
+  // several years if the user picked multiple in the universal Date Range
+  // filter. Pick a single year using the same rules as Cash Flow:
+  //   - selection present → most recent selected year
+  //   - no selection + current calendar year has data → current year
+  //   - otherwise → most recent year that has any transactions
+  const stSel = selectedYears();
+  let stYear;
+  if (stSel && stSel.length) {
+    stYear = [...stSel].sort()[stSel.length - 1];
+  } else {
+    const thisYear = String(new Date().getFullYear());
+    const txYears = new Set();
+    state.transactions.forEach(t => {
+      const y = (t.date || "").slice(0, 4);
+      if (/^\d{4}$/.test(y)) txYears.add(y);
+    });
+    stYear = txYears.has(thisYear)
+      ? thisYear
+      : ([...txYears].sort().pop() || thisYear);
+  }
+  const months = selectedMonths().filter(m => m.key.startsWith(stYear));
   const monthKeys = months.map(m => m.key);
   const monthIdx  = new Map(monthKeys.map((k, i) => [k, i]));
 
@@ -2018,7 +2039,9 @@ function renderSpendingTrends() {
 
   // ---- Build chart SVG ----
   const stIsMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
-  const baseWidth = 820, height = 360;
+  // Match Cash Flow's chart dimensions (800x380 viewBox) so both cards render
+  // at the same height on mobile.
+  const baseWidth = 800, height = 380;
   // On mobile we rotate month labels 45° to prevent overlap, so reserve more
   // bottom padding for them.
   const padL = 56, padR = 12, padT = 18, padB = stIsMobile ? 80 : 36;
