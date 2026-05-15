@@ -10456,7 +10456,7 @@ function renderBcatRose(el, items, total) {
     const ly = CY + labelR * Math.sin(midRad);
     const pct = total > 0 ? (d.value / total) * 100 : 0;
     const anchor = Math.cos(midRad) >= 0.05 ? "start" : (Math.cos(midRad) <= -0.05 ? "end" : "middle");
-    const labelTxt = `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="var(--text)" font-size="6" font-weight="600"><tspan>${escapeHtml(shortLabel(d.name, 22))}</tspan><tspan x="${lx}" dy="7" font-size="5" fill="var(--muted)" font-weight="500">${pct.toFixed(0)}%</tspan></text>`;
+    const labelTxt = `<text class="bcat-rose-label" x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="var(--text)" font-size="6" font-weight="600">${escapeHtml(shortLabel(d.name, 22))} ${pct.toFixed(0)}%</text>`;
     const lineX = CX + (r + 1) * Math.cos(midRad);
     const lineY = CY + (r + 1) * Math.sin(midRad);
     const line = `<line x1="${lineX}" y1="${lineY}" x2="${lx}" y2="${ly}" stroke="var(--muted)" stroke-width="0.2" opacity="0.6"/>`;
