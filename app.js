@@ -2626,7 +2626,7 @@ function renderCashFlow() {
   for (let v = -yTop; v <= yTop + 0.0001; v += tickStep) {
     const y = yFor(v);
     gridLines.push(`<line class="trend-grid-line" x1="${padL}" y1="${y}" x2="${padL + plotW}" y2="${y}"></line>`);
-    yLabels.push(`<text x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="var(--muted)" font-size="11" font-variant-numeric="tabular-nums">${fmtCashAxis(v)}</text>`);
+    yLabels.push(`<text class="cf-yaxis" x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="var(--muted)" font-size="11" font-variant-numeric="tabular-nums">${fmtCashAxis(v)}</text>`);
   }
 
   const showBars = cashFlowMode === "flow";
@@ -2646,7 +2646,7 @@ function renderCashFlow() {
 
   const monthLabels = data.map((d, i) => {
     const cx = padL + groupSlot * (i + 0.5);
-    return `<text x="${cx}" y="${height - padB + 16}" text-anchor="middle" fill="var(--muted)" font-size="11">${escapeHtml(d.label)}</text>`;
+    return `<text class="cf-xaxis" x="${cx}" y="${height - padB + 16}" text-anchor="middle" fill="var(--muted)" font-size="11">${escapeHtml(d.label)}</text>`;
   }).join("");
 
   const linePoints = data.map((d, i) => {
