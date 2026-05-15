@@ -1132,6 +1132,25 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   .breakdown-card { padding: 14px 16px; }
   .breakdown-total { font-size: 22px; }
   .breakdown-head { flex-direction: column; align-items: stretch; }
+
+  /* Sankey on mobile: render at full intrinsic width inside a horizontally
+     scrollable container so the diagonal flows aren't squashed onto a phone
+     screen. User swipes left/right to see the full diagram. */
+  .breakdown-chart {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .breakdown-chart svg {
+    width: auto !important;
+    min-width: 720px;
+    max-width: none !important;
+    height: auto !important;
+  }
+  /* Bigger node + amount labels so they read clearly. The SVG renders 1:1
+     in CSS pixels at its intrinsic width inside the scroller, so these are
+     real CSS pixel sizes. */
+  .breakdown-node-label,
+  .breakdown-amount-label { font-size: 14px !important; }
 }
 
 /* --- Cash Flow view --- */
