@@ -5832,6 +5832,10 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .spend-trends-total { font-size: 22px !important; }
   /* Match Spending by Category top total to the Trends total size. */
   .bcat-total { font-size: 22px !important; }
+  /* Same min-height reset as Cash Flow / Trends so the card hugs its
+     content on mobile (was 520px desktop, leaving the bottom half empty
+     when the chart shrinks to phone width). */
+  .bcat-main { min-height: 0 !important; }
   /* Savings Rate: same treatment — shrink the giant rate, reset card height,
      bump axis text on the chart. */
   .sr-main { min-height: 0 !important; }
