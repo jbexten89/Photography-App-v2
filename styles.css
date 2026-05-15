@@ -1604,6 +1604,11 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   .trend-card-toolbar #trend-mode-pills      { order: 1; width: auto; flex: 1 1 0; min-width: 0; }
   .trend-card-toolbar #trend-amount-pills    { order: 2; width: auto; flex: 1 1 0; min-width: 0; }
   .trend-card-toolbar #trend-job-picker-wrap { order: 3; flex: 1 1 100%; }
+  /* Drop the outer .trend-card chrome so the inner .flow-main is the only
+     visible card — eliminates the card-in-a-card gap between toolbar and
+     chart. The head still gets a small bottom margin for breathing room. */
+  .trend-card { background: transparent; border: none; box-shadow: none; padding: 0; }
+  .trend-card-head { margin-bottom: 8px; }
   /* Trim the switch buttons so the two pills fit on a single phone row. */
   .trend-card-toolbar .mode-switch-option { padding: 4px 8px; font-size: 11px; }
 }
