@@ -5840,8 +5840,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .flow-main  { min-height: 0 !important; }
   .flow-total { font-size: 22px !important; }
   .flow-bar-label,
-  .flow-bar-label-outside { font-size: 14px !important; }
-  .flow-axis-tick { font-size: 13px !important; }
+  .flow-bar-label-outside { font-size: 11px !important; }
+  .flow-axis-tick { font-size: 10px !important; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
