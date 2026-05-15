@@ -5830,6 +5830,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      top-of-card total. */
   .spend-trends-main { min-height: 0 !important; }
   .spend-trends-total { font-size: 22px !important; }
+  /* Match Spending by Category top total to the Trends total size. */
+  .bcat-total { font-size: 22px !important; }
   #st-chart .st-yaxis { font-size: 20px !important; }
   #st-chart .st-xaxis { font-size: 20px !important; }
 
