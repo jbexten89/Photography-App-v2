@@ -5806,9 +5806,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      percent labels above each bar, and the rotated x-axis category labels
      so they're readable when the 900-wide viewBox is squeezed onto a
      phone screen. */
-  #bcat-chart .bcat-col-yaxis { font-size: 22px !important; }
-  #bcat-chart .bcat-col-pct   { font-size: 22px !important; }
-  #bcat-chart .bcat-col-xaxis { font-size: 22px !important; }
+  #bcat-chart .bcat-col-yaxis { font-size: 24px !important; }
+  #bcat-chart .bcat-col-pct   { font-size: 24px !important; }
+  #bcat-chart .bcat-col-xaxis { font-size: 24px !important; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
