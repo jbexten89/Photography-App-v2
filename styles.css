@@ -1288,7 +1288,12 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 
 @media (max-width: 900px) {
   .cash-flow-grid { grid-template-columns: 1fr; }
-  .cash-flow-main { padding: 14px 16px; }
+  .cash-flow-main {
+    padding: 14px 16px;
+    /* The 480px desktop min-height leaves a huge gap on phone where the SVG's
+       800x380 aspect ratio scales the chart down to ~170px tall. */
+    min-height: 0;
+  }
   .cash-flow-list { max-height: none; }
 }
 
