@@ -10291,7 +10291,7 @@ function renderBcatDonut(el, items, total) {
     const lineX = CX + (R_OUT + 1) * cos;
     const lineY = CY + (R_OUT + 1) * sin;
     const line = `<line x1="${lineX}" y1="${lineY}" x2="${lx}" y2="${ly}" stroke="var(--muted)" stroke-width="0.2" opacity="0.6"/>`;
-    const labelTxt = `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="var(--text)" font-size="6" font-weight="600">${escapeHtml(shortLabel(s.name, 22))} ${s.pct.toFixed(0)}%</text>`;
+    const labelTxt = `<text class="bcat-donut-label" x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="var(--text)" font-size="6" font-weight="600">${escapeHtml(shortLabel(s.name, 22))} ${s.pct.toFixed(0)}%</text>`;
     return `${line}${labelTxt}`;
   }).join("");
 
@@ -10314,8 +10314,10 @@ function renderBcatColumns(el, items, total) {
     display = [...head, { name: `Other (${rest.length})`, value: restValue, color: "#7d7d8c" }];
   }
 
+  const isMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
   const W = 900, H = 480;
-  const padL = 60, padR = 20, padT = 40, padB = 70;
+  // On mobile we rotate x-axis labels 45° so reserve much more bottom padding.
+  const padL = 60, padR = 20, padT = 40, padB = isMobile ? 130 : 70;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 
@@ -10331,7 +10333,7 @@ function renderBcatColumns(el, items, total) {
   for (let v = 0; v <= yTop + 0.0001; v += tickStep) {
     const y = yFor(v);
     grid    += `<line x1="${padL}" y1="${y}" x2="${padL + plotW}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>`;
-    yLabels += `<text x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="var(--muted)" font-size="11" font-variant-numeric="tabular-nums">${fmtCashAxis(v)}</text>`;
+    yLabels += `<text class="bcat-col-yaxis" x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="var(--muted)" font-size="11" font-variant-numeric="tabular-nums">${fmtCashAxis(v)}</text>`;
   }
 
   const bars = display.map((d, i) => {
@@ -10340,12 +10342,16 @@ function renderBcatColumns(el, items, total) {
     const top = yFor(d.value);
     const h   = Math.max(0, yFor(0) - top);
     const pct = total > 0 ? Math.round((d.value / total) * 100) : 0;
-    const xLab = shortLabel(d.name, 18);
+    const xLab = shortLabel(d.name, isMobile ? 28 : 18);
+    const xLabelY = H - padB + 18;
+    const xLabelText = isMobile
+      ? `<text class="bcat-col-xaxis" x="${cx}" y="${xLabelY}" text-anchor="start" transform="rotate(45 ${cx} ${xLabelY})" fill="var(--muted)" font-size="10">${escapeHtml(xLab)}</text>`
+      : `<text class="bcat-col-xaxis" x="${cx}" y="${xLabelY}" text-anchor="middle" fill="var(--muted)" font-size="10">${escapeHtml(xLab)}</text>`;
     return `
       <g>
         <rect x="${x}" y="${top}" width="${barW}" height="${h}" fill="${d.color}" rx="3"><title>${escapeHtml(d.name)}: ${fmtMoney(d.value)}</title></rect>
-        <text x="${cx}" y="${top - 6}" text-anchor="middle" fill="var(--muted)" font-size="11" font-weight="600">${pct}%</text>
-        <text x="${cx}" y="${H - padB + 18}" text-anchor="middle" fill="var(--muted)" font-size="10">${escapeHtml(xLab)}</text>
+        <text class="bcat-col-pct" x="${cx}" y="${top - 6}" text-anchor="middle" fill="var(--muted)" font-size="11" font-weight="600">${pct}%</text>
+        ${xLabelText}
       </g>
     `;
   }).join("");
