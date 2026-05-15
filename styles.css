@@ -5833,6 +5833,16 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #st-chart .st-yaxis { font-size: 20px !important; }
   #st-chart .st-xaxis { font-size: 20px !important; }
 
+  /* Flow (Analytics → Flow): same mobile treatment as Cash Flow / Trends.
+     Drop the 420px desktop min-height, shrink the giant 32px total to 22px,
+     and bump the in-card label / axis CSS-px text since these elements are
+     plain HTML, not SVG-unit. */
+  .flow-main  { min-height: 0 !important; }
+  .flow-total { font-size: 22px !important; }
+  .flow-bar-label,
+  .flow-bar-label-outside { font-size: 14px !important; }
+  .flow-axis-tick { font-size: 13px !important; }
+
   /* --- Invoices --- */
   /* Mobile invoice summary:
        Row 1: Total Invoiced  · Total Paid
