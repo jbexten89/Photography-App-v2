@@ -5902,6 +5902,11 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      content on mobile (was 520px desktop, leaving the bottom half empty
      when the chart shrinks to phone width). */
   .bcat-main { min-height: 0 !important; }
+  /* The chart container itself also had a 420px min-height with
+     align-items:center, which left equal empty space above and below
+     the donut/columns/treemap/rose on mobile. Drop it so the chart sits
+     flush. */
+  .bcat-chart { min-height: 0 !important; }
   /* Savings Rate: same treatment — shrink the giant rate, reset card height,
      bump axis text on the chart. */
   .sr-main { min-height: 0 !important; }
