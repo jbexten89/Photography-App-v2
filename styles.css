@@ -5060,8 +5060,15 @@ select option {
     order: -23;
     flex: 0 0 calc(66.667% - 6px);
     min-width: 0;
-    height: 44px;
+    /* Stretch to match the New Tx button's height (which may grow to two
+     lines when "+ New Transaction" wraps on narrow screens) instead of
+     staying pinned at 44px and floating in a taller row. */
+    align-self: stretch;
+    height: auto;
     min-height: 44px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    line-height: 1.2;
   }
   /* When Back is visible, drop the New Tx trailing 6px so the two items
      fit edge-to-edge without sub-pixel rounding pushing New Tx onto a new
