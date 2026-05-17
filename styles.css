@@ -1576,7 +1576,7 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 /* Mobile: stack the sidebar below */
 @media (max-width: 900px) {
   .flow-grid { grid-template-columns: 1fr; }
-  .flow-main { padding: 6px 6px !important; }
+  .flow-main { padding: 0 !important; }
   .flow-aside { max-width: none; }
   .flow-source-list { max-height: none; }
 }
