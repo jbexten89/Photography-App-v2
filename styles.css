@@ -7897,9 +7897,12 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   }
   /* By Customer/Category/Job No. toggle takes the full row; Gross/Net drops
      to its own row beneath it (otherwise the 3-pill group fills the row and
-     pushes Gross/Net off-screen to the right). */
-  #jobs .jobs-section > .jobs-section-head #jobs-group-toggle { flex: 1 1 100%; }
-  #jobs .jobs-section > .jobs-section-head #jobs-mode-toggle  { flex: 0 0 auto; margin-left: auto; }
+     pushes Gross/Net off-screen to the right). !important because the
+     mobile #jobs-group-toggle rule earlier in this file sets width:100% and
+     the .jobs-mode-toggle base rule sets margin-left:auto on both elements. */
+  #jobs .jobs-section > .jobs-section-head { display: flex !important; flex-wrap: wrap !important; }
+  #jobs .jobs-section > .jobs-section-head #jobs-group-toggle { flex: 0 0 100% !important; width: 100% !important; margin-left: 0 !important; }
+  #jobs .jobs-section > .jobs-section-head #jobs-mode-toggle  { flex: 0 0 auto !important; margin-left: auto !important; }
 
   .donut-card h2 {
     margin-top: 0;
