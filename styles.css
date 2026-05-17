@@ -5925,9 +5925,10 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .flow-bar-label,
   .flow-bar-label-outside { font-size: 11px !important; }
   .flow-axis-tick { font-size: 10px !important; }
-  /* Slimmer, square-ended bars on mobile so the chart is less heavy. */
+  /* Slimmer bars on mobile so the chart is less heavy. Right edge rounded
+     (bars grow from the left axis, so the right side is the visible "tip"). */
   .flow-bar-track { height: 12px; }
-  .flow-bar { border-radius: 0; }
+  .flow-bar { border-radius: 0 6px 6px 0; }
 
   /* --- Invoices --- */
   /* Mobile invoice summary:
