@@ -1439,9 +1439,18 @@ function positionFilterPopover(anchorEl) {
   // Popover is a child of <body> with position:fixed; anchor directly to the
   // trigger's viewport-relative rect.
   const a = anchorEl.getBoundingClientRect();
-  filterPopover.style.left  = a.left + "px";
+  const vpW = window.innerWidth;
+  // Pick a width that fits in the viewport with an 8px gutter on each side.
+  const desiredW = Math.max(220, a.width);
+  const w = Math.min(desiredW, vpW - 16);
+  // Anchor at the trigger's left edge, then clamp so the right edge stays
+  // 8px inside the viewport (and the left edge stays 8px inside as well).
+  let left = a.left;
+  if (left + w + 8 > vpW) left = vpW - w - 8;
+  if (left < 8) left = 8;
+  filterPopover.style.left  = left + "px";
   filterPopover.style.top   = (a.bottom + 4) + "px";
-  filterPopover.style.width = Math.max(220, a.width) + "px";
+  filterPopover.style.width = w + "px";
 }
 
 function closeFilterPopover() {
