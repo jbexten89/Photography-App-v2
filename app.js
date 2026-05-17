@@ -673,12 +673,16 @@ function syncJobsModeTogglePlacement(viewName) {
   if (!_jobsModeToggle || !_jobsModeOrigParent) return;
   const isByJob   = (viewName || document.querySelector(".analytics-view.active")?.dataset.view) === "by-category";
   const toolbarRow = document.querySelector("#jobs .analytics-toolbar-row");
-  // Both desktop and mobile: when By Job is active, lift the Gross/Net
-  // toggle into the analytics toolbar-row (in the same row as Filters /
-  // Presets / active-preset chip). margin-left:auto in CSS pins it to
-  // the right side. When the user navigates to a different view, the
-  // toggle goes back to its original spot in the Jobs section header.
-  if (isByJob && toolbarRow) {
+  // Desktop only: when By Job is active, lift the Gross/Net toggle into the
+  // analytics toolbar-row (alongside Filters / Presets / active-preset chip).
+  // margin-left:auto in CSS pins it to the right side.
+  // On mobile we DON'T move it — the top row is already crowded by filter
+  // chips, and the Gross/Net pill would get pushed off the right edge.
+  // Leave it in its original spot in the Jobs section header where my
+  // mobile CSS gives it its own row beneath the By Customer/Category/Job No.
+  // group toggle.
+  const isMobile = window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+  if (isByJob && toolbarRow && !isMobile) {
     if (_jobsModeToggle.parentNode !== toolbarRow) toolbarRow.appendChild(_jobsModeToggle);
   } else {
     if (_jobsModeToggle.parentNode !== _jobsModeOrigParent) {
