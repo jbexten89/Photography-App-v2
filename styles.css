@@ -7890,9 +7890,16 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #jobs .jobs-section > h2 { display: none; }
   #jobs .jobs-section > .jobs-section-head > h2 { display: none; }
   #jobs .jobs-section > .jobs-section-head {
+    flex-wrap: wrap;
     justify-content: flex-end;
+    gap: 8px;
     margin-bottom: 8px;
   }
+  /* By Customer/Category/Job No. toggle takes the full row; Gross/Net drops
+     to its own row beneath it (otherwise the 3-pill group fills the row and
+     pushes Gross/Net off-screen to the right). */
+  #jobs .jobs-section > .jobs-section-head #jobs-group-toggle { flex: 1 1 100%; }
+  #jobs .jobs-section > .jobs-section-head #jobs-mode-toggle  { flex: 0 0 auto; margin-left: auto; }
 
   .donut-card h2 {
     margin-top: 0;
