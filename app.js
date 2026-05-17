@@ -1001,6 +1001,10 @@ document.getElementById("analytics-filter-summary")?.addEventListener("click", (
   if (x) {
     e.stopPropagation();
     filterStates[id] = { mode: "include", selected: null };
+    // If the popover for THIS filter is currently open, close it too —
+    // otherwise the chip disappears but the floating list stays open with
+    // no anchor / no obvious way to dismiss it.
+    if (activeFilterId === id) closeFilterPopover();
     refreshFilterTriggers();
     if (typeof rerenderActiveAnalyticsView === "function") rerenderActiveAnalyticsView();
     return;
