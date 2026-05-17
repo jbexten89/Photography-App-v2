@@ -5849,8 +5849,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 
   main {
     /* top padding leaves room for the hamburger + the iOS status bar / notch */
-    padding: calc(56px + env(safe-area-inset-top, 0px)) 12px
-             calc(16px + env(safe-area-inset-bottom, 0px)) 12px;
+    padding: calc(56px + env(safe-area-inset-top, 0px)) 4px
+             calc(16px + env(safe-area-inset-bottom, 0px)) 4px;
     max-width: 100%;
   }
 
