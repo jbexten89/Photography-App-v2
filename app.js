@@ -2049,8 +2049,19 @@ function renderYearMatrix() {
     yearList.forEach(y => { s += cm.get(y) || 0; });
     rowTotals.set(c, s);
   });
-  // Sort categories by lifetime total descending.
-  catList.sort((a, b) => (rowTotals.get(b) || 0) - (rowTotals.get(a) || 0));
+  // Sort categories: the user's preferred photography-job order first
+  // (Spring Sports, Baseball, …), then the rest by lifetime total desc.
+  const YM_PREFERRED_ORDER = [
+    "Spring Sports", "Baseball", "Softball", "Tee Ball",
+    "Fall Sports", "Banners", "Soccer", "Preschool", "Winter Sports",
+  ];
+  const ymRank = new Map(YM_PREFERRED_ORDER.map((n, i) => [n, i]));
+  catList.sort((a, b) => {
+    const ra = ymRank.has(a) ? ymRank.get(a) : Infinity;
+    const rb = ymRank.has(b) ? ymRank.get(b) : Infinity;
+    if (ra !== rb) return ra - rb;
+    return (rowTotals.get(b) || 0) - (rowTotals.get(a) || 0);
+  });
 
   const colTotals = new Map();
   yearList.forEach(y => {
