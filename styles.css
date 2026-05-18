@@ -7511,24 +7511,36 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   }
 
   /* Invoice preview (edit view) on mobile: render the sheet at its proper
-     letter-page width inside a horizontal scroll container so the user can
-     swipe sideways instead of having columns squished onto a phone-width
-     canvas. touch-action:pan-x tells the browser this scroller only
-     consumes horizontal gestures — vertical touches bubble up to the page
-     scroll so the user never feels stuck. overscroll-behavior contains the
-     scroll inside the wrap (no body-bounce). */
+     letter-page width inside a horizontal scroll container so the user
+     swipes sideways instead of having columns squished onto a phone-width
+     canvas. overflow-x:scroll (not auto) + explicit width:100% so the
+     wrap's scroll area is always defined. touch-action:pan-x pan-y +
+     overscroll-behavior contained keep the gesture local and snappy.
+     Apply touch-action to descendants too so taps on form fields don't
+     swallow the swipe direction at the start of a gesture. */
   #invoices-edit-view .invoice-sheet-wrap {
-    overflow-x: auto;
-    overflow-y: hidden;
+    display: block;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: scroll;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y;
     overscroll-behavior-x: contain;
-    scroll-behavior: smooth;
+  }
+  #invoices-edit-view .invoice-sheet-wrap,
+  #invoices-edit-view .invoice-sheet,
+  #invoices-edit-view .invoice-sheet * {
+    touch-action: pan-x pan-y;
   }
   #invoices-edit-view .invoice-sheet {
+    width: 800px;
     min-width: 800px;
-    max-width: none;
+    max-width: 800px;
     margin: 12px 0 0;
+    /* Hint the compositor to keep the sheet on its own layer for smoother
+       scroll. */
+    will-change: scroll-position;
   }
 
   /* Invoices list toolbar (mobile):
