@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=493" />
+<link rel="stylesheet" href="styles.css?v=494" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1940,10 +1940,7 @@
         </div>
 
         <div class="schedule-toolbar">
-          <button id="mileage-prev-year" class="btn" type="button" aria-label="Previous year">‹</button>
-          <h2 id="mileage-year-label">Year</h2>
-          <button id="mileage-next-year" class="btn" type="button" aria-label="Next year">›</button>
-          <button id="mileage-this-year" class="btn" type="button">Today</button>
+          <select id="mileage-year-select" class="btn year-select"></select>
           <span style="flex:1"></span>
           <button type="button" id="mileage-open-add-modal" class="btn primary">+ New Trip</button>
         </div>
@@ -2028,10 +2025,7 @@
         <p class="page-subtitle-mobile muted">Plan upcoming jobs and shoot dates</p>
       </div>
       <div class="schedule-toolbar">
-        <button id="sched-prev" class="btn" type="button" aria-label="Previous year">‹</button>
-        <h2 id="sched-month-label">Year</h2>
-        <button id="sched-next" class="btn" type="button" aria-label="Next year">›</button>
-        <button id="sched-today" class="btn" type="button">Today</button>
+        <select id="sched-year-select" class="btn year-select"></select>
         <span style="flex:1"></span>
         <button id="sched-new-event" class="btn primary" type="button">+ New Event</button>
       </div>
@@ -2957,6 +2951,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=274"></script>
+  <script src="app.js?v=275"></script>
 </body>
 </html>

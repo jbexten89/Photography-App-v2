@@ -5123,6 +5123,15 @@ select option {
   #transactions .toolbar #tx-sort-jobno         { order: -13; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
 }
 
+/* Year-select dropdown used in the Calendar + Mileage toolbars (replaces the
+   older ‹ Year › Today button row). */
+.year-select {
+  min-width: 120px;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 6px 28px 6px 12px;
+}
+
 /* ===== Year Matrix view ===== */
 .ym-card {
   background: var(--surface);

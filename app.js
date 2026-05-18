@@ -5745,11 +5745,26 @@ const SCHED_MONTHS_TO_SHOW = [2, 3, 4, 5, 6, 7, 8, 9, 10];
 function renderSchedule() {
   ensureScheduleState();
   const cal = document.getElementById("schedule-calendar");
-  const label = document.getElementById("sched-month-label");
-  if (!cal || !label) return;
+  const sel = document.getElementById("sched-year-select");
+  if (!cal) return;
 
   const year = scheduleViewMonth.getFullYear();
-  label.textContent = String(year);
+  // Build year options: every year with any scheduled job + the current
+  // calendar year + one year on either side of the viewed year for easy nav.
+  if (sel) {
+    const years = new Set();
+    (state.scheduledJobs || []).forEach(e => {
+      const y = (e.date || "").slice(0, 4);
+      if (/^\d{4}$/.test(y)) years.add(Number(y));
+    });
+    years.add(new Date().getFullYear());
+    years.add(year - 1);
+    years.add(year);
+    years.add(year + 1);
+    const sorted = [...years].sort((a, b) => b - a); // newest first
+    sel.innerHTML = sorted.map(y => `<option value="${y}">${y}</option>`).join("");
+    sel.value = String(year);
+  }
 
   // Group events by ISO date
   const eventsByDate = {};
@@ -5967,19 +5982,11 @@ function closeSchedModal() {
   editingSchedEvent = null;
 }
 
-document.getElementById("sched-prev").addEventListener("click", () => {
+document.getElementById("sched-year-select")?.addEventListener("change", (e) => {
+  const y = parseInt(e.target.value, 10);
+  if (!Number.isFinite(y)) return;
   ensureScheduleState();
-  scheduleViewMonth = new Date(scheduleViewMonth.getFullYear() - 1, 0, 1);
-  renderSchedule();
-});
-document.getElementById("sched-next").addEventListener("click", () => {
-  ensureScheduleState();
-  scheduleViewMonth = new Date(scheduleViewMonth.getFullYear() + 1, 0, 1);
-  renderSchedule();
-});
-document.getElementById("sched-today").addEventListener("click", () => {
-  const t = new Date();
-  scheduleViewMonth = new Date(t.getFullYear(), 0, 1);
+  scheduleViewMonth = new Date(y, 0, 1);
   renderSchedule();
 });
 document.getElementById("sched-new-event").addEventListener("click", () => openSchedModal(null));
@@ -7636,8 +7643,24 @@ function renderMileage() {
 
   // Year navigation — Summary, All Trips and Total Miles all scope to this year.
   const viewYear = String(mileageViewYear);
-  const yearLabelEl = document.getElementById("mileage-year-label");
-  if (yearLabelEl) yearLabelEl.textContent = viewYear;
+  const yearSel = document.getElementById("mileage-year-select");
+  if (yearSel) {
+    const years = new Set();
+    (state.trips || []).forEach(t => {
+      const y = (t.date || "").slice(0, 4);
+      if (/^\d{4}$/.test(y)) years.add(Number(y));
+    });
+    years.add(new Date().getFullYear());
+    const vy = Number(viewYear);
+    if (Number.isFinite(vy)) {
+      years.add(vy - 1);
+      years.add(vy);
+      years.add(vy + 1);
+    }
+    const sorted = [...years].sort((a, b) => b - a); // newest first
+    yearSel.innerHTML = sorted.map(y => `<option value="${y}">${y}</option>`).join("");
+    yearSel.value = viewYear;
+  }
   const summaryHeading = document.getElementById("mileage-summary-heading");
   if (summaryHeading) summaryHeading.textContent = `Summary by Vehicle — ${viewYear}`;
   const tripsHeading = document.getElementById("mileage-trips-heading");
@@ -7838,17 +7861,12 @@ document.getElementById("mileage-rate").addEventListener("input", e => {
   }
 });
 
-// Year navigation — mirrors the Calendar page pattern
-document.getElementById("mileage-prev-year")?.addEventListener("click", () => {
-  mileageViewYear = String(Number(mileageViewYear) - 1);
-  renderMileage();
-});
-document.getElementById("mileage-next-year")?.addEventListener("click", () => {
-  mileageViewYear = String(Number(mileageViewYear) + 1);
-  renderMileage();
-});
-document.getElementById("mileage-this-year")?.addEventListener("click", () => {
-  mileageViewYear = String(new Date().getFullYear());
+// Year navigation — dropdown select drives the viewed year (replaces the
+// older prev/next/Today button row).
+document.getElementById("mileage-year-select")?.addEventListener("change", (e) => {
+  const y = parseInt(e.target.value, 10);
+  if (!Number.isFinite(y)) return;
+  mileageViewYear = String(y);
   renderMileage();
 });
 
