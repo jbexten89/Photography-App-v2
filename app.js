@@ -2108,18 +2108,22 @@ function renderYearMatrix() {
   yearList.forEach(y => { head += `<th>${escapeHtml(y)}</th>`; });
   head += `<th class="ym-rowhead">Total</th></tr></thead>`;
 
+  const valueClass = wantType === "expense" ? "ym-expense" : "ym-income";
   let body = `<tbody>`;
   catList.forEach(c => {
     body += `<tr><td class="ym-rowhead">${escapeHtml(c)}</td>`;
     yearList.forEach(y => {
       const v = grid.get(c).get(y) || 0;
-      body += `<td class="${v === 0 ? "ym-zero" : ""}">${v === 0 ? "—" : fmtMoney(v)}</td>`;
+      const cls = v === 0 ? "ym-zero" : valueClass;
+      body += `<td class="${cls}">${v === 0 ? "—" : fmtMoney(v)}</td>`;
     });
     body += `<td class="ym-row-total ${wantType === "expense" ? "ym-row-total-expense" : ""}">${fmtMoney(rowTotals.get(c))}</td></tr>`;
   });
   body += `<tr class="ym-col-total-row"><td class="ym-rowhead">Total</td>`;
-  yearList.forEach(y => { body += `<td>${fmtMoney(colTotals.get(y))}</td>`; });
-  body += `<td>${fmtMoney(grand)}</td></tr></tbody>`;
+  yearList.forEach(y => {
+    body += `<td class="${valueClass}">${fmtMoney(colTotals.get(y))}</td>`;
+  });
+  body += `<td class="${valueClass}">${fmtMoney(grand)}</td></tr></tbody>`;
 
   tbl.innerHTML = head + body;
 }
