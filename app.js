@@ -2054,6 +2054,7 @@ function renderYearMatrix() {
   const YM_PREFERRED_ORDER = [
     "Spring Sports", "Baseball", "Softball", "Tee Ball",
     "Fall Sports", "Banners", "Soccer", "Preschool", "Winter Sports",
+    "Framed Prints", "Dry Mount Prints", "Buy Sell",
   ];
   const ymRank = new Map(YM_PREFERRED_ORDER.map((n, i) => [n, i]));
   catList.sort((a, b) => {
