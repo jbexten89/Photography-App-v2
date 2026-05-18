@@ -5156,7 +5156,15 @@ select option {
   white-space: nowrap;
 }
 .ym-mode-switch .mode-switch-option svg { width: 14px; height: 14px; margin-right: 4px; }
-.ym-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ym-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Pull the table left so it uses the card's left padding for the first
+     column gutter, leaving more horizontal room for the year columns. */
+  margin-left: -12px;
+}
+.ym-table th:first-child,
+.ym-table td:first-child { padding-left: 12px; }
 .ym-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .ym-table th,
 .ym-table td {
@@ -5190,9 +5198,9 @@ select option {
   z-index: 3;
   /* Lock the category column width so toggling Income/Expense doesn't make
      it expand to fit the longest category name in that mode. */
-  width: 160px;
-  min-width: 160px;
-  max-width: 160px;
+  width: 155px;
+  min-width: 155px;
+  max-width: 155px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
