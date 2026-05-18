@@ -2039,7 +2039,7 @@ function renderYearMatrix() {
     cm.set(yr, (cm.get(yr) || 0) + (t.amount || 0));
   });
 
-  const yearList = [...years].sort();
+  const yearList = [...years].sort((a, b) => b.localeCompare(a)); // newest first
   let catList = [...grid.keys()];
 
   const rowTotals = new Map();
