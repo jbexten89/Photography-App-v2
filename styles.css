@@ -7212,8 +7212,13 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     margin: 0 0 10px;
     border-bottom: 1px solid var(--border);
   }
-  /* Collapse the desktop spacer so + New Event sits inline right after Today */
+  /* Collapse the desktop flex-spacer (the buttons get a margin-left:auto
+     below to push them to the right edge of the row). */
   .schedule-toolbar > span[style*="flex"] { display: none; }
+  /* Push the primary "+ New Event" / "+ New Trip" buttons to the right
+     edge of the toolbar on mobile. */
+  .schedule-toolbar #sched-new-event,
+  .schedule-toolbar #mileage-open-add-modal { margin-left: auto; }
   /* Force everything onto a single row at phone widths */
   .schedule-toolbar { flex-wrap: nowrap; }
   .schedule-toolbar h2 { min-width: 0; font-size: 14px; flex: 1 1 auto; }
