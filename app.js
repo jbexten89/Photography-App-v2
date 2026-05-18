@@ -5667,6 +5667,7 @@ function render() {
   renderTransactions();
   renderJobs();
   renderTrends();
+  renderYearMatrix();
   renderInvoicesList();
   renderMileage();
   renderSchedule();
