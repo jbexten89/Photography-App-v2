@@ -5190,9 +5190,9 @@ select option {
   z-index: 3;
   /* Lock the category column width so toggling Income/Expense doesn't make
      it expand to fit the longest category name in that mode. */
-  width: 200px;
-  min-width: 200px;
-  max-width: 200px;
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
