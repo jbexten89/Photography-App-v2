@@ -5123,6 +5123,13 @@ select option {
   #transactions .toolbar #tx-sort-jobno         { order: -13; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
 }
 
+/* Invoice preview wrap — desktop is just a transparent passthrough; on
+   mobile we turn it into a horizontal scroll container so the invoice
+   sheet renders at its proper letter-page proportions and the user
+   swipes left/right to see the full page instead of having columns
+   squished onto a phone-width canvas. */
+.invoice-sheet-wrap { width: 100%; }
+
 /* Year-select dropdown used in the Calendar + Mileage toolbars (replaces the
    older ‹ Year › Today button row). */
 .year-select {
@@ -7495,6 +7502,20 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     width: 80px;
     min-width: 0;
     flex: 0 0 80px;
+  }
+
+  /* Invoice preview (edit view) on mobile: render the sheet at its proper
+     letter-page width inside a horizontal scroll container so the user can
+     swipe sideways instead of having columns squished onto a phone-width
+     canvas. */
+  #invoices-edit-view .invoice-sheet-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #invoices-edit-view .invoice-sheet {
+    min-width: 800px;
+    max-width: none;
+    margin: 12px 0 0;
   }
 
   /* Invoices list toolbar (mobile):

@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=495" />
+<link rel="stylesheet" href="styles.css?v=496" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1052,6 +1052,7 @@
           <ul id="invoice-linked-list" class="invoice-linked-list"></ul>
         </div>
 
+        <div class="invoice-sheet-wrap" id="invoice-sheet-wrap">
         <div class="invoice-sheet" id="invoice-sheet">
           <div id="invoice-paid-stamp" class="paid-stamp" hidden>
             <span class="paid-stamp-text">PAID</span>
@@ -1164,6 +1165,7 @@
             <div>www.jbextenphotography.com</div>
           </div>
         </div>
+        </div><!-- /invoice-sheet-wrap -->
       </div>
     </section>
 
