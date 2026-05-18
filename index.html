@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=485" />
+<link rel="stylesheet" href="styles.css?v=486" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -926,20 +926,20 @@
         <div class="analytics-view active" data-view="year-matrix">
           <div class="ym-card">
             <div class="ym-head">
-              <div class="ym-head-left">
-                <div class="ym-eyebrow" id="ym-eyebrow">Income by Category × Year</div>
+              <div class="ym-eyebrow" id="ym-eyebrow">Income by Category × Year</div>
+              <div class="ym-total-row">
                 <div class="ym-total" id="ym-total">$0.00</div>
-              </div>
-              <div class="ym-mode-switch mode-switch" id="ym-mode" data-mode="income">
-                <div class="mode-switch-thumb"></div>
-                <button type="button" class="mode-switch-option active" data-mode="income">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                  Income
-                </button>
-                <button type="button" class="mode-switch-option" data-mode="expense">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-                  Expense
-                </button>
+                <div class="ym-mode-switch mode-switch" id="ym-mode" data-mode="income">
+                  <div class="mode-switch-thumb"></div>
+                  <button type="button" class="mode-switch-option active" data-mode="income">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    Income
+                  </button>
+                  <button type="button" class="mode-switch-option" data-mode="expense">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+                    Expense
+                  </button>
+                </div>
               </div>
             </div>
             <div class="ym-table-wrap">

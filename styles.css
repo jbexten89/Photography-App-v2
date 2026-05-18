@@ -5132,14 +5132,18 @@ select option {
 }
 .ym-head {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 4px;
   margin-bottom: 12px;
 }
-.ym-head-left { display: flex; flex-direction: column; }
-.ym-eyebrow { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+.ym-eyebrow { font-size: 13px; color: var(--muted); }
+.ym-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 .ym-total { font-size: 24px; font-weight: 700; color: var(--income); font-variant-numeric: tabular-nums; }
 /* Match the Cash Flow Flow/Trend switch design — icons next to labels,
    width auto, tighter padding. */
