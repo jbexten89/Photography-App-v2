@@ -5141,7 +5141,17 @@ select option {
 .ym-head-left { display: flex; flex-direction: column; }
 .ym-eyebrow { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
 .ym-total { font-size: 24px; font-weight: 700; color: var(--income); font-variant-numeric: tabular-nums; }
-.ym-mode-switch { width: 180px; }
+/* Match the Cash Flow Flow/Trend switch design — icons next to labels,
+   width auto, tighter padding. */
+.ym-mode-switch.mode-switch { width: auto; padding: 2px; }
+.ym-mode-switch .mode-switch-option {
+  padding: 6px 14px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.ym-mode-switch .mode-switch-option svg { width: 14px; height: 14px; margin-right: 4px; }
 .ym-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .ym-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .ym-table th,
