@@ -7545,6 +7545,58 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
        scroll. */
     will-change: scroll-position;
   }
+  /* Force the editor's invoice sheet to use its desktop layout — undo every
+     mobile-reflow rule from earlier in this file so the sheet inside the
+     horizontal-scroll wrap renders identically to the desktop preview. The
+     report sheets (#tax-report-container, #pl-report-container, etc.) keep
+     their mobile reflow since those views render in-place, not in a scroller. */
+  #invoices-edit-view .invoice-sheet {
+    padding: 40px 48px !important;
+    min-height: 1050px !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-header {
+    flex-direction: row !important;
+    gap: 24px !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-meta {
+    text-align: right !important;
+    align-self: auto !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-meta-table {
+    width: auto !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-meta-table th,
+  #invoices-edit-view .invoice-sheet .invoice-meta-table td {
+    padding: 4px 12px !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-meta-table input { width: auto !important; }
+  #invoices-edit-view .invoice-sheet .invoice-billto-row {
+    flex-direction: row !important;
+    gap: 24px !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-billto {
+    max-width: 360px !important;
+    flex: 0 1 360px !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-items {
+    min-width: 0 !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-items th,
+  #invoices-edit-view .invoice-sheet .invoice-items td {
+    padding: 6px 8px !important;
+    font-size: 13px !important;
+  }
+  #invoices-edit-view .invoice-sheet .invoice-logo { width: 110px !important; }
+  #invoices-edit-view .invoice-sheet .invoice-title { font-size: 28px !important; }
+  #invoices-edit-view .invoice-sheet .invoice-footer {
+    flex-direction: row !important;
+    gap: 0 !important;
+    text-align: left !important;
+    padding-top: 40px !important;
+    font-size: 13px !important;
+  }
 
   /* Invoices list toolbar (mobile):
        Hide Sales Tax button
