@@ -7524,42 +7524,11 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     flex: 0 0 80px;
   }
 
-  /* Invoice preview (edit view) on mobile: render the sheet at its proper
-     letter-page width inside a horizontal scroll container so the user
-     swipes sideways instead of having columns squished onto a phone-width
-     canvas. overflow-x:scroll (not auto) + explicit width:100% so the
-     wrap's scroll area is always defined. touch-action:pan-x pan-y +
-     overscroll-behavior contained keep the gesture local and snappy.
-     Apply touch-action to descendants too so taps on form fields don't
-     swallow the swipe direction at the start of a gesture. */
-  #invoices-edit-view .invoice-sheet-wrap {
-    display: block;
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: scroll;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y;
-    overscroll-behavior-x: contain;
-  }
-  #invoices-edit-view .invoice-sheet-wrap,
-  #invoices-edit-view .invoice-sheet,
-  #invoices-edit-view .invoice-sheet * {
-    touch-action: pan-x pan-y;
-  }
-  #invoices-edit-view .invoice-sheet {
-    width: 800px;
-    min-width: 800px;
-    max-width: 800px;
-    margin: 12px 0 0;
-    /* Hint the compositor to keep the sheet on its own layer for smoother
-       scroll. */
-    will-change: scroll-position;
-  }
-  /* (The !important overrides that used to live here were replaced by
-     scoping every mobile-reflow rule earlier in this file with
-     .invoice-sheet:not(.invoice-sheet--editor), so the editor sheet now
-     simply uses the base desktop CSS — no overrides needed.) */
+  /* (The previous horizontal-scroll wrap + 800px-pin treatment was removed.
+     The invoice editor sheet now uses the same mobile-reflow path as the
+     report sheets — see .invoice-sheet:not(.invoice-sheet--editor) earlier
+     in this file. The .invoice-sheet-wrap div in the HTML stays as a
+     harmless passthrough.) */
 
   /* Invoices list toolbar (mobile):
        Hide Sales Tax button
