@@ -2111,22 +2111,75 @@ function renderYearMatrix() {
   const valueClass = wantType === "expense" ? "ym-expense" : "ym-income";
   let body = `<tbody>`;
   catList.forEach(c => {
-    body += `<tr><td class="ym-rowhead">${escapeHtml(c)}</td>`;
+    const cAttr = escapeHtml(c);
+    // Row-head: click drills into ALL years for this category.
+    body += `<tr><td class="ym-rowhead ym-drill" data-cat="${cAttr}">${escapeHtml(c)}</td>`;
     yearList.forEach(y => {
       const v = grid.get(c).get(y) || 0;
-      const cls = v === 0 ? "ym-zero" : valueClass;
-      body += `<td class="${cls}">${v === 0 ? "—" : fmtMoney(v)}</td>`;
+      if (v === 0) {
+        body += `<td class="ym-zero">—</td>`;
+      } else {
+        // Cell click drills into (category × year) transactions.
+        body += `<td class="${valueClass} ym-drill" data-cat="${cAttr}" data-year="${y}">${fmtMoney(v)}</td>`;
+      }
     });
-    body += `<td class="ym-row-total ${wantType === "expense" ? "ym-row-total-expense" : ""}">${fmtMoney(rowTotals.get(c))}</td></tr>`;
+    body += `<td class="ym-row-total ${wantType === "expense" ? "ym-row-total-expense" : ""} ym-drill" data-cat="${cAttr}">${fmtMoney(rowTotals.get(c))}</td></tr>`;
   });
+  // Column-total row: each year cell drills into ALL categories for that year.
   body += `<tr class="ym-col-total-row"><td class="ym-rowhead">Total</td>`;
   yearList.forEach(y => {
-    body += `<td class="${valueClass}">${fmtMoney(colTotals.get(y))}</td>`;
+    body += `<td class="${valueClass} ym-drill" data-year="${y}">${fmtMoney(colTotals.get(y))}</td>`;
   });
   body += `<td class="${valueClass}">${fmtMoney(grand)}</td></tr></tbody>`;
 
   tbl.innerHTML = head + body;
 }
+
+// Year Matrix → drill into Transactions. Click any cell (or row/column
+// header) to jump to the Transactions tab pre-filtered to the matching
+// (category, year, income/expense) subset.
+document.getElementById("ym-table")?.addEventListener("click", (e) => {
+  const cell = e.target.closest(".ym-drill");
+  if (!cell) return;
+  const cat  = cell.dataset.cat  || "";
+  const year = cell.dataset.year || "";
+  const wantType = yearMatrixMode === "expense" ? "expense" : "income";
+
+  __txDrillFilter = (t) => {
+    if (t.type !== wantType) return false;
+    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (SAVINGS_CATEGORIES.includes(t.category)) return false;
+    if (cat && (t.category || "").trim() !== cat) return false;
+    if (year && (t.date || "").slice(0, 4) !== year) return false;
+    return true;
+  };
+  if (typeof __txDrillLabel !== "undefined") {
+    const typeWord = wantType === "expense" ? "Expense" : "Income";
+    __txDrillLabel = cat && year
+      ? `${cat} · ${year} · ${typeWord}`
+      : cat
+        ? `${cat} · ${typeWord}`
+        : `${year} · ${typeWord}`;
+  }
+  if (typeof refreshTxDrillChip === "function") setTimeout(refreshTxDrillChip, 0);
+
+  // Navigate to Transactions tab. Clear the Transactions tab's own filters
+  // so the drill predicate is the sole narrowing.
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelector('.tab-btn[data-tab="transactions"]').classList.add("active");
+  document.getElementById("transactions").classList.add("active");
+  const searchAll = document.getElementById("tx-search-all");
+  if (searchAll) searchAll.value = "";
+  document.getElementById("tx-filter-type").value = wantType;
+  document.getElementById("tx-filter-category").value = "";
+  document.getElementById("tx-filter-year").value = year || "";
+  window.__txBackToAnalytics = true;
+  const backBtn = document.getElementById("btn-tx-back");
+  if (backBtn) backBtn.hidden = false;
+  if (typeof renderTransactions === "function") renderTransactions();
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+});
 
 // Wire the Income / Expense mode-switch on the Year Matrix card.
 document.querySelectorAll("#ym-mode .mode-switch-option").forEach(btn => {

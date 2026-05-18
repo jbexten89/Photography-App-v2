@@ -5226,6 +5226,8 @@ select option {
 }
 .ym-table thead th:first-child { background: var(--bg); }
 .ym-table .ym-zero { color: var(--muted); }
+.ym-table .ym-drill { cursor: pointer; }
+.ym-table .ym-drill:hover { background: rgba(96, 165, 250, 0.12); }
 .ym-table .ym-income  { color: var(--income); }
 .ym-table .ym-expense { color: var(--expense); }
 .ym-table .ym-row-total { font-weight: 700; color: var(--income); }
