@@ -2007,15 +2007,18 @@ function renderSavingsRate() {
 }
 
 // --------- Year Matrix view ---------
-// Pivot table: rows = jobs/categories, columns = years, cells = income $.
+// Pivot table: rows = categories, columns = years, cells = income or expense $.
 // Honors the universal Date Range / Customer / Category / Payees filters.
+let yearMatrixMode = "income"; // "income" | "expense"
 function renderYearMatrix() {
   const tbl = document.getElementById("ym-table");
   const totalEl = document.getElementById("ym-total");
   if (!tbl) return;
 
+  const wantType = yearMatrixMode === "expense" ? "expense" : "income";
+
   const passes = t => {
-    if (t.type !== "income") return false;
+    if (t.type !== wantType) return false;
     if (NON_JOB_CATEGORIES.includes(t.category)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
@@ -2049,19 +2052,31 @@ function renderYearMatrix() {
     yearList.forEach(y => { s += cm.get(y) || 0; });
     rowTotals.set(c, s);
   });
-  // Sort categories: the user's preferred photography-job order first
-  // (Spring Sports, Baseball, …), then the rest by lifetime total desc.
-  const YM_PREFERRED_ORDER = [
+  // Sort categories:
+  //   HEAD — the user's preferred photography-job order (Spring Sports first)
+  //   MIDDLE — everything else, by lifetime total desc
+  //   TAIL — "Product" is pinned at the bottom
+  const YM_HEAD_ORDER = [
     "Spring Sports", "Baseball", "Softball", "Tee Ball",
     "Fall Sports", "Banners", "Soccer", "Preschool", "Winter Sports",
-    "Framed Prints", "Dry Mount Prints", "Buy Sell",
+    "Framed Prints", "Mounted Prints", "Dry Mount Prints", "Buy Sell",
   ];
-  const ymRank = new Map(YM_PREFERRED_ORDER.map((n, i) => [n, i]));
+  const YM_TAIL_ORDER = ["Product"];
+  const headRank = new Map(YM_HEAD_ORDER.map((n, i) => [n, i]));
+  const tailRank = new Map(YM_TAIL_ORDER.map((n, i) => [n, i]));
+  const tierOf = c => {
+    if (headRank.has(c)) return { tier: 0, rank: headRank.get(c) };
+    if (tailRank.has(c)) return { tier: 2, rank: tailRank.get(c) };
+    return { tier: 1, rank: 0 };
+  };
   catList.sort((a, b) => {
-    const ra = ymRank.has(a) ? ymRank.get(a) : Infinity;
-    const rb = ymRank.has(b) ? ymRank.get(b) : Infinity;
-    if (ra !== rb) return ra - rb;
-    return (rowTotals.get(b) || 0) - (rowTotals.get(a) || 0);
+    const ta = tierOf(a), tb = tierOf(b);
+    if (ta.tier !== tb.tier) return ta.tier - tb.tier;
+    if (ta.tier === 1) {
+      // Middle tier — sort by lifetime total desc.
+      return (rowTotals.get(b) || 0) - (rowTotals.get(a) || 0);
+    }
+    return ta.rank - tb.rank;
   });
 
   const colTotals = new Map();
@@ -2072,14 +2087,24 @@ function renderYearMatrix() {
   });
 
   const grand = [...rowTotals.values()].reduce((a, b) => a + b, 0);
-  if (totalEl) totalEl.textContent = fmtMoney(grand);
+  if (totalEl) {
+    totalEl.textContent = fmtMoney(grand);
+    totalEl.style.color = wantType === "expense" ? "var(--expense)" : "var(--income)";
+  }
+  const eyebrowEl = document.getElementById("ym-eyebrow");
+  if (eyebrowEl) {
+    eyebrowEl.textContent = wantType === "expense"
+      ? "Expense by Category × Year"
+      : "Income by Category × Year";
+  }
 
   if (!catList.length || !yearList.length) {
-    tbl.innerHTML = `<tbody><tr><td class="ym-empty">No income data for the selected filters.</td></tr></tbody>`;
+    const noun = wantType === "expense" ? "expense" : "income";
+    tbl.innerHTML = `<tbody><tr><td class="ym-empty">No ${noun} data for the selected filters.</td></tr></tbody>`;
     return;
   }
 
-  let head = `<thead><tr><th class="ym-rowhead">Job / Category</th>`;
+  let head = `<thead><tr><th class="ym-rowhead">Category</th>`;
   yearList.forEach(y => { head += `<th>${escapeHtml(y)}</th>`; });
   head += `<th class="ym-rowhead">Total</th></tr></thead>`;
 
@@ -2090,7 +2115,7 @@ function renderYearMatrix() {
       const v = grid.get(c).get(y) || 0;
       body += `<td class="${v === 0 ? "ym-zero" : ""}">${v === 0 ? "—" : fmtMoney(v)}</td>`;
     });
-    body += `<td class="ym-row-total">${fmtMoney(rowTotals.get(c))}</td></tr>`;
+    body += `<td class="ym-row-total ${wantType === "expense" ? "ym-row-total-expense" : ""}">${fmtMoney(rowTotals.get(c))}</td></tr>`;
   });
   body += `<tr class="ym-col-total-row"><td class="ym-rowhead">Total</td>`;
   yearList.forEach(y => { body += `<td>${fmtMoney(colTotals.get(y))}</td>`; });
@@ -2098,6 +2123,21 @@ function renderYearMatrix() {
 
   tbl.innerHTML = head + body;
 }
+
+// Wire the Income / Expense mode-switch on the Year Matrix card.
+document.querySelectorAll("#ym-mode .mode-switch-option").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const next = btn.dataset.mode;
+    if (next === yearMatrixMode) return;
+    yearMatrixMode = next;
+    const wrap = document.getElementById("ym-mode");
+    if (wrap) wrap.dataset.mode = yearMatrixMode;
+    document.querySelectorAll("#ym-mode .mode-switch-option").forEach(b => {
+      b.classList.toggle("active", b.dataset.mode === yearMatrixMode);
+    });
+    renderYearMatrix();
+  });
+});
 
 function renderSpendingTrends() {
   const chartEl = document.getElementById("st-chart");

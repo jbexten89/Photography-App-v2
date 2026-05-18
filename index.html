@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=483" />
+<link rel="stylesheet" href="styles.css?v=484" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -926,8 +926,15 @@
         <div class="analytics-view active" data-view="year-matrix">
           <div class="ym-card">
             <div class="ym-head">
-              <div class="ym-eyebrow">Income by Job/Category × Year</div>
-              <div class="ym-total" id="ym-total">$0.00</div>
+              <div class="ym-head-left">
+                <div class="ym-eyebrow" id="ym-eyebrow">Income by Category × Year</div>
+                <div class="ym-total" id="ym-total">$0.00</div>
+              </div>
+              <div class="ym-mode-switch mode-switch" id="ym-mode" data-mode="income">
+                <div class="mode-switch-thumb"></div>
+                <button type="button" class="mode-switch-option active" data-mode="income">Income</button>
+                <button type="button" class="mode-switch-option" data-mode="expense">Expense</button>
+              </div>
             </div>
             <div class="ym-table-wrap">
               <table id="ym-table" class="ym-table"></table>
@@ -2944,6 +2951,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=271"></script>
+  <script src="app.js?v=272"></script>
 </body>
 </html>
