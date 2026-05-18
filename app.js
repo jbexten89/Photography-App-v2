@@ -8743,28 +8743,30 @@ function renderInvoiceTotals() {
   if (mode === "tax") {
     const label = (inv.taxLabel || "Tax").trim() || "Tax";
     const rate = parseFloat(inv.taxRate) || 0;
+    // Label cell spans 2 columns (Description + Price = 55%) so long labels
+    // like "Ohio Sales Tax (7.25%)" don't spill into the Amount column.
     tbody.innerHTML = `
       <tr>
-        <td class="no-border" colspan="3"></td>
-        <td class="subtotal-label-cell">Subtotal</td>
+        <td class="no-border" colspan="2"></td>
+        <td class="subtotal-label-cell" colspan="2">Subtotal</td>
         <td class="subtotal-value-cell">${fmtMoney(subtotal)}</td>
       </tr>
       <tr>
-        <td class="no-border" colspan="3"></td>
-        <td class="tax-label-cell">${escapeHtml(label)} (${rate.toFixed(2)}%)</td>
+        <td class="no-border" colspan="2"></td>
+        <td class="tax-label-cell" colspan="2">${escapeHtml(label)} (${rate.toFixed(2)}%)</td>
         <td class="tax-value-cell">${fmtMoney(tax)}</td>
       </tr>
       <tr>
-        <td class="no-border" colspan="3"></td>
-        <td class="total-label-cell">Total</td>
+        <td class="no-border" colspan="2"></td>
+        <td class="total-label-cell" colspan="2">Total</td>
         <td class="total-value-cell" id="invoice-total">${fmtMoney(total)}</td>
       </tr>
     `;
   } else {
     tbody.innerHTML = `
       <tr>
-        <td class="no-border" colspan="3"></td>
-        <td class="total-label-cell">Total</td>
+        <td class="no-border" colspan="2"></td>
+        <td class="total-label-cell" colspan="2">Total</td>
         <td class="total-value-cell" id="invoice-total">${fmtMoney(total)}</td>
       </tr>
     `;

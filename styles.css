@@ -4333,7 +4333,10 @@ select option {
   padding: 6px 8px;
   color: #111;
   background: #fff;
-  vertical-align: top;
+  /* Center contents vertically so plain-text cells (Qty/Price/Amount) line
+     up with select-dropdown cells (Item/Description), which have taller
+     chrome. */
+  vertical-align: middle;
 }
 
 .invoice-items tbody td { border-bottom: 1px solid #333; }
