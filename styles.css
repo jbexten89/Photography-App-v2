@@ -5981,9 +5981,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .spend-trends-total { font-size: 22px !important; }
   /* Match Spending by Category top total to the Trends total size. */
   .bcat-total { font-size: 22px !important; }
-  /* Year Matrix mobile: shrink the grand-total + switch padding/font so the
-     two share one row without wrapping. */
-  .ym-total { font-size: 18px; }
+  /* Year Matrix mobile: grand-total matches the other chart cards (22px) and
+     the switch is tightened so the two share one row without wrapping. */
+  .ym-total { font-size: 22px; }
   .ym-mode-switch .mode-switch-option { padding: 4px 10px; font-size: 12px; }
   .ym-mode-switch .mode-switch-option svg { width: 12px; height: 12px; }
   /* Same min-height reset as Cash Flow / Trends so the card hugs its
