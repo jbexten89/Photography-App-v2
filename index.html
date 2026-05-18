@@ -425,6 +425,10 @@
           <p class="analytics-subtitle-mobile muted">Track your finances with detailed reports and charts</p>
         </div>
         <nav class="analytics-pills" id="analytics-pills">
+          <button class="analytics-pill" data-view="year-matrix">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            Year Matrix
+          </button>
           <button class="analytics-pill active" data-view="by-category">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
             By Job
@@ -457,12 +461,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             Savings Rate
           </button>
-          <button class="analytics-pill" data-view="year-matrix">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-            Year Matrix
-          </button>
         </nav>
         <select id="analytics-view-select" class="analytics-view-select" aria-label="Analytics view" hidden>
+          <option value="year-matrix">Year Matrix</option>
           <option value="by-category">By Job</option>
           <option value="cash-flow">Cash Flow</option>
           <option value="trends">By Category</option>
@@ -471,7 +472,6 @@
           <option value="vs-expense">vs Expense</option>
           <option value="breakdown">Breakdown</option>
           <option value="savings-rate">Savings Rate</option>
-          <option value="year-matrix">Year Matrix</option>
         </select>
         <!-- Custom mobile view picker (richer styling than native <select>) -->
         <div class="amvp" id="amvp">
@@ -483,6 +483,10 @@
             <svg class="amvp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="amvp-menu" id="amvp-menu" role="listbox" hidden>
+            <button type="button" class="amvp-item" data-view="year-matrix" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+              <span>Year Matrix</span>
+            </button>
             <button type="button" class="amvp-item active" data-view="by-category" role="option">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
               <span>By Job</span>
@@ -514,10 +518,6 @@
             <button type="button" class="amvp-item" data-view="savings-rate" role="option">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               <span>Savings Rate</span>
-            </button>
-            <button type="button" class="amvp-item" data-view="year-matrix" role="option">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-              <span>Year Matrix</span>
             </button>
           </div>
         </div>
