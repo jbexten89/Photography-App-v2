@@ -5188,6 +5188,14 @@ select option {
   left: 0;
   background: var(--surface);
   z-index: 3;
+  /* Lock the category column width so toggling Income/Expense doesn't make
+     it expand to fit the longest category name in that mode. */
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .ym-table thead th:first-child { background: var(--bg); }
 .ym-table .ym-zero { color: var(--muted); }
