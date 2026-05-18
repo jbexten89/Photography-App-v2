@@ -9640,6 +9640,11 @@ function renderTrends() {
       const y = (t.date || "").slice(0, 4);
       if (!/^\d{4}$/.test(y)) return;
       if (!isYearSelected(y)) return;
+      // Honor the universal Customer + Category filters from the chips. The
+      // Job + Date Range + Payees filters are already enforced upstream (via
+      // activeJobs, isYearSelected, and trendSelectedPayees respectively).
+      if (!filterPasses("customer", t.customer || "")) return;
+      if (!filterPassesCategory(t.category)) return;
       const payee = t.payee || "(no payee)";
       const signed = (t.type === "income" ? 1 : -1) * t.amount;
       if (!byYearJob[y]) byYearJob[y] = {};
