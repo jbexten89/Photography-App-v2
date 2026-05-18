@@ -653,6 +653,7 @@ function activateAnalyticsView(viewName) {
   if (viewName === "vs-expense" && typeof renderVsExpense === "function") renderVsExpense();
   if (viewName === "spending-trends" && typeof renderSpendingTrends === "function") renderSpendingTrends();
   if (viewName === "savings-rate" && typeof renderSavingsRate === "function") renderSavingsRate();
+  if (viewName === "year-matrix"  && typeof renderYearMatrix  === "function") renderYearMatrix();
 }
 
 document.querySelectorAll(".analytics-pill").forEach(btn => {
@@ -1411,6 +1412,7 @@ function rerenderActiveAnalyticsView() {
   if (activeView === "vs-expense") renderVsExpense();
   if (activeView === "spending-trends") renderSpendingTrends();
   if (activeView === "savings-rate")    renderSavingsRate();
+  if (activeView === "year-matrix")     renderYearMatrix();
 }
 
 // ===== Multi-select popover =====
@@ -2002,6 +2004,87 @@ function renderSavingsRate() {
       `;
     }
   }
+}
+
+// --------- Year Matrix view ---------
+// Pivot table: rows = jobs/categories, columns = years, cells = income $.
+// Honors the universal Date Range / Customer / Category / Payees filters.
+function renderYearMatrix() {
+  const tbl = document.getElementById("ym-table");
+  const totalEl = document.getElementById("ym-total");
+  if (!tbl) return;
+
+  const passes = t => {
+    if (t.type !== "income") return false;
+    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (SAVINGS_CATEGORIES.includes(t.category)) return false;
+    if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
+    if (!filterPasses("customer", t.customer || "")) return false;
+    if (!filterPassesCategory(t.category)) return false;
+    if (!filterPasses("payees", t.payee || "")) return false;
+    return true;
+  };
+
+  // grid[category][year] = sum
+  const grid = new Map();
+  const years = new Set();
+  state.transactions.forEach(t => {
+    if (!passes(t)) return;
+    const cat = (t.category || "Uncategorized").trim();
+    const yr  = (t.date || "").slice(0, 4);
+    if (!/^\d{4}$/.test(yr)) return;
+    years.add(yr);
+    if (!grid.has(cat)) grid.set(cat, new Map());
+    const cm = grid.get(cat);
+    cm.set(yr, (cm.get(yr) || 0) + (t.amount || 0));
+  });
+
+  const yearList = [...years].sort();
+  let catList = [...grid.keys()];
+
+  const rowTotals = new Map();
+  catList.forEach(c => {
+    const cm = grid.get(c);
+    let s = 0;
+    yearList.forEach(y => { s += cm.get(y) || 0; });
+    rowTotals.set(c, s);
+  });
+  // Sort categories by lifetime total descending.
+  catList.sort((a, b) => (rowTotals.get(b) || 0) - (rowTotals.get(a) || 0));
+
+  const colTotals = new Map();
+  yearList.forEach(y => {
+    let s = 0;
+    catList.forEach(c => { s += grid.get(c).get(y) || 0; });
+    colTotals.set(y, s);
+  });
+
+  const grand = [...rowTotals.values()].reduce((a, b) => a + b, 0);
+  if (totalEl) totalEl.textContent = fmtMoney(grand);
+
+  if (!catList.length || !yearList.length) {
+    tbl.innerHTML = `<tbody><tr><td class="ym-empty">No income data for the selected filters.</td></tr></tbody>`;
+    return;
+  }
+
+  let head = `<thead><tr><th class="ym-rowhead">Job / Category</th>`;
+  yearList.forEach(y => { head += `<th>${escapeHtml(y)}</th>`; });
+  head += `<th class="ym-rowhead">Total</th></tr></thead>`;
+
+  let body = `<tbody>`;
+  catList.forEach(c => {
+    body += `<tr><td class="ym-rowhead">${escapeHtml(c)}</td>`;
+    yearList.forEach(y => {
+      const v = grid.get(c).get(y) || 0;
+      body += `<td class="${v === 0 ? "ym-zero" : ""}">${v === 0 ? "—" : fmtMoney(v)}</td>`;
+    });
+    body += `<td class="ym-row-total">${fmtMoney(rowTotals.get(c))}</td></tr>`;
+  });
+  body += `<tr class="ym-col-total-row"><td class="ym-rowhead">Total</td>`;
+  yearList.forEach(y => { body += `<td>${fmtMoney(colTotals.get(y))}</td>`; });
+  body += `<td>${fmtMoney(grand)}</td></tr></tbody>`;
+
+  tbl.innerHTML = head + body;
 }
 
 function renderSpendingTrends() {

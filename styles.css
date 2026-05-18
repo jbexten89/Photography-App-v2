@@ -5123,6 +5123,59 @@ select option {
   #transactions .toolbar #tx-sort-jobno         { order: -13; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
 }
 
+/* ===== Year Matrix view ===== */
+.ym-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px 12px;
+}
+.ym-head { margin-bottom: 12px; }
+.ym-eyebrow { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+.ym-total { font-size: 24px; font-weight: 700; color: var(--income); font-variant-numeric: tabular-nums; }
+.ym-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ym-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ym-table th,
+.ym-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ym-table thead th {
+  background: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.ym-table .ym-rowhead {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+}
+.ym-table tbody td.ym-rowhead,
+.ym-table thead th:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+  z-index: 3;
+}
+.ym-table thead th:first-child { background: var(--bg); }
+.ym-table .ym-zero { color: var(--muted); }
+.ym-table .ym-row-total { font-weight: 700; color: var(--income); }
+.ym-table .ym-col-total-row td {
+  font-weight: 700;
+  border-top: 2px solid var(--border);
+  background: var(--surface);
+}
+.ym-table .ym-empty { text-align: center; color: var(--muted); padding: 24px; font-style: italic; }
+
 /* Mobile-only row-break sibling inside the All Transactions toolbar. */
 .tx-toolbar-row-break { display: none; }
 
