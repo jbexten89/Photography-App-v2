@@ -570,6 +570,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     // Clicking any sidebar tab (including Transactions directly) clears the
     // "came from Analytics" context and hides the Back arrow.
     window.__txBackToAnalytics = false;
+    window.__txBackToAnalyticsView = null;
     const backBtn = document.getElementById("btn-tx-back");
     if (backBtn) backBtn.hidden = true;
     render();
@@ -609,8 +610,10 @@ if (btnThemeFlyout) {
 // Back arrow on Transactions → returns to Analytics overview
 document.getElementById("btn-tx-back").addEventListener("click", () => {
   const origin = window.__txBackTo || (window.__txBackToAnalytics ? "jobs" : null);
+  const analyticsView = window.__txBackToAnalyticsView || "by-category";
   window.__txBackToAnalytics = false;
   window.__txBackTo = null;
+  window.__txBackToAnalyticsView = null;
   document.getElementById("btn-tx-back").hidden = true;
   // Clear the category filter so Transactions isn't still filtered after the round-trip
   document.getElementById("tx-filter-category").value = "";
@@ -621,10 +624,11 @@ document.getElementById("btn-tx-back").addEventListener("click", () => {
     syncTabActive("dashboard");
     document.getElementById("dashboard").classList.add("active");
   } else {
-    // Default: return to Analytics master with the By Category view selected
+    // Default: return to Analytics master with whichever view the user
+    // drilled from (set by the drill click handler) — falls back to By Job.
     syncTabActive("jobs");
     document.getElementById("jobs").classList.add("active");
-    if (typeof activateAnalyticsView === "function") activateAnalyticsView("by-category");
+    if (typeof activateAnalyticsView === "function") activateAnalyticsView(analyticsView);
   }
   render();
 });
@@ -2175,6 +2179,9 @@ document.getElementById("ym-table")?.addEventListener("click", (e) => {
   document.getElementById("tx-filter-category").value = "";
   document.getElementById("tx-filter-year").value = year || "";
   window.__txBackToAnalytics = true;
+  // Remember which Analytics view the user drilled from so Back returns
+  // them to Year Matrix (not the default By Category).
+  window.__txBackToAnalyticsView = "year-matrix";
   const backBtn = document.getElementById("btn-tx-back");
   if (backBtn) backBtn.hidden = false;
   if (typeof renderTransactions === "function") renderTransactions();
