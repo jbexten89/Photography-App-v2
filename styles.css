@@ -5633,6 +5633,12 @@ body.reports-inverted .invoice-sheet {
   --income: #c03685;   /* inverts to #3fc97a (dark-theme income green) */
   --expense: #1ea4b3;  /* inverts to #e15b4c (dark-theme expense red)  */
 }
+/* Counter-invert the PAID stamp so it stays green/white even when the
+   surrounding sheet has been inverted. A nested filter: invert(1) cancels
+   the parent's invert filter for this subtree. */
+body.reports-inverted .invoice-sheet .paid-stamp {
+  filter: invert(1);
+}
 [data-theme="light"] body.reports-inverted .invoice-sheet {
   background: #ffffff !important;
 }
@@ -7507,10 +7513,17 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* Invoice preview (edit view) on mobile: render the sheet at its proper
      letter-page width inside a horizontal scroll container so the user can
      swipe sideways instead of having columns squished onto a phone-width
-     canvas. */
+     canvas. touch-action:pan-x tells the browser this scroller only
+     consumes horizontal gestures — vertical touches bubble up to the page
+     scroll so the user never feels stuck. overscroll-behavior contains the
+     scroll inside the wrap (no body-bounce). */
   #invoices-edit-view .invoice-sheet-wrap {
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
   }
   #invoices-edit-view .invoice-sheet {
     min-width: 800px;
