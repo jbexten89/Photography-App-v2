@@ -6116,22 +6116,26 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #job-summary-table,
   #expense-summary-table,
   #account-summary-table { min-width: 680px; }
-  .invoice-sheet {
+  /* Mobile-reflow for the report-style invoice sheets only (tax / P&L /
+     mileage / vs-expense / Schedule C / etc.). The editor sheet (marked
+     .invoice-sheet--editor) keeps the full desktop layout inside its
+     horizontal-scroll wrap. */
+  .invoice-sheet:not(.invoice-sheet--editor) {
     padding: 20px 16px;
     min-height: auto;
   }
-  .invoice-header {
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-header {
     flex-direction: column;
     gap: 16px;
   }
-  .invoice-meta { text-align: left; align-self: stretch; }
-  .invoice-meta-table { width: 100%; }
-  .invoice-billto-row {
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta { text-align: left; align-self: stretch; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table { width: 100%; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-billto-row {
     flex-direction: column;
     gap: 16px;
   }
-  .invoice-billto { max-width: 100%; flex: 1 1 auto; }
-  .invoice-footer {
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-billto { max-width: 100%; flex: 1 1 auto; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-footer {
     flex-direction: column;
     gap: 6px;
     text-align: center;
@@ -7187,22 +7191,25 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     margin-top: 0;
   }
 
-  /* Invoice line items — shrink padding so the columns still fit */
-  .invoice-items th, .invoice-items td { padding: 4px 4px; font-size: 11px; }
-  .invoice-meta-table th, .invoice-meta-table td { padding: 4px 8px; }
+  /* Invoice line items — shrink padding so the columns still fit (report
+     sheets only; editor uses desktop padding inside its scroll wrap). */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items th,
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td { padding: 4px 4px; font-size: 11px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table th,
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table td { padding: 4px 8px; }
 
-  /* Tighter invoice sheet */
-  .invoice-sheet { padding: 16px 10px; }
-  .invoice-logo { width: 70px; }
-  .invoice-title { font-size: 18px; }
+  /* Tighter invoice sheet (report sheets only). */
+  .invoice-sheet:not(.invoice-sheet--editor) { padding: 16px 10px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-logo { width: 70px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-title { font-size: 18px; }
 
   /* Tax report tables — even tighter */
   .tax-report-table, .tax-report-detail { font-size: 10px; }
   .tax-report-table th, .tax-report-table td,
   .tax-report-detail th, .tax-report-detail td { padding: 3px 4px; }
 
-  /* Invoice footer smaller on narrow phones */
-  .invoice-footer { font-size: 10px; padding-top: 20px; }
+  /* Invoice footer smaller on narrow phones (report sheets only). */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-footer { font-size: 10px; padding-top: 20px; }
 
   /* Schedule toolbar — compact */
   /* Keep the Analytics subtabs (Breakdown | Trends) pinned to the top on mobile */
@@ -7385,11 +7392,13 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .tx-row.nonjob td:nth-child(2) { background: rgba(128, 128, 128, 0.08) !important; }
   .tx-row.nonjob:hover td:nth-child(2) { background: rgba(128, 128, 128, 0.15) !important; }
 
-  /* Invoice editor — reflow items table so it scrolls cleanly */
-  .invoice-items {
+  /* Report invoice sheets — let their items table scroll internally on
+     narrow widths. (The editor sheet sits in its own scroll wrap, so this
+     would conflict; skip the editor variant.) */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items {
     min-width: 580px; /* enough for all 5 columns to stay readable */
   }
-  .invoice-sheet {
+  .invoice-sheet:not(.invoice-sheet--editor) {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -7545,58 +7554,10 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
        scroll. */
     will-change: scroll-position;
   }
-  /* Force the editor's invoice sheet to use its desktop layout — undo every
-     mobile-reflow rule from earlier in this file so the sheet inside the
-     horizontal-scroll wrap renders identically to the desktop preview. The
-     report sheets (#tax-report-container, #pl-report-container, etc.) keep
-     their mobile reflow since those views render in-place, not in a scroller. */
-  #invoices-edit-view .invoice-sheet {
-    padding: 40px 48px !important;
-    min-height: 1050px !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-header {
-    flex-direction: row !important;
-    gap: 24px !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-meta {
-    text-align: right !important;
-    align-self: auto !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-meta-table {
-    width: auto !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-meta-table th,
-  #invoices-edit-view .invoice-sheet .invoice-meta-table td {
-    padding: 4px 12px !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-meta-table input { width: auto !important; }
-  #invoices-edit-view .invoice-sheet .invoice-billto-row {
-    flex-direction: row !important;
-    gap: 24px !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-billto {
-    max-width: 360px !important;
-    flex: 0 1 360px !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-items {
-    min-width: 0 !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-items th,
-  #invoices-edit-view .invoice-sheet .invoice-items td {
-    padding: 6px 8px !important;
-    font-size: 13px !important;
-  }
-  #invoices-edit-view .invoice-sheet .invoice-logo { width: 110px !important; }
-  #invoices-edit-view .invoice-sheet .invoice-title { font-size: 28px !important; }
-  #invoices-edit-view .invoice-sheet .invoice-footer {
-    flex-direction: row !important;
-    gap: 0 !important;
-    text-align: left !important;
-    padding-top: 40px !important;
-    font-size: 13px !important;
-  }
+  /* (The !important overrides that used to live here were replaced by
+     scoping every mobile-reflow rule earlier in this file with
+     .invoice-sheet:not(.invoice-sheet--editor), so the editor sheet now
+     simply uses the base desktop CSS — no overrides needed.) */
 
   /* Invoices list toolbar (mobile):
        Hide Sales Tax button
@@ -7944,8 +7905,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 @media (max-width: 768px) {
   /* noop placeholder so the closing brace above doesn't orphan */
 
-  /* Invoice meta-table — keep date + number visible without cramping */
-  .invoice-meta-table input { width: 80px; }
+  /* Invoice meta-table — keep date + number visible without cramping
+     (report sheets only; editor preserves desktop input widths). */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table input { width: 80px; }
 
   /* Calendar mini-month day cells — tap-friendly */
   .mini-calendar-grid .cal-day { min-height: 32px; }
