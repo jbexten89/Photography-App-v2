@@ -5193,6 +5193,12 @@ select option {
 .ym-table .ym-zero { color: var(--muted); }
 .ym-table .ym-row-total { font-weight: 700; color: var(--income); }
 .ym-table .ym-row-total-expense { color: var(--expense); }
+
+/* Override the global "income"-mode thumb slide: on this switch Income is
+   the LEFT button, so the thumb sits at translateX(0) for Income and slides
+   right for Expense. */
+#ym-mode[data-mode="income"]  .mode-switch-thumb { transform: translateX(0)    !important; }
+#ym-mode[data-mode="expense"] .mode-switch-thumb { transform: translateX(100%) !important; }
 .ym-table .ym-col-total-row td {
   font-weight: 700;
   border-top: 2px solid var(--border);
@@ -5975,6 +5981,11 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .spend-trends-total { font-size: 22px !important; }
   /* Match Spending by Category top total to the Trends total size. */
   .bcat-total { font-size: 22px !important; }
+  /* Year Matrix mobile: shrink the grand-total + switch padding/font so the
+     two share one row without wrapping. */
+  .ym-total { font-size: 18px; }
+  .ym-mode-switch .mode-switch-option { padding: 4px 10px; font-size: 12px; }
+  .ym-mode-switch .mode-switch-option svg { width: 12px; height: 12px; }
   /* Same min-height reset as Cash Flow / Trends so the card hugs its
      content on mobile (was 520px desktop, leaving the bottom half empty
      when the chart shrinks to phone width). */
