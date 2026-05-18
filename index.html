@@ -425,11 +425,11 @@
           <p class="analytics-subtitle-mobile muted">Track your finances with detailed reports and charts</p>
         </div>
         <nav class="analytics-pills" id="analytics-pills">
-          <button class="analytics-pill" data-view="year-matrix">
+          <button class="analytics-pill active" data-view="year-matrix">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
             Year Matrix
           </button>
-          <button class="analytics-pill active" data-view="by-category">
+          <button class="analytics-pill" data-view="by-category">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
             By Job
           </button>
@@ -477,17 +477,17 @@
         <div class="amvp" id="amvp">
           <button type="button" class="amvp-trigger" id="amvp-trigger" aria-haspopup="listbox" aria-expanded="false">
             <span class="amvp-current">
-              <svg class="amvp-icon" id="amvp-current-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
-              <span class="amvp-label" id="amvp-current-label">By Job</span>
+              <svg class="amvp-icon" id="amvp-current-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+              <span class="amvp-label" id="amvp-current-label">Year Matrix</span>
             </span>
             <svg class="amvp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="amvp-menu" id="amvp-menu" role="listbox" hidden>
-            <button type="button" class="amvp-item" data-view="year-matrix" role="option">
+            <button type="button" class="amvp-item active" data-view="year-matrix" role="option">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
               <span>Year Matrix</span>
             </button>
-            <button type="button" class="amvp-item active" data-view="by-category" role="option">
+            <button type="button" class="amvp-item" data-view="by-category" role="option">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>
               <span>By Job</span>
             </button>
@@ -587,7 +587,7 @@
       </header>
 
       <div class="analytics-views">
-        <div class="analytics-view active" data-view="by-category">
+        <div class="analytics-view" data-view="by-category">
       <div class="jobs-sticky">
       <select id="jobs-year" hidden><option value="">All Years</option></select>
 
@@ -923,7 +923,7 @@
             </aside>
           </div>
         </div>
-        <div class="analytics-view" data-view="year-matrix">
+        <div class="analytics-view active" data-view="year-matrix">
           <div class="ym-card">
             <div class="ym-head">
               <div class="ym-eyebrow">Income by Job/Category × Year</div>
