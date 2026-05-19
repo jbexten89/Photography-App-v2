@@ -7214,9 +7214,12 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody { display: block; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody tr {
     display: grid;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     /* minmax keeps the Item dropdown from collapsing when its placeholder
-       text is short; without it, the grid algorithm gives Item just its
-       min-content (the dropdown arrow) and the rest goes to Description. */
+       text is short. min:0 on Item and Desc means selects inside them get
+       clipped (ellipsis) rather than forcing the row to overflow. */
     grid-template-columns: minmax(0, 1.4fr) minmax(56px, 0.6fr) minmax(0, 1.6fr);
     grid-template-areas:
       "item qty desc"
@@ -7226,6 +7229,18 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     border: 1px solid #333;
     border-bottom: none;
     background: #fff;
+    overflow: hidden;
+  }
+  /* Force every cell + every select inside the row to honor its grid track
+     width so wide option text doesn't push the row past the viewport. */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td { min-width: 0; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody select,
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    text-overflow: ellipsis;
   }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody tr:last-child {
     border-bottom: 1px solid #333;
