@@ -6026,6 +6026,23 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .spend-trends-total { font-size: 22px !important; }
   /* Match Spending by Category top total to the Trends total size. */
   .bcat-total { font-size: 22px !important; }
+
+  /* Overview summary tables — narrow the first (Job / Category / Account)
+     column on mobile so the value columns get more room. Long names clip
+     with an ellipsis instead of forcing the table wider. */
+  #job-summary-table colgroup col:first-child,
+  #expense-summary-table colgroup col:first-child,
+  #account-summary-table colgroup col:first-child { width: 14% !important; }
+  #job-summary-table colgroup col:not(:first-child),
+  #expense-summary-table colgroup col:not(:first-child),
+  #account-summary-table colgroup col:not(:first-child) { width: 21.5% !important; }
+  #job-summary-table td:first-child,
+  #expense-summary-table td:first-child,
+  #account-summary-table td:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   /* Year Matrix mobile: grand-total matches the other chart cards (22px) and
      the switch is tightened so the two share one row without wrapping. */
   .ym-total { font-size: 22px; }
