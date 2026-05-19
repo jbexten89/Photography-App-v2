@@ -7193,18 +7193,65 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     margin-top: 0;
   }
 
-  /* Invoice line items — shrink padding so the columns still fit. Font size
-     matches the totals table (13px) so Item / Qty / Description / Price /
-     Amount cells line up visually with the Subtotal / Tax / Total rows
-     below them. */
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items th,
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td { padding: 4px 4px; font-size: 13px; }
-  /* Shift the Price/Amount value text a touch left so it doesn't hug the
-     right border of its cell. */
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-price,
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-amount,
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-price input,
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-amount input { padding-right: 8px; }
+  /* Invoice line items on mobile — stacked 2-line layout per row:
+       Line 1: Item · Qty · Description
+       Line 2: Price (spans first two cols) · Amount
+     Plus a small "QTY" / "PRICE" / "AMOUNT" mini-label inside each input
+     cell so the missing column header is recoverable at a glance. */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items {
+    border: none;
+    min-width: 0; /* let the items table fit phone width since rows are now stacked */
+    font-size: 13px;
+  }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items thead { display: none; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody { display: block; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody tr {
+    display: grid;
+    grid-template-columns: 1.4fr 0.6fr 1.6fr;
+    grid-template-areas:
+      "item qty desc"
+      "price price amount";
+    gap: 6px 8px;
+    padding: 8px 6px;
+    border: 1px solid #333;
+    border-bottom: none;
+    background: #fff;
+  }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody tr:last-child {
+    border-bottom: 1px solid #333;
+  }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td {
+    border: none !important;
+    padding: 0;
+    background: transparent;
+  }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-item  { grid-area: item; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-qty   { grid-area: qty; display: flex; align-items: center; gap: 4px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-desc  { grid-area: desc; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-price { grid-area: price; display: flex; align-items: center; gap: 4px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-amount {
+    grid-area: amount;
+    text-align: right;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    padding-right: 22px; /* leave room for the × delete button */
+  }
+  /* Mini-labels for cells that lost their column header. */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-qty::before    { content: "QTY";    font-size: 10px; font-weight: 700; color: #666; letter-spacing: 0.5px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-price::before  { content: "PRICE";  font-size: 10px; font-weight: 700; color: #666; letter-spacing: 0.5px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-amount::before { content: "AMOUNT"; font-size: 10px; font-weight: 700; color: #666; letter-spacing: 0.5px; }
+  /* Delete button still absolutely positioned, but anchor to the cell's
+     right edge inside the stacked layout. */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-line-delete {
+    position: absolute;
+    right: 0;
+    left: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 
   /* Widen the LABEL columns on the totals table so long labels like
      "Ohio Sales Tax (7.25%)" don't get cut. Original 23/7/40/15/15 →
