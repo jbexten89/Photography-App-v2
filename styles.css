@@ -9163,8 +9163,11 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
     grid-area: qty;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 10px;
     justify-content: flex-end;
+    /* Don't clip the qty value with the cell-wide ellipsis rule */
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
   .invoice-lines-mini tbody td:nth-child(2)::before {
     content: "QTY";
@@ -9178,7 +9181,7 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
     grid-area: price;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 10px;
   }
   .invoice-lines-mini tbody td:nth-child(4)::before {
     content: "PRICE";
@@ -9192,7 +9195,7 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 4px;
+    gap: 10px;
     border-left: 1px solid rgba(127,127,127,0.25) !important;
     padding-left: 8px !important;
   }

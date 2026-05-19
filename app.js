@@ -8305,11 +8305,11 @@ function renderInvoicesList() {
              const price = parseMoneyInput(l.price);
              const amt = invoiceLineAmount(l);
              return `<tr>
-               <td>${escapeHtml(l.item || "")}</td>
-               <td style="text-align:right">${l.qty || ""}</td>
-               <td>${escapeHtml(l.description || "")}</td>
-               <td style="text-align:right">${isNaN(price) ? "" : fmtMoney(price)}</td>
-               <td style="text-align:right">${amt ? fmtMoney(amt) : ""}</td>
+               <td><span class="line-val">${escapeHtml(l.item || "")}</span></td>
+               <td style="text-align:right"><span class="line-val">${escapeHtml(String(l.qty ?? ""))}</span></td>
+               <td><span class="line-val">${escapeHtml(l.description || "")}</span></td>
+               <td style="text-align:right"><span class="line-val">${isNaN(price) ? "" : fmtMoney(price)}</span></td>
+               <td style="text-align:right"><span class="line-val">${amt ? fmtMoney(amt) : ""}</span></td>
              </tr>`;
            }).join("")}</tbody>
          </table>`
