@@ -657,6 +657,7 @@ function activateAnalyticsView(viewName) {
   if (viewName === "vs-expense" && typeof renderVsExpense === "function") renderVsExpense();
   if (viewName === "spending-trends" && typeof renderSpendingTrends === "function") renderSpendingTrends();
   if (viewName === "savings-rate" && typeof renderSavingsRate === "function") renderSavingsRate();
+  if (viewName === "savings"      && typeof renderSavings      === "function") renderSavings();
   if (viewName === "year-matrix"  && typeof renderYearMatrix  === "function") renderYearMatrix();
 }
 
@@ -1416,6 +1417,7 @@ function rerenderActiveAnalyticsView() {
   if (activeView === "vs-expense") renderVsExpense();
   if (activeView === "spending-trends") renderSpendingTrends();
   if (activeView === "savings-rate")    renderSavingsRate();
+  if (activeView === "savings")         renderSavings();
   if (activeView === "year-matrix")     renderYearMatrix();
 }
 
@@ -2008,6 +2010,106 @@ function renderSavingsRate() {
       `;
     }
   }
+}
+
+// --------- Savings view ---------
+// Monthly vertical bar chart of savings-category deposits for one year.
+// Year selection follows the universal Date Range filter (most recent
+// selected year, or current calendar year, or most recent year with data).
+function renderSavings() {
+  const chartEl   = document.getElementById("sv-chart");
+  const totalEl   = document.getElementById("sv-total");
+  const eyebrowEl = document.getElementById("sv-eyebrow");
+  if (!chartEl || !totalEl) return;
+
+  // Pick the year — same rules as Cash Flow / Spending Trends.
+  const sel = selectedYears();
+  let svYear;
+  if (sel && sel.length) {
+    svYear = [...sel].sort()[sel.length - 1];
+  } else {
+    const thisYear = String(new Date().getFullYear());
+    const txYears = new Set();
+    state.transactions.forEach(t => {
+      const y = (t.date || "").slice(0, 4);
+      if (/^\d{4}$/.test(y)) txYears.add(y);
+    });
+    svYear = txYears.has(thisYear) ? thisYear : ([...txYears].sort().pop() || thisYear);
+  }
+
+  // Aggregate savings (SAVINGS_CATEGORIES) by month for the chosen year.
+  // Treat both legacy category and the new-spec expense-table mapping as savings.
+  const months = new Array(12).fill(0);
+  state.transactions.forEach(t => {
+    if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
+    if (!filterPasses("customer",   t.customer || "")) return;
+    if (!filterPasses("payees",     t.payee || "")) return;
+    const y = (t.date || "").slice(0, 4);
+    if (y !== svYear) return;
+    const cat = (t.category || "").trim();
+    const ei  = (t.expenseIncome || "").trim();
+    const isSavings = SAVINGS_CATEGORIES.includes(cat) || SAVINGS_CATEGORIES.includes(ei);
+    if (!isSavings) return;
+    // Savings are typically logged as expenses (money moved out to a savings
+    // account). Count expense rows as positive deposits; income rows would be
+    // a withdrawal — subtract.
+    const m = parseInt((t.date || "").slice(5, 7), 10) - 1;
+    if (m < 0 || m > 11) return;
+    const amt = +t.amount || 0;
+    months[m] += t.type === "income" ? -amt : amt;
+  });
+
+  const total = months.reduce((s, v) => s + v, 0);
+  totalEl.textContent = fmtMoney(total);
+  totalEl.style.color = total >= 0 ? "var(--income)" : "var(--expense)";
+  if (eyebrowEl) eyebrowEl.textContent = `Savings — ${svYear}`;
+
+  // SVG vertical bars — 12 months
+  const W = 800, H = 380;
+  const isMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+  const padL = 60, padR = 16, padT = 24, padB = isMobile ? 80 : 36;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const maxV = Math.max(0, ...months);
+  const tickStep = pickAxisStep(Math.max(1, maxV), 5);
+  const yTop = Math.ceil(maxV / tickStep) * tickStep || tickStep;
+  const yFor = v => padT + ((yTop - v) / yTop) * plotH;
+
+  const slot = plotW / 12;
+  const barW = Math.min(slot * 0.6, 56);
+
+  let grid = "", yLabels = "";
+  for (let v = 0; v <= yTop + 0.001; v += tickStep) {
+    const y = yFor(v);
+    grid    += `<line x1="${padL}" y1="${y}" x2="${padL + plotW}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>`;
+    yLabels += `<text class="sv-yaxis" x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="var(--muted)" font-size="11">${fmtCashAxis(v)}</text>`;
+  }
+
+  const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  let bars = "";
+  months.forEach((v, i) => {
+    const cx = padL + slot * (i + 0.5);
+    const x = cx - barW / 2;
+    const h = v > 0 ? plotH * (v / yTop) : 0;
+    const y = yFor(v > 0 ? v : 0);
+    if (v > 0) {
+      bars += `<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(0, h)}" fill="var(--income)" rx="3"><title>${MONTH_NAMES[i]} ${svYear}: ${fmtMoney(v)}</title></rect>`;
+    }
+    const ly = H - padB + 16;
+    bars += isMobile
+      ? `<text class="sv-xaxis" x="${cx}" y="${ly}" text-anchor="start" transform="rotate(45 ${cx} ${ly})" fill="var(--muted)" font-size="10">${MONTH_NAMES[i]}</text>`
+      : `<text class="sv-xaxis" x="${cx}" y="${ly}" text-anchor="middle" fill="var(--muted)" font-size="10">${MONTH_NAMES[i]}</text>`;
+  });
+
+  chartEl.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;max-height:420px">
+      ${grid}
+      ${yLabels}
+      <line x1="${padL}" y1="${yFor(0)}" x2="${padL + plotW}" y2="${yFor(0)}" stroke="var(--border)" stroke-width="1"/>
+      ${bars}
+    </svg>
+  `;
 }
 
 // --------- Year Matrix view ---------
@@ -5772,6 +5874,7 @@ function render() {
   renderJobs();
   renderTrends();
   renderYearMatrix();
+  renderSavings();
   renderInvoicesList();
   renderMileage();
   renderSchedule();

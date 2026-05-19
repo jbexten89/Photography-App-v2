@@ -5142,6 +5142,47 @@ select option {
   padding: 6px 28px 6px 12px;
 }
 
+/* ===== Savings view ===== */
+.sv-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+.sv-head { margin-bottom: 12px; }
+.sv-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.sv-total-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.sv-total {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--income);
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+.sv-sub { font-size: 12px; }
+.sv-chart { width: 100%; min-width: 0; }
+.sv-chart svg { display: block; max-width: 100%; height: auto; }
+
+@media (max-width: 768px) {
+  .sv-card { padding: 12px 14px; }
+  .sv-total { font-size: 22px; }
+  /* Bump chart text on mobile so the SVG-unit fonts read clearly. */
+  #sv-chart .sv-yaxis { font-size: 20px !important; }
+  #sv-chart .sv-xaxis { font-size: 20px !important; }
+}
+
 /* ===== Year Matrix view ===== */
 .ym-card {
   background: var(--surface);

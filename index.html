@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=522" />
+<link rel="stylesheet" href="styles.css?v=523" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -461,6 +461,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             Savings Rate
           </button>
+          <button class="analytics-pill" data-view="savings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 17V11"/><path d="M12 17V7"/><path d="M17 17v-8"/></svg>
+            Savings
+          </button>
         </nav>
         <select id="analytics-view-select" class="analytics-view-select" aria-label="Analytics view" hidden>
           <option value="year-matrix">Year Matrix</option>
@@ -472,6 +476,7 @@
           <option value="vs-expense">vs Expense</option>
           <option value="breakdown">Breakdown</option>
           <option value="savings-rate">Savings Rate</option>
+          <option value="savings">Savings</option>
         </select>
         <!-- Custom mobile view picker (richer styling than native <select>) -->
         <div class="amvp" id="amvp">
@@ -518,6 +523,10 @@
             <button type="button" class="amvp-item" data-view="savings-rate" role="option">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               <span>Savings Rate</span>
+            </button>
+            <button type="button" class="amvp-item" data-view="savings" role="option">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 17V11"/><path d="M12 17V7"/><path d="M17 17v-8"/></svg>
+              <span>Savings</span>
             </button>
           </div>
         </div>
@@ -874,6 +883,19 @@
               <div class="sr-list-title">SAVINGS BY CATEGORY</div>
               <ul id="sr-cat-list" class="sr-list"></ul>
             </aside>
+          </div>
+        </div>
+
+        <div class="analytics-view" data-view="savings">
+          <div class="sv-card">
+            <div class="sv-head">
+              <div class="sv-eyebrow" id="sv-eyebrow">Savings — Year</div>
+              <div class="sv-total-row">
+                <div class="sv-total" id="sv-total">$0.00</div>
+                <div class="sv-sub muted" id="sv-sub">Monthly deposits into Wealthfront / CiT Bank</div>
+              </div>
+            </div>
+            <div class="sv-chart" id="sv-chart"></div>
           </div>
         </div>
 
@@ -2953,6 +2975,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=284"></script>
+  <script src="app.js?v=285"></script>
 </body>
 </html>
