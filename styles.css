@@ -7263,6 +7263,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     justify-content: flex-end;
     gap: 4px;
     padding-right: 22px; /* leave room for the × delete button */
+    /* Thin vertical divider between Price and Amount. */
+    border-left: 1px solid #bbb !important;
+    padding-left: 8px;
   }
   /* Mini-labels for cells that lost their column header. */
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-qty::before    { content: "QTY";    font-size: 10px; font-weight: 700; color: #666; letter-spacing: 0.5px; }
