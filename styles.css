@@ -6043,6 +6043,14 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  /* Tighter cell padding so the columns visually bunch closer together.
+     Defaults are 10px 14px; mobile drops horizontal to 4px. */
+  #job-summary-table th, #job-summary-table td,
+  #expense-summary-table th, #expense-summary-table td,
+  #account-summary-table th, #account-summary-table td {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
   /* Year Matrix mobile: grand-total matches the other chart cards (22px) and
      the switch is tightened so the two share one row without wrapping. */
   .ym-total { font-size: 22px; }
