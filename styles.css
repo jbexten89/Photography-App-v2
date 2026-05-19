@@ -7533,10 +7533,17 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      fits any viewport without horizontal scroll.) */
 
   /* Match the Back button width to the Print/PDF button on the invoice
-     editor toolbar so the two have the same visual weight on mobile. */
+     editor toolbar so the two have the same visual weight on mobile.
+     Save + Delete also share a width pair so the two secondary actions
+     match each other. */
   #invoices-edit-view .toolbar #btn-invoice-back,
   #invoices-edit-view .toolbar #btn-invoice-print {
     min-width: 110px;
+    text-align: center;
+  }
+  #invoices-edit-view .toolbar #btn-invoice-save,
+  #invoices-edit-view .toolbar #btn-invoice-delete {
+    min-width: 90px;
     text-align: center;
   }
 
