@@ -7496,16 +7496,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .tx-row.nonjob td:nth-child(2) { background: rgba(128, 128, 128, 0.08) !important; }
   .tx-row.nonjob:hover td:nth-child(2) { background: rgba(128, 128, 128, 0.15) !important; }
 
-  /* Report invoice sheets — let their items table scroll internally on
-     narrow widths. (The editor sheet sits in its own scroll wrap, so this
-     would conflict; skip the editor variant.) */
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items {
-    min-width: 580px; /* enough for all 5 columns to stay readable */
-  }
-  .invoice-sheet:not(.invoice-sheet--editor) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+  /* (Old rule that forced .invoice-items to 580px min-width was removed —
+     the items table now uses a 2-line stacked-grid layout per row that
+     fits any viewport without horizontal scroll.) */
 
   /* Match the Back button width to the Print/PDF button on the invoice
      editor toolbar so the two have the same visual weight on mobile. */
