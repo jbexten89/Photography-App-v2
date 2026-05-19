@@ -8800,37 +8800,44 @@ function renderInvoiceTotals() {
   const total = subtotal + tax;
   const mode = inv.taxMode || "tax";
 
+  // On mobile, the value column (Amount, 15%) is too narrow for "$2,790.00"
+  // once fonts get bumped up. Shift the label cell one column left (so it
+  // sits in the Description column, 40%) and give the value cell 2 columns
+  // (Price + Amount = 30%) for breathing room.
+  const isMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+  const noBorderSpan = isMobile ? 2 : 2;
+  const labelSpan    = isMobile ? 1 : 2;
+  const valueSpan    = isMobile ? 2 : 1;
+  const totalLabelLeftSpan  = isMobile ? 2 : 3;
+  const totalLabelOwnSpan   = isMobile ? 1 : 1;
+  const totalValueSpan      = isMobile ? 2 : 1;
+
   if (mode === "tax") {
     const label = (inv.taxLabel || "Tax").trim() || "Tax";
     const rate = parseFloat(inv.taxRate) || 0;
-    // Label cell spans 2 columns (Description + Price = 55%) so long labels
-    // like "Ohio Sales Tax (7.25%)" don't spill into the Amount column.
-    // On mobile the Total row's label tucks into the Price column only so
-    // the "Total"+value pair sits flush at the right under the Amount header.
-    const totalLabelMobile = "ym-total-label-mobile"; // hook for mobile CSS
     tbody.innerHTML = `
       <tr>
-        <td class="no-border" colspan="2"></td>
-        <td class="subtotal-label-cell" colspan="2">Subtotal</td>
-        <td class="subtotal-value-cell">${fmtMoney(subtotal)}</td>
+        <td class="no-border" colspan="${noBorderSpan}"></td>
+        <td class="subtotal-label-cell" colspan="${labelSpan}">Subtotal</td>
+        <td class="subtotal-value-cell" colspan="${valueSpan}">${fmtMoney(subtotal)}</td>
       </tr>
       <tr>
-        <td class="no-border" colspan="2"></td>
-        <td class="tax-label-cell" colspan="2">${escapeHtml(label)} (${rate.toFixed(2)}%)</td>
-        <td class="tax-value-cell">${fmtMoney(tax)}</td>
+        <td class="no-border" colspan="${noBorderSpan}"></td>
+        <td class="tax-label-cell" colspan="${labelSpan}">${escapeHtml(label)} (${rate.toFixed(2)}%)</td>
+        <td class="tax-value-cell" colspan="${valueSpan}">${fmtMoney(tax)}</td>
       </tr>
       <tr class="invoice-total-row">
-        <td class="no-border" colspan="3"></td>
-        <td class="total-label-cell">Total</td>
-        <td class="total-value-cell" id="invoice-total">${fmtMoney(total)}</td>
+        <td class="no-border" colspan="${totalLabelLeftSpan}"></td>
+        <td class="total-label-cell" colspan="${totalLabelOwnSpan}">Total</td>
+        <td class="total-value-cell" colspan="${totalValueSpan}" id="invoice-total">${fmtMoney(total)}</td>
       </tr>
     `;
   } else {
     tbody.innerHTML = `
       <tr class="invoice-total-row">
-        <td class="no-border" colspan="3"></td>
-        <td class="total-label-cell">Total</td>
-        <td class="total-value-cell" id="invoice-total">${fmtMoney(total)}</td>
+        <td class="no-border" colspan="${totalLabelLeftSpan}"></td>
+        <td class="total-label-cell" colspan="${totalLabelOwnSpan}">Total</td>
+        <td class="total-value-cell" colspan="${totalValueSpan}" id="invoice-total">${fmtMoney(total)}</td>
       </tr>
     `;
   }
