@@ -7197,22 +7197,32 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
        Line 1: Item · Qty · Description
        Line 2: Price (spans first two cols) · Amount
      Plus a small "QTY" / "PRICE" / "AMOUNT" mini-label inside each input
-     cell so the missing column header is recoverable at a glance. */
+     cell so the missing column header is recoverable at a glance.
+     Flip the entire table out of table-layout so display:grid on the row
+     actually applies (browsers ignore display:grid on table-rows when the
+     parent is still display:table). */
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items {
+    display: block;
+    width: 100%;
     border: none;
-    min-width: 0; /* let the items table fit phone width since rows are now stacked */
+    min-width: 0;
     font-size: 13px;
+    table-layout: auto;
   }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items colgroup { display: none; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items thead { display: none; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody { display: block; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody tr {
     display: grid;
-    grid-template-columns: 1.4fr 0.6fr 1.6fr;
+    /* minmax keeps the Item dropdown from collapsing when its placeholder
+       text is short; without it, the grid algorithm gives Item just its
+       min-content (the dropdown arrow) and the rest goes to Description. */
+    grid-template-columns: minmax(0, 1.4fr) minmax(56px, 0.6fr) minmax(0, 1.6fr);
     grid-template-areas:
       "item qty desc"
       "price price amount";
     gap: 6px 8px;
-    padding: 8px 6px;
+    padding: 8px 4px;
     border: 1px solid #333;
     border-bottom: none;
     background: #fff;
@@ -7278,7 +7288,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table td { padding: 4px 8px; }
 
   /* Tighter invoice sheet (report sheets only). */
-  .invoice-sheet:not(.invoice-sheet--editor) { padding: 16px 10px; }
+  .invoice-sheet:not(.invoice-sheet--editor) { padding: 16px 4px; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-logo { width: 70px; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-title { font-size: 18px; }
 
