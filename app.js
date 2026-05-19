@@ -11732,6 +11732,16 @@ function renderTransactions() {
     });
   });
 
+  // Build set of jobNos that have at least one invoice — used to show a
+  // small invoice icon next to the JobNo on income rows that fall under a
+  // billed job (the matching logic mirrors renderInvoiceLinkedTransactions).
+  const invoicedJobNos = new Set();
+  (state.invoices || []).forEach(inv => {
+    const jn = (inv.jobNo || "").trim()
+      || (inv.number || "").trim().replace(/-\d+$/, "");
+    if (jn) invoicedJobNos.add(jn);
+  });
+
   // Per-job color map for the optional "Color rows by Job No." setting.
   // Sorted unique jobNos so the color ↔ jobNo mapping is stable across renders.
   const txJobColorMap = new Map();
@@ -11772,7 +11782,11 @@ function renderTransactions() {
       ${checkboxCell}
       <td data-col="date">${fmtDate(t.date)}</td>
       <td data-col="vendor">${t.vendor ? escapeHtml(t.vendor) : "&nbsp;"}</td>
-      <td data-col="jobno">${escapeHtml(t.jobNo || "")}</td>
+      <td data-col="jobno">${escapeHtml(t.jobNo || "")}${
+        t.jobNo && t.type === "income" && invoicedJobNos.has(t.jobNo)
+          ? ` <span class="tx-invoice-icon" title="Linked to invoice for ${escapeHtml(t.jobNo)}" aria-label="Invoiced"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span>`
+          : ""
+      }</td>
       <td data-col="customer">${escapeHtml(t.customer || txCustomerMap.get(t.id) || "")}</td>
       <td data-col="payee">${escapeHtml(t.payee)}</td>
       <td data-col="category">${escapeHtml(t.category)}</td>

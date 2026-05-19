@@ -5825,6 +5825,18 @@ th.tag-col, td.tag-cell { width: 32px; text-align: center; }
 .tag-icon svg { width: 16px; height: 16px; display: block; }
 .tag-icon.has-tags { color: var(--primary); opacity: 1; }
 
+/* Small invoice icon shown next to a transaction's JobNo when that job has
+   at least one invoice on file. */
+.tx-invoice-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.tx-invoice-icon svg { width: 14px; height: 14px; display: block; }
+
 #tx-form .outflow-label { color: var(--expense); }
 #tx-form .inflow-label { color: var(--income); }
 #tx-form .outflow-label input { border-color: var(--expense); }
@@ -6042,14 +6054,6 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-  /* Tighter cell padding so the columns visually bunch closer together.
-     Defaults are 10px 14px; mobile drops horizontal to 4px. */
-  #job-summary-table th, #job-summary-table td,
-  #expense-summary-table th, #expense-summary-table td,
-  #account-summary-table th, #account-summary-table td {
-    padding-left: 4px;
-    padding-right: 4px;
   }
   /* Year Matrix mobile: grand-total matches the other chart cards (22px) and
      the switch is tightened so the two share one row without wrapping. */
