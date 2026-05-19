@@ -9132,6 +9132,79 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 }
 .invoice-lines-mini tbody tr:last-child td { border-bottom: 0; }
 
+@media (max-width: 768px) {
+  /* Mobile: render each line as a 2-line stacked card so all five fields
+     are visible and Price + Amount sit on the same row. */
+  .invoice-lines-mini { display: block; width: 100%; font-size: 12px; }
+  .invoice-lines-mini thead { display: none; }
+  .invoice-lines-mini tbody { display: block; }
+  .invoice-lines-mini tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(70px, 0.9fr) minmax(0, 1.4fr);
+    grid-template-areas:
+      "item qty desc"
+      "price price amount";
+    gap: 4px 8px;
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(127,127,127,0.15);
+  }
+  .invoice-lines-mini tbody tr:last-child { border-bottom: 0; }
+  .invoice-lines-mini tbody td {
+    padding: 0 !important;
+    border: none !important;
+    text-align: left !important;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .invoice-lines-mini tbody td:nth-child(1) { grid-area: item; }
+  .invoice-lines-mini tbody td:nth-child(2) {
+    grid-area: qty;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+  .invoice-lines-mini tbody td:nth-child(2)::before {
+    content: "QTY";
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.4px;
+  }
+  .invoice-lines-mini tbody td:nth-child(3) { grid-area: desc; }
+  .invoice-lines-mini tbody td:nth-child(4) {
+    grid-area: price;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .invoice-lines-mini tbody td:nth-child(4)::before {
+    content: "PRICE";
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.4px;
+  }
+  .invoice-lines-mini tbody td:nth-child(5) {
+    grid-area: amount;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    border-left: 1px solid rgba(127,127,127,0.25) !important;
+    padding-left: 8px !important;
+  }
+  .invoice-lines-mini tbody td:nth-child(5)::before {
+    content: "AMOUNT";
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.4px;
+  }
+}
+
 /* Flow view — visible Job picker next to View By toggle.
    We always reserve its layout space so the View By and Gross/Net pills don't
    shift when toggling between All Jobs / One Job. The HTML `hidden` attribute
