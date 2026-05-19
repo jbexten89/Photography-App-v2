@@ -8304,9 +8304,14 @@ function renderInvoicesList() {
              const qty = parseFloat(l.qty) || 0;
              const price = parseMoneyInput(l.price);
              const amt = invoiceLineAmount(l);
+             // Default qty display to "1" if missing so the drill-down always
+             // shows something (qty=1 is the implicit value when blank).
+             const qtyDisplay = (l.qty !== undefined && l.qty !== null && String(l.qty).trim() !== "")
+               ? String(l.qty)
+               : "1";
              return `<tr>
                <td><span class="line-val">${escapeHtml(l.item || "")}</span></td>
-               <td style="text-align:right"><span class="line-val">${escapeHtml(String(l.qty ?? ""))}</span></td>
+               <td style="text-align:right"><span class="line-val">${escapeHtml(qtyDisplay)}</span></td>
                <td><span class="line-val">${escapeHtml(l.description || "")}</span></td>
                <td style="text-align:right"><span class="line-val">${isNaN(price) ? "" : fmtMoney(price)}</span></td>
                <td style="text-align:right"><span class="line-val">${amt ? fmtMoney(amt) : ""}</span></td>

@@ -9175,6 +9175,23 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
     font-weight: 700;
     color: var(--muted);
     letter-spacing: 0.4px;
+    flex: 0 0 auto;
+  }
+  /* Force the wrapped span value to display as an inline element with
+     guaranteed visibility — guarded against the cell-wide
+     overflow:hidden/ellipsis from text rules elsewhere. */
+  .invoice-lines-mini tbody td .line-val {
+    display: inline-block;
+    flex: 0 0 auto;
+    color: var(--text);
+    font-weight: 600;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  .invoice-lines-mini tbody td:nth-child(2) .line-val::before {
+    /* Fallback "—" so the user knows the cell is for qty even if l.qty
+       happens to be empty/undefined on legacy invoices. */
+    content: "";
   }
   .invoice-lines-mini tbody td:nth-child(3) { grid-area: desc; }
   .invoice-lines-mini tbody td:nth-child(4) {
