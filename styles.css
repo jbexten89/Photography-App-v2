@@ -7206,14 +7206,15 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-price input,
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-amount input { padding-right: 8px; }
 
-  /* Widen the Subtotal / Sales Tax / Total value boxes by re-weighting the
-     totals table's colgroup on mobile. Original 23/7/40/15/15 → 14/6/28/26/26
-     so Price + Amount (the value side) jumps from 30% to 52% of the table. */
-  .invoice-total-table colgroup col:nth-child(1) { width: 14% !important; }
+  /* Widen the LABEL columns on the totals table so long labels like
+     "Ohio Sales Tax (7.25%)" don't get cut. Original 23/7/40/15/15 →
+     10/6/44/20/20: label area (Description col 3) grows from 40% to 44%,
+     and the value side (Price + Amount, cols 4+5) trims slightly. */
+  .invoice-total-table colgroup col:nth-child(1) { width: 10% !important; }
   .invoice-total-table colgroup col:nth-child(2) { width:  6% !important; }
-  .invoice-total-table colgroup col:nth-child(3) { width: 28% !important; }
-  .invoice-total-table colgroup col:nth-child(4) { width: 26% !important; }
-  .invoice-total-table colgroup col:nth-child(5) { width: 26% !important; }
+  .invoice-total-table colgroup col:nth-child(3) { width: 44% !important; }
+  .invoice-total-table colgroup col:nth-child(4) { width: 20% !important; }
+  .invoice-total-table colgroup col:nth-child(5) { width: 20% !important; }
 
   /* Tax controls + Add Line on the same row on mobile: let the row wrap
      if needed and keep the button visually grouped on the left. */
@@ -7432,6 +7433,14 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .invoice-sheet:not(.invoice-sheet--editor) {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* Match the Back button width to the Print/PDF button on the invoice
+     editor toolbar so the two have the same visual weight on mobile. */
+  #invoices-edit-view .toolbar #btn-invoice-back,
+  #invoices-edit-view .toolbar #btn-invoice-print {
+    min-width: 110px;
+    text-align: center;
   }
 
   /* Invoice toolbar — wrap buttons onto a second line */
