@@ -8442,11 +8442,31 @@ function openInvoiceEditor(inv) {
   if (_rateSel) _rateSel.value = _normRate;
   document.querySelector(".invoice-tax-controls").classList.toggle("nontax", mode !== "tax");
 
+  // On mobile, tuck the "+ Add Line" button into the tax-controls row so it
+  // sits inline with Tax / Non-Tax / Tax Label / Rate. On desktop, leave it
+  // in its own .invoice-add-row block.
+  syncInvoiceAddLinePlacement();
+
   renderInvoiceItems();
   renderInvoiceTotals();
   renderInvoiceLinkedTransactions();
   updatePaidUI();
 }
+
+function syncInvoiceAddLinePlacement() {
+  const btn = document.getElementById("btn-add-line");
+  if (!btn) return;
+  const taxControls = document.querySelector(".invoice-tax-controls");
+  const addRow = document.querySelector(".invoice-add-row");
+  if (!taxControls || !addRow) return;
+  const isMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+  if (isMobile) {
+    if (btn.parentNode !== taxControls) taxControls.insertBefore(btn, taxControls.firstChild);
+  } else {
+    if (btn.parentNode !== addRow) addRow.appendChild(btn);
+  }
+}
+window.addEventListener("resize", () => { if (typeof syncInvoiceAddLinePlacement === "function") syncInvoiceAddLinePlacement(); });
 
 // --- Linked transactions on the invoice editor ---
 // Derived from state.transactions where t.jobNo === invoice.number (i.e., the

@@ -7199,6 +7199,33 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      below them. */
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items th,
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td { padding: 4px 4px; font-size: 13px; }
+  /* Shift the Price/Amount value text a touch left so it doesn't hug the
+     right border of its cell. */
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-price,
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-amount,
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-price input,
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td.col-amount input { padding-right: 8px; }
+
+  /* Widen the Subtotal / Sales Tax / Total value boxes by re-weighting the
+     totals table's colgroup on mobile. Original 23/7/40/15/15 → 14/6/28/26/26
+     so Price + Amount (the value side) jumps from 30% to 52% of the table. */
+  .invoice-total-table colgroup col:nth-child(1) { width: 14% !important; }
+  .invoice-total-table colgroup col:nth-child(2) { width:  6% !important; }
+  .invoice-total-table colgroup col:nth-child(3) { width: 28% !important; }
+  .invoice-total-table colgroup col:nth-child(4) { width: 26% !important; }
+  .invoice-total-table colgroup col:nth-child(5) { width: 26% !important; }
+
+  /* Tax controls + Add Line on the same row on mobile: let the row wrap
+     if needed and keep the button visually grouped on the left. */
+  .invoice-tax-controls {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .invoice-tax-controls #btn-add-line { margin-right: auto; }
+  /* Hide the now-empty .invoice-add-row container on mobile so the button's
+     former row doesn't leave a gap. */
+  .invoice-add-row:empty { display: none; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table th,
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table td { padding: 4px 8px; }
 
