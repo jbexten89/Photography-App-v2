@@ -7233,7 +7233,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     /* minmax keeps the Item dropdown from collapsing when its placeholder
        text is short. min:0 on Item and Desc means selects inside them get
        clipped (ellipsis) rather than forcing the row to overflow. */
-    grid-template-columns: minmax(0, 1.2fr) minmax(90px, 0.9fr) minmax(0, 1.5fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(110px, 1fr) minmax(0, 1.4fr);
     grid-template-areas:
       "item qty desc"
       "price price amount";
@@ -7264,7 +7264,15 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     background: transparent;
   }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-item  { grid-area: item; }
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-qty   { grid-area: qty; display: flex; align-items: center; gap: 4px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-qty   { grid-area: qty; display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-qty input {
+    /* Override the universal "width:100%" rule so the input shares the
+       cell's row with the QTY label instead of pushing it off. */
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0;
+    text-align: center;
+  }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-desc  { grid-area: desc; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-price { grid-area: price; display: flex; align-items: center; gap: 4px; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items tbody td.col-amount {
