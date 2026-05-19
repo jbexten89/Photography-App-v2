@@ -7193,10 +7193,12 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     margin-top: 0;
   }
 
-  /* Invoice line items — shrink padding so the columns still fit (report
-     sheets only; editor uses desktop padding inside its scroll wrap). */
+  /* Invoice line items — shrink padding so the columns still fit. Font size
+     matches the totals table (13px) so Item / Qty / Description / Price /
+     Amount cells line up visually with the Subtotal / Tax / Total rows
+     below them. */
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-items th,
-  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td { padding: 4px 4px; font-size: 11px; }
+  .invoice-sheet:not(.invoice-sheet--editor) .invoice-items td { padding: 4px 4px; font-size: 13px; }
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table th,
   .invoice-sheet:not(.invoice-sheet--editor) .invoice-meta-table td { padding: 4px 8px; }
 
