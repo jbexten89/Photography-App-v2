@@ -8805,6 +8805,9 @@ function renderInvoiceTotals() {
     const rate = parseFloat(inv.taxRate) || 0;
     // Label cell spans 2 columns (Description + Price = 55%) so long labels
     // like "Ohio Sales Tax (7.25%)" don't spill into the Amount column.
+    // On mobile the Total row's label tucks into the Price column only so
+    // the "Total"+value pair sits flush at the right under the Amount header.
+    const totalLabelMobile = "ym-total-label-mobile"; // hook for mobile CSS
     tbody.innerHTML = `
       <tr>
         <td class="no-border" colspan="2"></td>
@@ -8816,17 +8819,17 @@ function renderInvoiceTotals() {
         <td class="tax-label-cell" colspan="2">${escapeHtml(label)} (${rate.toFixed(2)}%)</td>
         <td class="tax-value-cell">${fmtMoney(tax)}</td>
       </tr>
-      <tr>
-        <td class="no-border" colspan="2"></td>
-        <td class="total-label-cell" colspan="2">Total</td>
+      <tr class="invoice-total-row">
+        <td class="no-border" colspan="3"></td>
+        <td class="total-label-cell">Total</td>
         <td class="total-value-cell" id="invoice-total">${fmtMoney(total)}</td>
       </tr>
     `;
   } else {
     tbody.innerHTML = `
-      <tr>
-        <td class="no-border" colspan="2"></td>
-        <td class="total-label-cell" colspan="2">Total</td>
+      <tr class="invoice-total-row">
+        <td class="no-border" colspan="3"></td>
+        <td class="total-label-cell">Total</td>
         <td class="total-value-cell" id="invoice-total">${fmtMoney(total)}</td>
       </tr>
     `;
