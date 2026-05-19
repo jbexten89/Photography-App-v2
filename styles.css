@@ -7249,7 +7249,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     /* minmax keeps the Item dropdown from collapsing when its placeholder
        text is short. min:0 on Item and Desc means selects inside them get
        clipped (ellipsis) rather than forcing the row to overflow. */
-    grid-template-columns: minmax(0, 1.4fr) minmax(56px, 0.6fr) minmax(0, 1.6fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(90px, 0.9fr) minmax(0, 1.5fr);
     grid-template-areas:
       "item qty desc"
       "price price amount";
