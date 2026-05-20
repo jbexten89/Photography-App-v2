@@ -1951,9 +1951,20 @@ function renderSavingsRate() {
     const cx = padL + slot * (i + 0.5);
     const x  = cx - barW / 2;
     const r  = monthlyRate[i];
-    const top = yFor(r);
-    const h   = Math.max(0, yFor(0) - top);
-    bars += `<rect x="${x}" y="${top}" width="${barW}" height="${h}" fill="var(--income)" rx="3"><title>${escapeHtml(months[i].label)}: ${r.toFixed(1)}% (saved ${fmtMoney(sav[i])})</title></rect>`;
+    const profitBase = inc[i] - jobExp[i] - cogs[i];
+    // Months with savings but no profit base render as a faint capped bar at
+    // the top of the chart — visually says "money was saved here even though
+    // the percent metric is undefined" instead of dropping the month entirely.
+    const ghost = sav[i] > 0 && profitBase <= 0;
+    if (ghost) {
+      const ghostTop = yFor(yTop); // full-height bar capped at yTop
+      const ghostH   = Math.max(0, yFor(0) - ghostTop);
+      bars += `<rect x="${x}" y="${ghostTop}" width="${barW}" height="${ghostH}" fill="var(--income)" opacity="0.18" stroke="var(--income)" stroke-dasharray="4 3" stroke-opacity="0.55" rx="3"><title>${escapeHtml(months[i].label)}: saved ${fmtMoney(sav[i])} (no profit base to compute a rate)</title></rect>`;
+    } else {
+      const top = yFor(r);
+      const h   = Math.max(0, yFor(0) - top);
+      bars += `<rect x="${x}" y="${top}" width="${barW}" height="${h}" fill="var(--income)" rx="3"><title>${escapeHtml(months[i].label)}: ${r.toFixed(1)}% (saved ${fmtMoney(sav[i])})</title></rect>`;
+    }
     const label = months[i].label;
     const ly = H - padB + 16;
     bars += srIsMobile
