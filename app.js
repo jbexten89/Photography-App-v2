@@ -1877,6 +1877,10 @@ function renderSavingsRate() {
   const denom = totalInc - totalJobExp - totalCogs;
   const rate = denom > 0 ? (totalSav / denom) * 100 : 0;
 
+  // Mirror the Savings view header: include the picked year alongside the
+  // eyebrow label so the user sees "Savings Rate — 2025" at a glance.
+  const srEyebrow = document.getElementById("sr-eyebrow");
+  if (srEyebrow) srEyebrow.textContent = `Savings Rate — ${srYear}`;
   document.getElementById("sr-rate").textContent          = rate.toFixed(1) + "%";
   document.getElementById("sr-stat-income").textContent   = fmtMoney(totalInc);
   // "Total Expenses" tile shows job + cost-of-goods (the deductions that go
