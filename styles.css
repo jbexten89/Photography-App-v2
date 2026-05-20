@@ -5143,11 +5143,18 @@ select option {
 }
 
 /* ===== Savings view ===== */
+.sv-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
 .sv-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 16px 20px;
+  min-width: 0;
 }
 .sv-head { margin-bottom: 12px; }
 .sv-eyebrow {
@@ -5171,10 +5178,79 @@ select option {
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
 }
-.sv-sub { font-size: 12px; }
+.sv-sub { font-size: 12px; margin-top: 2px; }
+/* Year-over-year delta chip */
+.sv-yoy {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.sv-yoy.yoy-up   { color: #6ee7b7; background: rgba(16, 185, 129, 0.14); }
+.sv-yoy.yoy-down { color: #fca5a5; background: rgba(239, 68, 68, 0.14); }
+/* Savings goal progress bar */
+.sv-goal { margin-top: 10px; }
+.sv-goal-bar {
+  position: relative;
+  height: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.sv-goal-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--income), var(--primary));
+  width: 0%;
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+.sv-goal-fill.met { background: var(--income); }
+.sv-goal-text { margin-top: 4px; font-size: 11px; color: var(--muted); }
 .sv-chart { width: 100%; min-width: 0; }
 .sv-chart svg { display: block; max-width: 100%; height: auto; }
 
+/* Sidebar stats */
+.sv-aside {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sv-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.sv-stat {
+  background: var(--surface-alt, rgba(0,0,0,0.06));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.sv-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.sv-stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.sv-stat-value.income { color: var(--income); }
+
+@media (max-width: 900px) {
+  .sv-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 768px) {
   .sv-card { padding: 12px 14px; }
   .sv-total { font-size: 22px; }

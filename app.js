@@ -2069,6 +2069,67 @@ function renderSavings() {
   totalEl.style.color = total >= 0 ? "var(--income)" : "var(--expense)";
   if (eyebrowEl) eyebrowEl.textContent = `Savings — ${svYear}`;
 
+  // ---- Year-over-year delta chip ----
+  let prevYearTotal = 0;
+  const prevYear = String(Number(svYear) - 1);
+  state.transactions.forEach(t => {
+    const y = (t.date || "").slice(0, 4);
+    if (y !== prevYear) return;
+    const cat = (t.category || "").trim();
+    const ei  = (t.expenseIncome || "").trim();
+    if (!(SAVINGS_CATEGORIES.includes(cat) || SAVINGS_CATEGORIES.includes(ei))) return;
+    const amt = +t.amount || 0;
+    prevYearTotal += t.type === "income" ? -amt : amt;
+  });
+  const yoyEl = document.getElementById("sv-yoy");
+  if (yoyEl) {
+    if (prevYearTotal > 0) {
+      const pct = ((total - prevYearTotal) / Math.abs(prevYearTotal)) * 100;
+      const up = pct >= 0;
+      yoyEl.hidden = false;
+      yoyEl.className = "sv-yoy " + (up ? "yoy-up" : "yoy-down");
+      yoyEl.textContent = `${up ? "▲" : "▼"} ${up ? "+" : ""}${pct.toFixed(1)}% vs ${prevYear}`;
+    } else {
+      yoyEl.hidden = true;
+    }
+  }
+
+  // ---- Savings goal progress bar ----
+  const goalEl     = document.getElementById("sv-goal");
+  const goalFillEl = document.getElementById("sv-goal-fill");
+  const goalTextEl = document.getElementById("sv-goal-text");
+  const goal       = +state.savingsGoal || 0;
+  if (goalEl && goalFillEl && goalTextEl) {
+    if (goal > 0) {
+      const pct = Math.max(0, Math.min(1, total / goal));
+      goalEl.hidden = false;
+      goalFillEl.style.width = (pct * 100).toFixed(1) + "%";
+      goalFillEl.classList.toggle("met", total >= goal);
+      const remaining = goal - total;
+      goalTextEl.textContent = total >= goal
+        ? `Goal met · ${fmtMoney(total - goal)} over`
+        : `${fmtMoney(total)} of ${fmtMoney(goal)} · ${fmtMoney(remaining)} to go`;
+    } else {
+      goalEl.hidden = true;
+    }
+  }
+
+  // ---- Stats sidebar ----
+  const activeMonths = months.filter(v => v > 0).length;
+  const avgPerMonth = activeMonths ? total / activeMonths : 0;
+  const bestIdx = months.indexOf(Math.max(0, ...months));
+  const MONTH_NAMES_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const bestVal = months[bestIdx] || 0;
+  const largestSingle = savingsTxs.reduce((m, t) => {
+    const signed = (t.type === "income" ? -1 : 1) * (+t.amount || 0);
+    return signed > m ? signed : m;
+  }, 0);
+  const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setText("sv-stat-avg",     fmtMoney(avgPerMonth));
+  setText("sv-stat-best",    bestVal > 0 ? `${MONTH_NAMES_SHORT[bestIdx]} · ${fmtMoney(bestVal)}` : "—");
+  setText("sv-stat-active",  String(activeMonths));
+  setText("sv-stat-largest", fmtMoney(largestSingle));
+
   // SVG vertical bars — 12 months
   const W = 800, H = 380;
   const isMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
@@ -2107,12 +2168,32 @@ function renderSavings() {
       : `<text class="sv-xaxis" x="${cx}" y="${ly}" text-anchor="middle" fill="var(--muted)" font-size="10">${MONTH_NAMES[i]}</text>`;
   });
 
+  // ---- Cumulative line overlay ----
+  // Running sum at the END of each month. Plot at the month's center X with a
+  // separate Y-scale so the line uses the full plot height even when individual
+  // bars are small. Hidden if total is 0.
+  let cumLine = "", cumDots = "";
+  if (total > 0) {
+    let cumMax = 0, running = 0;
+    const cumByMonth = months.map(v => { running += v; if (running > cumMax) cumMax = running; return running; });
+    const cumYFor = v => padT + ((cumMax - v) / cumMax) * plotH;
+    const points = cumByMonth.map((v, i) => `${padL + slot * (i + 0.5)},${cumYFor(v)}`).join(" ");
+    cumLine = `<polyline points="${points}" fill="none" stroke="var(--accent, #ffd150)" stroke-width="2" opacity="0.85"/>`;
+    cumDots = cumByMonth.map((v, i) => {
+      const cx = padL + slot * (i + 0.5);
+      const cy = cumYFor(v);
+      return `<circle cx="${cx}" cy="${cy}" r="2.5" fill="var(--accent, #ffd150)" stroke="var(--surface)" stroke-width="1"><title>${MONTH_NAMES[i]} cum: ${fmtMoney(v)}</title></circle>`;
+    }).join("");
+  }
+
   chartEl.innerHTML = `
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;max-height:420px">
       ${grid}
       ${yLabels}
       <line x1="${padL}" y1="${yFor(0)}" x2="${padL + plotW}" y2="${yFor(0)}" stroke="var(--border)" stroke-width="1"/>
       ${bars}
+      ${cumLine}
+      ${cumDots}
     </svg>
   `;
 
