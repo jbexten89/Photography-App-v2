@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Photography Bookkeeping App v2 — Infrastructure Manual</title>
+<style>
+  :root {
+    --primary: #2c6ecb;
+    --accent:  #3b9eff;
+    --muted:   #6b7280;
+    --border:  #d7dce5;
+    --bg-soft: #f3f6fb;
+    --text:    #1f2937;
+    --gh:      #24292f;
+    --vercel:  #000000;
+    --supabase:#3ecf8e;
+    --browser: #f59e0b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: #fff;
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+  body { max-width: 7.2in; margin: 0 auto; padding: 0.75in 0.7in 0.5in; }
+
+  .print-banner {
+    position: sticky; top: 0; z-index: 100;
+    background: #fff7cc; border: 1px solid #e6c84a;
+    padding: 10px 16px; border-radius: 6px;
+    margin-bottom: 24px; font-size: 10pt;
+  }
+  .print-banner strong { color: #7a5a00; }
+  @media print { .print-banner { display: none !important; } body { padding: 0; max-width: none; } }
+
+  h1 { color: var(--primary); font-size: 26pt; line-height: 1.1; margin: 0 0 0.2em; }
+  h2 { color: var(--primary); font-size: 17pt; margin: 1.2em 0 0.4em; page-break-after: avoid;
+       border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  h3 { color: var(--text); font-size: 12.5pt; margin: 1em 0 0.3em; page-break-after: avoid; }
+  h4 { color: var(--accent); font-size: 10.5pt; margin: 0.9em 0 0.2em; text-transform: uppercase; letter-spacing: 0.5px; }
+  p  { margin: 0.3em 0 0.6em; }
+  ul, ol { margin: 0.3em 0 0.8em; padding-left: 1.3em; }
+  li { margin-bottom: 3px; }
+  code {
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+    font-size: 0.92em; background: var(--bg-soft);
+    padding: 1px 5px; border-radius: 3px;
+  }
+  pre {
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+    font-size: 9.5pt; background: var(--bg-soft);
+    padding: 8px 12px; border-radius: 4px;
+    overflow-x: auto; margin: 6px 0 10px;
+    border-left: 3px solid var(--accent);
+  }
+  .muted { color: var(--muted); }
+  .tip {
+    background: var(--bg-soft);
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px; margin: 10px 0 14px;
+    font-size: 10.5pt; border-radius: 0 4px 4px 0;
+  }
+  .tip strong { color: var(--primary); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 10pt; }
+  th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--bg-soft); font-weight: 600; color: var(--primary); }
+
+  /* Diagram frames */
+  .diagram {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    margin: 14px 0 18px;
+    background: #fbfcfe;
+    page-break-inside: avoid;
+  }
+  .diagram-title {
+    font-size: 10pt; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.7px;
+    margin-bottom: 6px; text-align: center;
+  }
+  .diagram svg { display: block; width: 100%; height: auto; }
+
+  /* Title page */
+  .title-page { text-align: center; padding-top: 1.8in; page-break-after: always; height: 10in; }
+  .title-page .title-main { font-size: 28pt; color: var(--primary); font-weight: 700; line-height: 1.1; }
+  .title-page .subtitle  { font-size: 14pt; color: var(--muted); margin-top: 0.4em; }
+  .title-page .meta      { font-size: 11pt; color: var(--text); margin-top: 2.5em; }
+  .stack-row {
+    display: flex; justify-content: center; gap: 30px; margin-top: 1.8em;
+    font-size: 11pt; color: var(--muted);
+  }
+  .stack-row span b { display:block; color: var(--text); font-size: 13pt; }
+
+  @page { margin: 0.6in 0.55in 0.7in; @bottom-right { content: counter(page); color:#888; font-size:9pt; } @bottom-left { content: "Photography Bookkeeping App — Infrastructure"; color:#888; font-size:9pt; } }
+
+  .legend { display:flex; flex-wrap:wrap; gap:14px; font-size:9.5pt; color:var(--muted); margin-top:8px; }
+  .legend .swatch { display:inline-block; width:11px; height:11px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+</style>
+</head>
+<body>
+
+<div class="print-banner">
+  <strong>To save as PDF:</strong> Press <code>Ctrl+P</code> (or <code>Cmd+P</code>) → choose
+  <em>Save as PDF</em> as the destination. Enable "Background graphics" for full color diagrams.
+</div>
+
+<!-- ============================================================ -->
+<!-- TITLE PAGE                                                   -->
+<!-- ============================================================ -->
+<section class="title-page">
+  <div class="title-main">Infrastructure Manual</div>
+  <div class="subtitle">How GitHub, Vercel, and Supabase Run<br/>the Photography Bookkeeping App v2</div>
+  <div class="stack-row">
+    <span><b style="color:#24292f;">GitHub</b>Source &amp; CI</span>
+    <span><b style="color:#000;">Vercel</b>Hosting &amp; CDN</span>
+    <span><b style="color:#3ecf8e;">Supabase</b>Database &amp; Auth</span>
+  </div>
+  <div class="meta">
+    Rev 2026-05 · App v2<br/>
+    Jamie Bexten Photography
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 1. OVERVIEW                                                  -->
+<!-- ============================================================ -->
+<h2>1. The Three Services at a Glance</h2>
+
+<p>The Photography Bookkeeping App is a static single-page web app with cloud sync. It runs on a
+three-service stack — each service has one job and they hand off to each other in predictable ways.</p>
+
+<table>
+  <thead><tr><th>Service</th><th>Role</th><th>What lives there</th></tr></thead>
+  <tbody>
+    <tr><td><b>GitHub</b></td><td>Source of truth for code</td><td><code>index.html</code>, <code>app.js</code>, <code>styles.css</code>, <code>manual.html</code> on the <code>main</code> branch of the <code>v2</code> repo</td></tr>
+    <tr><td><b>Vercel</b></td><td>Builds, hosts, and serves the app over HTTPS</td><td>The compiled static site at your public URL, served from a global CDN</td></tr>
+    <tr><td><b>Supabase</b></td><td>Database + authentication for cloud sync</td><td>The <code>app_state_v2</code> table (one row per user) and the auth user account</td></tr>
+  </tbody>
+</table>
+
+<div class="diagram">
+  <div class="diagram-title">Diagram 1 — High-Level Architecture</div>
+  <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#2c6ecb"/>
+      </marker>
+      <marker id="arrSb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#3ecf8e"/>
+      </marker>
+    </defs>
+
+    <!-- Developer / Phone -->
+    <g>
+      <rect x="20" y="140" width="120" height="80" rx="10" fill="#fff" stroke="#f59e0b" stroke-width="2"/>
+      <text x="80" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">Browser</text>
+      <text x="80" y="190" text-anchor="middle" font-size="10" fill="#6b7280">Phone or laptop</text>
+      <text x="80" y="206" text-anchor="middle" font-size="10" fill="#6b7280">runs the app</text>
+    </g>
+
+    <!-- Developer arrow up to GitHub -->
+    <g>
+      <rect x="20" y="20" width="120" height="70" rx="10" fill="#fff" stroke="#6b7280" stroke-dasharray="4 3"/>
+      <text x="80" y="48" text-anchor="middle" font-size="12" font-weight="700" fill="#1f2937">You (dev)</text>
+      <text x="80" y="68" text-anchor="middle" font-size="10" fill="#6b7280">git push</text>
+    </g>
+    <path d="M140,55 L290,55" stroke="#2c6ecb" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+    <!-- GitHub -->
+    <g>
+      <rect x="290" y="20" width="140" height="90" rx="10" fill="#24292f"/>
+      <text x="360" y="50" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">GitHub</text>
+      <text x="360" y="70" text-anchor="middle" font-size="10" fill="#cfd3d8">v2 repo · main branch</text>
+      <text x="360" y="86" text-anchor="middle" font-size="10" fill="#cfd3d8">source of truth</text>
+    </g>
+
+    <!-- Webhook to Vercel -->
+    <path d="M430,65 L500,65 L500,140" stroke="#2c6ecb" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <text x="510" y="100" font-size="9" fill="#6b7280">webhook</text>
+    <text x="510" y="112" font-size="9" fill="#6b7280">on push</text>
+
+    <!-- Vercel -->
+    <g>
+      <rect x="430" y="140" width="140" height="90" rx="10" fill="#000"/>
+      <text x="500" y="170" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Vercel</text>
+      <text x="500" y="190" text-anchor="middle" font-size="10" fill="#bbb">Build · CDN · HTTPS</text>
+      <text x="500" y="206" text-anchor="middle" font-size="10" fill="#bbb">serves static files</text>
+    </g>
+
+    <!-- Browser <-> Vercel -->
+    <path d="M140,180 L430,180" stroke="#2c6ecb" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <text x="200" y="172" font-size="9" fill="#6b7280">HTTPS request</text>
+    <path d="M430,200 L140,200" stroke="#2c6ecb" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <text x="200" y="216" font-size="9" fill="#6b7280">HTML · CSS · JS</text>
+
+    <!-- Supabase -->
+    <g>
+      <rect x="560" y="260" width="140" height="80" rx="10" fill="#3ecf8e"/>
+      <text x="630" y="288" text-anchor="middle" font-size="14" font-weight="700" fill="#0a1f14">Supabase</text>
+      <text x="630" y="308" text-anchor="middle" font-size="10" fill="#0a1f14">Postgres + Auth</text>
+      <text x="630" y="324" text-anchor="middle" font-size="10" fill="#0a1f14">app_state_v2 table</text>
+    </g>
+
+    <!-- Browser <-> Supabase direct -->
+    <path d="M140,220 C 240,330 480,330 560,300" stroke="#3ecf8e" stroke-width="2" fill="none" marker-end="url(#arrSb)"/>
+    <path d="M560,310 C 480,345 240,345 140,225" stroke="#3ecf8e" stroke-width="2" fill="none" marker-end="url(#arrSb)"/>
+    <text x="340" y="345" text-anchor="middle" font-size="9.5" fill="#1c8a5a">read / write state · login token (direct, not via Vercel)</text>
+  </svg>
+  <div class="legend">
+    <span><i class="swatch" style="background:#2c6ecb;"></i>Code &amp; static file delivery</span>
+    <span><i class="swatch" style="background:#3ecf8e;"></i>Cloud sync &amp; auth traffic</span>
+    <span><i class="swatch" style="background:#f59e0b;"></i>End-user device</span>
+  </div>
+</div>
+
+<div class="tip">
+  <strong>Key insight:</strong> Vercel only ever sends static files. It never touches your data.
+  Once the browser loads the app, the browser talks directly to Supabase. Vercel is not in the data path.
+</div>
+
+<!-- ============================================================ -->
+<!-- 2. DEPLOY FLOW                                               -->
+<!-- ============================================================ -->
+<h2>2. Deploy Flow — From <code>git push</code> to Live</h2>
+
+<p>Every time code is changed and pushed to <code>main</code>, the following sequence runs automatically.
+This is the only path that puts new code in front of users; there is no manual deploy step.</p>
+
+<div class="diagram">
+  <div class="diagram-title">Diagram 2 — Deployment Pipeline (push → live, ~30–60 seconds)</div>
+  <svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#2c6ecb"/>
+      </marker>
+    </defs>
+
+    <!-- Step boxes -->
+    <g font-family="-apple-system, Segoe UI, sans-serif">
+      <!-- 1 Edit -->
+      <rect x="10" y="100" width="120" height="80" rx="8" fill="#fff" stroke="#6b7280"/>
+      <text x="70" y="125" text-anchor="middle" font-size="11" font-weight="700">1 · Edit</text>
+      <text x="70" y="145" text-anchor="middle" font-size="9" fill="#6b7280">edit app.js,</text>
+      <text x="70" y="158" text-anchor="middle" font-size="9" fill="#6b7280">styles.css, etc.</text>
+      <text x="70" y="171" text-anchor="middle" font-size="9" fill="#6b7280">bump ?v=NNN</text>
+
+      <!-- 2 Push -->
+      <rect x="150" y="100" width="120" height="80" rx="8" fill="#24292f"/>
+      <text x="210" y="125" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">2 · git push</text>
+      <text x="210" y="145" text-anchor="middle" font-size="9" fill="#cfd3d8">v2 HEAD:main</text>
+      <text x="210" y="160" text-anchor="middle" font-size="9" fill="#cfd3d8">commit lands on</text>
+      <text x="210" y="172" text-anchor="middle" font-size="9" fill="#cfd3d8">GitHub main</text>
+
+      <!-- 3 Webhook -->
+      <rect x="290" y="100" width="120" height="80" rx="8" fill="#fff" stroke="#2c6ecb" stroke-width="2"/>
+      <text x="350" y="125" text-anchor="middle" font-size="11" font-weight="700" fill="#2c6ecb">3 · Webhook</text>
+      <text x="350" y="145" text-anchor="middle" font-size="9" fill="#6b7280">GitHub pings</text>
+      <text x="350" y="158" text-anchor="middle" font-size="9" fill="#6b7280">Vercel with the</text>
+      <text x="350" y="171" text-anchor="middle" font-size="9" fill="#6b7280">commit SHA</text>
+
+      <!-- 4 Build -->
+      <rect x="430" y="100" width="120" height="80" rx="8" fill="#000"/>
+      <text x="490" y="125" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">4 · Vercel build</text>
+      <text x="490" y="145" text-anchor="middle" font-size="9" fill="#bbb">no build step —</text>
+      <text x="490" y="158" text-anchor="middle" font-size="9" fill="#bbb">static files copied</text>
+      <text x="490" y="171" text-anchor="middle" font-size="9" fill="#bbb">to CDN edge</text>
+
+      <!-- 5 Live -->
+      <rect x="570" y="100" width="135" height="80" rx="8" fill="#3b9eff"/>
+      <text x="637" y="125" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">5 · Live</text>
+      <text x="637" y="145" text-anchor="middle" font-size="9" fill="#eaf3ff">new version</text>
+      <text x="637" y="158" text-anchor="middle" font-size="9" fill="#eaf3ff">served worldwide</text>
+      <text x="637" y="171" text-anchor="middle" font-size="9" fill="#eaf3ff">at your domain</text>
+
+      <!-- arrows -->
+      <path d="M130,140 L150,140" stroke="#2c6ecb" stroke-width="2" marker-end="url(#arr2)"/>
+      <path d="M270,140 L290,140" stroke="#2c6ecb" stroke-width="2" marker-end="url(#arr2)"/>
+      <path d="M410,140 L430,140" stroke="#2c6ecb" stroke-width="2" marker-end="url(#arr2)"/>
+      <path d="M550,140 L570,140" stroke="#2c6ecb" stroke-width="2" marker-end="url(#arr2)"/>
+    </g>
+
+    <!-- Timing band -->
+    <g>
+      <line x1="20" y1="220" x2="700" y2="220" stroke="#d7dce5" stroke-width="1"/>
+      <text x="70"  y="240" text-anchor="middle" font-size="9" fill="#6b7280">~instant</text>
+      <text x="210" y="240" text-anchor="middle" font-size="9" fill="#6b7280">~2 sec</text>
+      <text x="350" y="240" text-anchor="middle" font-size="9" fill="#6b7280">~1 sec</text>
+      <text x="490" y="240" text-anchor="middle" font-size="9" fill="#6b7280">~20–40 sec</text>
+      <text x="637" y="240" text-anchor="middle" font-size="9" fill="#6b7280">propagates</text>
+      <text x="360" y="262" text-anchor="middle" font-size="9.5" font-style="italic" fill="#6b7280">
+        Total: typically 30–60 seconds from push to live worldwide
+      </text>
+    </g>
+  </svg>
+</div>
+
+<h3>What each step actually does</h3>
+<ol>
+  <li><b>Edit locally.</b> All files are plain text. When changing <code>app.js</code> or <code>styles.css</code>,
+    bump the cache buster query string (<code>?v=NNN</code>) in <code>index.html</code> so phones reload the new
+    file instead of using a stale cached copy.</li>
+  <li><b>Push to GitHub.</b> The command <code>git push v2 HEAD:main</code> sends the commit to the
+    <code>v2</code> remote's <code>main</code> branch — GitHub stores it permanently and updates the branch pointer.</li>
+  <li><b>GitHub fires a webhook.</b> The repo has a webhook installed by Vercel during initial connection.
+    On every push to <code>main</code> GitHub sends a POST request to Vercel containing the commit SHA.</li>
+  <li><b>Vercel builds.</b> Because the project has no <code>package.json</code> build step, Vercel simply
+    copies the static files (HTML, JS, CSS, images) into its CDN. This takes seconds.</li>
+  <li><b>Live worldwide.</b> Vercel atomically swaps the production alias to the new deployment. The next
+    HTTPS request from any browser gets the new files from the nearest edge location.</li>
+</ol>
+
+<div class="tip">
+  <strong>If Vercel misses a commit:</strong> push an empty commit to nudge it —
+  <code>git commit --allow-empty -m "nudge" &amp;&amp; git push v2 HEAD:main</code>.
+</div>
+
+<!-- ============================================================ -->
+<!-- 3. RUNTIME DATA FLOW                                         -->
+<!-- ============================================================ -->
+<h2>3. Runtime — How the App Loads and Syncs</h2>
+
+<p>Once deployed, this is what happens every time the app is opened or used.</p>
+
+<div class="diagram">
+  <div class="diagram-title">Diagram 3 — Runtime Request &amp; Sync Flow</div>
+  <svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#2c6ecb"/>
+      </marker>
+      <marker id="arr3g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#3ecf8e"/>
+      </marker>
+    </defs>
+
+    <!-- Browser column -->
+    <g>
+      <rect x="20" y="30" width="180" height="360" rx="10" fill="#fffaf1" stroke="#f59e0b"/>
+      <text x="110" y="55" text-anchor="middle" font-size="13" font-weight="700" fill="#7a4a00">Browser</text>
+
+      <rect x="40" y="75" width="140" height="50" rx="6" fill="#fff" stroke="#f59e0b"/>
+      <text x="110" y="95" text-anchor="middle" font-size="10" font-weight="700">JS runtime</text>
+      <text x="110" y="112" text-anchor="middle" font-size="9" fill="#6b7280">app.js — state, UI</text>
+
+      <rect x="40" y="145" width="140" height="50" rx="6" fill="#fff" stroke="#f59e0b"/>
+      <text x="110" y="165" text-anchor="middle" font-size="10" font-weight="700">localStorage</text>
+      <text x="110" y="182" text-anchor="middle" font-size="9" fill="#6b7280">photo-bookkeeping-v1</text>
+
+      <rect x="40" y="215" width="140" height="50" rx="6" fill="#fff" stroke="#f59e0b"/>
+      <text x="110" y="235" text-anchor="middle" font-size="10" font-weight="700">Auth session</text>
+      <text x="110" y="252" text-anchor="middle" font-size="9" fill="#6b7280">JWT in localStorage</text>
+
+      <rect x="40" y="285" width="140" height="80" rx="6" fill="#fff" stroke="#f59e0b"/>
+      <text x="110" y="305" text-anchor="middle" font-size="10" font-weight="700">Renders</text>
+      <text x="110" y="322" text-anchor="middle" font-size="9" fill="#6b7280">pages, charts,</text>
+      <text x="110" y="335" text-anchor="middle" font-size="9" fill="#6b7280">reports, invoices</text>
+      <text x="110" y="352" text-anchor="middle" font-size="9" fill="#6b7280">— all client-side</text>
+    </g>
+
+    <!-- Vercel -->
+    <g>
+      <rect x="280" y="50" width="160" height="120" rx="10" fill="#000"/>
+      <text x="360" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Vercel CDN</text>
+      <text x="360" y="98" text-anchor="middle" font-size="9" fill="#bbb">index.html</text>
+      <text x="360" y="112" text-anchor="middle" font-size="9" fill="#bbb">app.js?v=NNN</text>
+      <text x="360" y="126" text-anchor="middle" font-size="9" fill="#bbb">styles.css?v=NNN</text>
+      <text x="360" y="140" text-anchor="middle" font-size="9" fill="#bbb">manual.html</text>
+      <text x="360" y="156" text-anchor="middle" font-size="9" fill="#bbb">infrastructure.html</text>
+    </g>
+
+    <!-- Supabase -->
+    <g>
+      <rect x="500" y="50" width="200" height="320" rx="10" fill="#eafff5" stroke="#3ecf8e"/>
+      <text x="600" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#0a5a36">Supabase</text>
+
+      <rect x="520" y="100" width="160" height="70" rx="6" fill="#fff" stroke="#3ecf8e"/>
+      <text x="600" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#0a5a36">Auth</text>
+      <text x="600" y="140" text-anchor="middle" font-size="9" fill="#0a5a36">email/password</text>
+      <text x="600" y="155" text-anchor="middle" font-size="9" fill="#0a5a36">issues JWT</text>
+
+      <rect x="520" y="190" width="160" height="160" rx="6" fill="#fff" stroke="#3ecf8e"/>
+      <text x="600" y="212" text-anchor="middle" font-size="10" font-weight="700" fill="#0a5a36">Postgres database</text>
+      <text x="600" y="232" text-anchor="middle" font-size="9" fill="#0a5a36">table: app_state_v2</text>
+      <text x="600" y="250" text-anchor="middle" font-size="9" fill="#0a5a36">columns:</text>
+      <text x="600" y="264" text-anchor="middle" font-size="9" fill="#0a5a36">user_id (uuid)</text>
+      <text x="600" y="278" text-anchor="middle" font-size="9" fill="#0a5a36">state (jsonb)</text>
+      <text x="600" y="292" text-anchor="middle" font-size="9" fill="#0a5a36">updated_at (timestamp)</text>
+      <text x="600" y="316" text-anchor="middle" font-size="9" font-style="italic" fill="#0a5a36">Row Level Security:</text>
+      <text x="600" y="330" text-anchor="middle" font-size="9" font-style="italic" fill="#0a5a36">you only see your row</text>
+    </g>
+
+    <!-- Arrows: Browser <-> Vercel -->
+    <path d="M200,100 L280,100" stroke="#2c6ecb" stroke-width="2" marker-end="url(#arr3)"/>
+    <text x="240" y="92" text-anchor="middle" font-size="9" fill="#6b7280">GET /</text>
+    <path d="M280,130 L200,130" stroke="#2c6ecb" stroke-width="2" marker-end="url(#arr3)"/>
+    <text x="240" y="146" text-anchor="middle" font-size="9" fill="#6b7280">files</text>
+
+    <!-- Arrows: Browser <-> Supabase Auth -->
+    <path d="M200,240 L520,135" stroke="#3ecf8e" stroke-width="2" fill="none" marker-end="url(#arr3g)"/>
+    <text x="340" y="180" font-size="9" fill="#1c8a5a">login</text>
+    <path d="M520,150 L200,250" stroke="#3ecf8e" stroke-width="2" fill="none" marker-end="url(#arr3g)"/>
+    <text x="340" y="230" font-size="9" fill="#1c8a5a">JWT token</text>
+
+    <!-- Arrows: Browser <-> Supabase DB -->
+    <path d="M200,320 L520,260" stroke="#3ecf8e" stroke-width="2" fill="none" marker-end="url(#arr3g)"/>
+    <text x="320" y="290" font-size="9" fill="#1c8a5a">upsert state (debounced)</text>
+    <path d="M520,280 L200,335" stroke="#3ecf8e" stroke-width="2" fill="none" marker-end="url(#arr3g)"/>
+    <text x="320" y="335" font-size="9" fill="#1c8a5a">pull state on login</text>
+
+    <text x="360" y="405" text-anchor="middle" font-size="9" fill="#6b7280" font-style="italic">
+      Vercel is not on the data path. Browser talks to Supabase directly over HTTPS.
+    </text>
+  </svg>
+</div>
+
+<h3>Step-by-step</h3>
+<ol>
+  <li><b>App load.</b> The browser requests <code>https://&lt;your-domain&gt;/</code>. Vercel's nearest edge server
+    returns <code>index.html</code>. The HTML pulls <code>styles.css?v=NNN</code> and <code>app.js?v=NNN</code>
+    (the version query forces a fresh download whenever the number bumps).</li>
+  <li><b>Local state hydrates first.</b> <code>app.js</code> reads <code>localStorage</code> key
+    <code>photo-bookkeeping-v1</code> and immediately renders the UI from that cached state, so the app is
+    usable offline and before any network call completes.</li>
+  <li><b>Auth check.</b> If a Supabase JWT is present in localStorage and still valid, the user is signed in.
+    Otherwise the login screen is shown.</li>
+  <li><b>Pull from Supabase.</b> Once authenticated, the app queries <code>app_state_v2</code> for the row
+    matching the logged-in user's <code>user_id</code>. If the cloud copy is newer than local, it replaces local
+    state and re-renders.</li>
+  <li><b>Edits go to localStorage first.</b> Every change (add transaction, edit invoice, mark trip) updates
+    in-memory state, persists to localStorage immediately, and re-renders. This is instant — no network wait.</li>
+  <li><b>Debounced push to Supabase.</b> A short debounce (typically a few seconds of inactivity) triggers an
+    <code>upsert</code> into <code>app_state_v2</code> — the entire state blob is written as a single JSONB row.
+    Other devices logged into the same account pick up the change on their next pull.</li>
+</ol>
+
+<!-- ============================================================ -->
+<!-- 4. WHY THIS SPLIT                                            -->
+<!-- ============================================================ -->
+<h2>4. Why Three Services Instead of One</h2>
+
+<table>
+  <thead><tr><th>Concern</th><th>Solved by</th><th>Why not somewhere else</th></tr></thead>
+  <tbody>
+    <tr><td>Version history, rollback, code review</td><td>GitHub</td><td>Vercel keeps deploy history but the source of truth is the git tree</td></tr>
+    <tr><td>Free global HTTPS, instant cache invalidation</td><td>Vercel</td><td>GitHub Pages would work but lacks the same edge speed and atomic swaps</td></tr>
+    <tr><td>User accounts &amp; per-user data isolation</td><td>Supabase Auth + Row Level Security</td><td>Vercel has no database; rolling your own auth is expensive and risky</td></tr>
+    <tr><td>Cross-device sync (phone ↔ laptop)</td><td>Supabase Postgres (jsonb state column)</td><td>localStorage is per-browser; Vercel doesn't store state</td></tr>
+    <tr><td>Offline-first behavior</td><td>localStorage in the browser</td><td>Going to Supabase first would block the UI when offline</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- 5. FAILURE MODES                                             -->
+<!-- ============================================================ -->
+<h2>5. Failure Modes &amp; What Happens</h2>
+
+<table>
+  <thead><tr><th>If this breaks…</th><th>What still works</th><th>What breaks</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>GitHub is down</td>
+      <td>The live site keeps working. Existing users keep using it.</td>
+      <td>You can't push new code or trigger deploys.</td>
+    </tr>
+    <tr>
+      <td>Vercel is down</td>
+      <td>Already-loaded browser tabs keep working (the JS is cached). Local data is safe.</td>
+      <td>New visitors can't load the site. The URL is unreachable.</td>
+    </tr>
+    <tr>
+      <td>Supabase is down</td>
+      <td>App loads, localStorage data is intact, everything renders, edits are saved locally.</td>
+      <td>Login fails (if not already signed in). No cloud sync. Other devices fall out of sync until it returns.</td>
+    </tr>
+    <tr>
+      <td>User is offline</td>
+      <td>Everything except cloud sync. The app is fully usable on a plane.</td>
+      <td>Changes don't propagate to other devices until the connection returns.</td>
+    </tr>
+    <tr>
+      <td>Cache-buster not bumped</td>
+      <td>App loads with the old <code>app.js</code> / <code>styles.css</code>.</td>
+      <td>Users see stale behavior until they hard-refresh.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- 6. WHERE TO LOOK                                             -->
+<!-- ============================================================ -->
+<h2>6. Where Each Thing Lives</h2>
+
+<h3>GitHub</h3>
+<ul>
+  <li>Remote name: <code>v2</code> · Branch: <code>main</code></li>
+  <li>Tracked files: <code>index.html</code>, <code>app.js</code>, <code>styles.css</code>,
+    <code>manual.html</code>, <code>infrastructure.html</code>, plus image/icon assets.</li>
+  <li>Every commit triggers a deploy. There are no protected branches or required reviews — push goes live.</li>
+</ul>
+
+<h3>Vercel</h3>
+<ul>
+  <li>Project is linked to the GitHub repo's <code>main</code> branch.</li>
+  <li>No build command — it's a static site, files are served as-is.</li>
+  <li>Environment variables (Supabase URL and anon key) are embedded directly in <code>app.js</code> because
+    the anon key is safe to expose publicly; security comes from Supabase Row Level Security policies.</li>
+</ul>
+
+<h3>Supabase</h3>
+<ul>
+  <li><b>Auth:</b> email + password. JWTs are stored in browser localStorage by the Supabase JS client.</li>
+  <li><b>Database table <code>app_state_v2</code>:</b>
+    <pre>user_id     uuid       primary key, references auth.users(id)
+state       jsonb      the entire app state blob
+updated_at  timestamp  bumped on every upsert</pre>
+  </li>
+  <li><b>Row Level Security:</b> a policy restricts <code>SELECT</code> / <code>UPDATE</code> / <code>INSERT</code>
+    on <code>app_state_v2</code> to rows where <code>user_id = auth.uid()</code>. Even with the public anon key,
+    one user cannot read another's row.</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- 7. A TYPICAL CHANGE                                          -->
+<!-- ============================================================ -->
+<h2>7. End-to-End Example — Adding a Feature</h2>
+
+<p>Suppose you add a new chart to the Analytics page. The full lifecycle:</p>
+
+<ol>
+  <li>Open <code>app.js</code>, write the new render function and wire it to the menu.</li>
+  <li>Open <code>styles.css</code>, add the chart's styles.</li>
+  <li>Open <code>index.html</code>, bump <code>?v=143</code> → <code>?v=144</code> on both files.</li>
+  <li><code>git add . &amp;&amp; git commit -m "Add new chart" &amp;&amp; git push v2 HEAD:main</code></li>
+  <li>GitHub stores the commit and pings Vercel via webhook (within ~1 second).</li>
+  <li>Vercel uploads the changed files to its CDN (~20–40 seconds).</li>
+  <li>You hard-refresh on your phone. The browser sees <code>?v=144</code>, downloads the new files, runs the new
+    render function — the chart appears.</li>
+  <li>You add a transaction. localStorage updates instantly. A few seconds later the debounced sync upserts
+    the new state to <code>app_state_v2</code> in Supabase.</li>
+  <li>You open the app on your laptop. It pulls the latest row from <code>app_state_v2</code>, sees the new
+    transaction, and renders it in the new chart.</li>
+</ol>
+
+<div class="tip">
+  <strong>That's the whole stack.</strong> GitHub holds the code, Vercel ships it, Supabase holds the data,
+  and the browser does all the actual work — including formulas, rendering, filtering, and reports.
+</div>
+
+<p class="muted" style="margin-top:2em; text-align:center; font-size:9.5pt;">
+  Infrastructure Manual · Rev 2026-05 · App v2
+</p>
+
+</body>
+</html>

@@ -23,7 +23,6 @@
   }
   body { max-width: 7in; margin: 0 auto; padding: 0.75in 0.75in 0.5in; }
 
-  /* Screen-only print banner */
   .print-banner {
     position: sticky; top: 0; z-index: 100;
     background: #fff7cc; border: 1px solid #e6c84a;
@@ -41,8 +40,17 @@
   p  { margin: 0.3em 0 0.6em; }
   ul, ol { margin: 0.3em 0 0.8em; padding-left: 1.3em; }
   li { margin-bottom: 3px; }
-  code, tt { font-family: "SF Mono", Consolas, Monaco, monospace; font-size: 0.93em; background: var(--bg-soft); padding: 1px 4px; border-radius: 3px; }
-
+  code, tt {
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+    font-size: 0.93em; background: var(--bg-soft);
+    padding: 1px 4px; border-radius: 3px;
+  }
+  pre {
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+    font-size: 9.5pt; background: var(--bg-soft);
+    padding: 8px 12px; border-radius: 4px;
+    overflow-x: auto; margin: 6px 0 10px;
+  }
   .muted { color: var(--muted); }
   .tip {
     background: var(--bg-soft);
@@ -53,58 +61,42 @@
     border-radius: 0 4px 4px 0;
   }
   .tip strong { color: var(--primary); }
+  .formula {
+    background: #fff; border: 1px solid var(--border);
+    padding: 8px 12px; margin: 6px 0 12px;
+    border-radius: 4px;
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+    font-size: 10pt;
+    overflow-x: auto;
+  }
+  .formula strong { color: var(--primary); font-family: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 10pt; }
+  th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--bg-soft); font-weight: 600; color: var(--primary); }
 
-  /* ===== Title page ===== */
-  .title-page {
-    text-align: center;
-    padding-top: 2in;
-    page-break-after: always;
-    height: 10in;
-  }
-  .title-page .title-main {
-    font-size: 28pt;
-    color: var(--primary);
-    font-weight: 700;
-    line-height: 1.1;
-  }
-  .title-page .subtitle {
-    font-size: 14pt;
-    color: var(--muted);
-    margin-top: 0.4em;
-  }
-  .title-page hr {
-    width: 3in; border: none; border-top: 2px solid var(--primary);
-    margin: 0.5in auto;
-  }
-  .title-page .intro {
-    max-width: 5in; margin: 0 auto; color: var(--muted); font-size: 11pt;
-  }
-  .title-page .version {
-    margin-top: 2in; color: var(--muted); font-size: 10pt;
-  }
+  /* Title page */
+  .title-page { text-align: center; padding-top: 2in; page-break-after: always; height: 10in; }
+  .title-page .title-main { font-size: 28pt; color: var(--primary); font-weight: 700; line-height: 1.1; }
+  .title-page .subtitle { font-size: 14pt; color: var(--muted); margin-top: 0.4em; }
+  .title-page hr { width: 3in; border: none; border-top: 2px solid var(--primary); margin: 0.5in auto; }
+  .title-page .intro { max-width: 5in; margin: 0 auto; color: var(--muted); font-size: 11pt; }
+  .title-page .version { margin-top: 2in; color: var(--muted); font-size: 10pt; }
 
-  /* ===== TOC ===== */
+  /* TOC */
   .toc { page-break-after: always; }
   .toc ol { list-style: none; padding: 0; counter-reset: toc; }
   .toc ol li {
     counter-increment: toc;
     display: flex; justify-content: space-between;
     border-bottom: 1px dotted var(--border);
-    padding: 4px 0;
-    font-size: 11pt;
+    padding: 4px 0; font-size: 11pt;
   }
-  .toc ol li::before {
-    content: counter(toc) ". ";
-    color: var(--muted);
-    margin-right: 6px;
-  }
+  .toc ol li::before { content: counter(toc) ". "; color: var(--muted); margin-right: 6px; }
   .toc ol li span:last-child { color: var(--muted); }
 
-  /* ===== Section layout ===== */
   section { page-break-before: always; }
   section:first-of-type { page-break-before: auto; }
 
-  /* ===== Print margins / page numbers ===== */
   @page {
     size: letter portrait;
     margin: 0.75in 0.75in 0.7in;
@@ -112,10 +104,9 @@
     @bottom-right  { content: "Page " counter(page) " of " counter(pages); font-family: Helvetica, sans-serif; font-size: 9pt; color: #6b7280; }
   }
 
-  /* Prevent orphaned lists/headings from splitting awkwardly */
   h2, h3, h4 { break-after: avoid-page; }
   ul, ol { break-inside: avoid-page; }
-  .tip { break-inside: avoid-page; }
+  .tip, .formula, pre { break-inside: avoid-page; }
 </style>
 </head>
 <body>
@@ -124,7 +115,7 @@
   <strong>To save this manual as a PDF:</strong>
   press <kbd>Ctrl</kbd>+<kbd>P</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>P</kbd> (Mac) →
   <em>Destination</em>: Save as PDF → <em>Save</em>.
-  The headers and page numbers are set up automatically.
+  Headers and page numbers are set up automatically.
 </div>
 
 <!-- ============== TITLE PAGE ============== -->
@@ -132,498 +123,1783 @@
   <div class="title-main">Jamie Bexten Photography</div>
   <div class="title-main">Bookkeeping App</div>
   <hr>
-  <div class="subtitle">A guide to every feature</div>
-  <div style="margin-top: 0.6in;"></div>
+  <div class="subtitle">Complete user manual — every page, every chart, every formula</div>
+  <div style="margin-top: 0.5in;"></div>
   <p class="intro">
-    Single-page web app for tracking photography business income, expenses,
-    invoices, mileage, and scheduling. Data lives in your browser's
-    <code>localStorage</code> and can be backed up to iCloud.
+    A single-page web app for tracking photography business income, expenses,
+    invoices, mileage, jobs, and scheduling. Data lives in your browser's
+    localStorage and mirrors to a Supabase cloud row for backup and sync
+    across devices. No build step, no framework, no installation — open the
+    URL and start working.
   </p>
-  <div class="version">User Manual — Version 1.0</div>
+  <div class="version">Manual rev 2026-05 · App v2</div>
 </div>
 
-<!-- ============== TABLE OF CONTENTS ============== -->
-<div class="toc">
-  <h2>Table of Contents</h2>
+<!-- ============== TOC ============== -->
+<section class="toc">
+  <h1>Contents</h1>
   <ol>
-    <li><span>App Overview</span><span>3</span></li>
-    <li><span>Sidebar Navigation</span><span>3</span></li>
-    <li><span>Overview Tab (Dashboard)</span><span>4</span></li>
-    <li><span>Calendar Tab</span><span>5</span></li>
-    <li><span>Analytics Tab</span><span>6</span></li>
-    <li><span>All Transactions Tab</span><span>7</span></li>
-    <li><span>Invoices Tab</span><span>9</span></li>
-    <li><span>Mileage Tab</span><span>11</span></li>
-    <li><span>Reports Tab</span><span>11</span></li>
-    <li><span>Settings Tab</span><span>11</span></li>
-    <li><span>Backup &amp; Restore</span><span>12</span></li>
-    <li><span>Tips &amp; Tricks</span><span>13</span></li>
+    <li><span>Quick Start</span><span>3</span></li>
+    <li><span>App Layout &amp; Navigation</span><span>4</span></li>
+    <li><span>Data Model &amp; Glossary</span><span>5</span></li>
+    <li><span>Overview Page</span><span>7</span></li>
+    <li><span>Calendar Page</span><span>9</span></li>
+    <li><span>New Job Page</span><span>10</span></li>
+    <li><span>Transactions Page</span><span>11</span></li>
+    <li><span>Analytics — Overview</span><span>14</span></li>
+    <li><span>Analytics — Year Matrix</span><span>15</span></li>
+    <li><span>Analytics — By Job</span><span>16</span></li>
+    <li><span>Analytics — Cash Flow</span><span>17</span></li>
+    <li><span>Analytics — By Category</span><span>18</span></li>
+    <li><span>Analytics — Trends (Spending Trends)</span><span>19</span></li>
+    <li><span>Analytics — Flow</span><span>20</span></li>
+    <li><span>Analytics — vs Expense</span><span>21</span></li>
+    <li><span>Analytics — Breakdown (Sankey)</span><span>22</span></li>
+    <li><span>Analytics — Savings Rate</span><span>23</span></li>
+    <li><span>Analytics — Savings</span><span>24</span></li>
+    <li><span>Universal Filters</span><span>25</span></li>
+    <li><span>Filter Presets</span><span>26</span></li>
+    <li><span>Invoices Page</span><span>27</span></li>
+    <li><span>Mileage Page</span><span>29</span></li>
+    <li><span>Reports</span><span>30</span></li>
+    <li><span>Settings Page</span><span>32</span></li>
+    <li><span>Locked Years</span><span>34</span></li>
+    <li><span>Cloud Sync &amp; Backup</span><span>35</span></li>
+    <li><span>Mobile-Specific Behaviors</span><span>36</span></li>
+    <li><span>Print &amp; PDF Export</span><span>37</span></li>
+    <li><span>Formulas Reference</span><span>38</span></li>
+    <li><span>Keyboard &amp; Touch Shortcuts</span><span>40</span></li>
+    <li><span>Troubleshooting</span><span>41</span></li>
   </ol>
-</div>
-
-<!-- ============== 1. APP OVERVIEW ============== -->
-<section>
-  <h2>1. App Overview</h2>
-  <p>This app runs entirely in your browser. No server, no login — just open the
-  page and your data is already loaded from the local device. It's designed for
-  a sole-proprietor photography business to track every dollar in and out,
-  produce invoices, log business mileage, and surface clean financial reports at
-  tax time.</p>
-
-  <h3>What the app tracks</h3>
-  <ul>
-    <li><strong>Income &amp; expenses</strong> per transaction, tagged to a Customer, Category (Job), and Payee.</li>
-    <li><strong>Invoices</strong> with line items, optional sales tax, and direct links to the income transactions they cover.</li>
-    <li><strong>Mileage</strong> trips with IRS-rate deduction.</li>
-    <li><strong>Scheduled photo shoots</strong> (Calendar) that feed the <em>Un Invoiced</em> queue.</li>
-    <li><strong>Savings progress</strong> toward a configurable goal.</li>
-  </ul>
-
-  <h3>Where the data lives</h3>
-  <p>All state is stored in <code>localStorage</code> under the key
-  <code>photo-bookkeeping-v1</code>. Each browser/device keeps its own copy — use
-  the built-in backup tools (Settings → Data) to copy the data elsewhere,
-  including iCloud Drive on Apple devices.</p>
 </section>
 
-<!-- ============== 2. SIDEBAR NAVIGATION ============== -->
+<!-- ============== 1. QUICK START ============== -->
 <section>
-  <h2>2. Sidebar Navigation</h2>
-  <p>The left sidebar (or the hamburger menu on mobile) lists the main tabs:</p>
-  <ul>
-    <li><strong>Overview</strong> — financial at-a-glance for the year (dashboard).</li>
-    <li><strong>Calendar</strong> — scheduled photo shoots.</li>
-    <li><strong>Analytics</strong> — two sub-tabs: <em>Breakdown</em> and <em>Trends</em>.</li>
-    <li><strong>All Transactions</strong> — the full income/expense ledger.</li>
-    <li><strong>Invoices</strong> — builder, list, and Un Invoiced queue.</li>
-    <li><strong>Mileage</strong> — business trip tracker.</li>
-    <li><strong>Reports</strong> — Profit &amp; Loss, customer sales, sales tax.</li>
-    <li><strong>Settings</strong> — bottom gear icon; data, customization, backups.</li>
-  </ul>
+  <h1>1. Quick Start</h1>
 
-  <h3>Mobile navigation styles</h3>
-  <p><strong>Settings → Mobile Nav Style</strong> lets you switch between two modes:</p>
-  <ul>
-    <li><strong>Sidebar</strong> (default): hamburger opens the same left drawer as desktop.</li>
-    <li><strong>Bottom Bar</strong>: a fixed 5-slot bottom toolbar — <em>Overview</em>,
-      <em>Transactions</em>, <em>Calendar</em>, <em>Analytics</em>, <em>More</em>.
-      Tapping <em>More</em> slides a right-side flyout containing every other tab
-      plus the light/dark theme toggle and Settings.</li>
-  </ul>
+  <h3>1.1 Opening the app</h3>
+  <p>
+    The app is a single web page hosted on Vercel. Open the URL in any modern
+    browser (Chrome, Safari, Firefox, Edge). There is no install. On first
+    open you'll see a sign-in screen (if cloud sync is enabled in
+    <em>Settings → Cloud Sync</em>) or go straight to the Overview page.
+  </p>
 
-  <h3>Theme toggle</h3>
-  <p>A moon/sun icon at the bottom of the sidebar (or inside the mobile More flyout)
-  flips between dark and light themes. Your choice is remembered per device.</p>
+  <h3>1.2 Adding your first transaction</h3>
+  <ol>
+    <li>Click <strong>Transactions</strong> in the left sidebar (or in the bottom-tab on mobile).</li>
+    <li>Click <strong>+ New Transaction</strong> in the toolbar.</li>
+    <li>Fill in date, payee, amount (either Inflow for income or Outflow for expense), category, and any optional fields (vendor, customer, memo, tags, chart of accounts).</li>
+    <li>Click <strong>Save</strong>.</li>
+  </ol>
+  <p>
+    Allowed values for <em>Outflow</em> and <em>Inflow</em> include
+    <code>$0.00</code> — the form rejects only the case where both fields are
+    empty.
+  </p>
+
+  <h3>1.3 Creating a job</h3>
+  <ol>
+    <li>Click <strong>New Job</strong> in the sidebar.</li>
+    <li>Click <strong>+ New Job</strong>.</li>
+    <li>Enter date, Job No. (free-form, suggested format <code>YY###</code> like <code>26001</code>), customer, category (Spring Sports, Baseball, etc.), and optional hours.</li>
+    <li>Save. The job is now selectable from any transaction's "Existing Job" picker and from the invoice editor.</li>
+  </ol>
+
+  <h3>1.4 Creating an invoice</h3>
+  <ol>
+    <li>Click <strong>Invoices</strong>, then <strong>+ New Invoice</strong>.</li>
+    <li>Pick a customer (or pick a Job — Bill To and Invoice # are auto-filled from the job).</li>
+    <li>Add line items: Item · Qty · Description · Price (Amount = Qty × Price).</li>
+    <li>Pick Tax / Non-Tax. If Tax, choose a rate from the dropdown (7.00% or 7.25%).</li>
+    <li>Click <strong>Save</strong>. Click <strong>Mark as Paid</strong> to stamp the invoice with a green PAID watermark and record the payment date.</li>
+    <li>Click <strong>Print / PDF</strong> to produce a print-ready letter-size invoice.</li>
+  </ol>
+
+  <h3>1.5 Backing up your data</h3>
+  <p>
+    Open <em>Settings → Cloud Sync</em> and sign in with an email + password.
+    The app will push any local data to Supabase on save and pull the
+    server-side copy when you open the app fresh. If you want a one-shot
+    snapshot, click <strong>Force Upload</strong>; if you need to recover the
+    server's copy, click <strong>Force Download</strong>.
+  </p>
 </section>
 
-<!-- ============== 3. OVERVIEW TAB ============== -->
+<!-- ============== 2. LAYOUT & NAVIGATION ============== -->
 <section>
-  <h2>3. Overview Tab (Dashboard)</h2>
-  <p>The Overview gives you the big picture for whichever year you pick.</p>
+  <h1>2. App Layout &amp; Navigation</h1>
 
-  <h3>Year selector</h3>
-  <p>Pill buttons across the top let you filter by year or choose <strong>All</strong>.
-  On desktop, every year with data appears as its own pill. On mobile you see
-  <strong>All</strong> + the three most-recent years + a <strong>More ▾</strong>
-  button; tapping More opens a bottom sheet with every available year as a grid.</p>
-
-  <h3>Savings Goal bar</h3>
-  <p>The goal amount is configured in Settings. The bar fills as your
-  <em>Savings</em>-category transactions accumulate. On desktop it renders as a
-  vertical column; on mobile it rotates into a horizontal strip so it doesn't
-  dominate the screen. A thin accent line marks the target — fill past it and
-  the bar turns solid green (Goal met).</p>
-
-  <h3>Total Income by Year</h3>
-  <p>A bar chart showing up to 6 years at a time. Use the <strong>‹ / ›</strong> arrows
-  at the top of the card to slide the window. Each bar is labeled with its
-  total and a percentage-change delta vs. the previous year. Toggle
-  <strong>Full Year</strong> / <strong>Year to Date</strong> to switch the reference.</p>
-
-  <h3>Income by Job donut</h3>
-  <p>Shows the share each job contributed to your income for the selected year.
-  The center displays the total. The legend lists every job with its percentage.
-  Hover a slice to highlight it (desktop); on mobile, tap the legend to focus
-  a slice.</p>
-
-  <h3>Summary cards</h3>
-  <p>Five stat tiles: <strong>Total Income</strong>, <strong>Total Expenses</strong>,
-  <strong>Total Savings</strong>, <strong>Net</strong>, and the
-  <strong>Transactions</strong> count.</p>
-
-  <h3>Summary tables</h3>
-  <p>Three tables sit below the charts:</p>
+  <h3>2.1 Desktop layout</h3>
+  <p>
+    Three regions on every page:
+  </p>
   <ul>
-    <li><strong>By Job</strong> — income-positive categories, with Income, Expenses, Net, Count.</li>
-    <li><strong>By Category</strong> — expense-only and savings categories, with Expenses, Income, Net, Count.</li>
-    <li><strong>By Account</strong> — aggregated per account.</li>
+    <li><strong>Left sidebar</strong> — vertical list of every page, with the photographer logo at the top, the cloud-sync status pill below it, and the theme/gear icons at the bottom. The active tab is highlighted with the accent color.</li>
+    <li><strong>Main canvas</strong> — the page's own UI takes up the remaining width up to a 1400px max. Most pages have a heading, a toolbar (filters, action buttons), and one or more content cards beneath.</li>
+    <li><strong>Right flyout</strong> — a duplicate of the sidebar that can slide out from the right edge on narrow viewports, controlled by the "More" button in the bottom nav.</li>
   </ul>
-  <p>On mobile the first two columns (e.g. Job + Income) are visible at the edge;
-  slide the table left to reveal the rest. Desktop shows all columns at once.</p>
 
-  <div class="tip">
-    <strong>Drill-through:</strong> on mobile, <strong>long-press</strong> any row in the By Job or
-    By Category table to open that category's transactions with a Back arrow
-    that returns you to the Overview. On desktop, a single click does the same.
+  <h3>2.2 Sidebar tabs</h3>
+  <p>The full list, in display order:</p>
+  <ol>
+    <li><strong>Overview</strong> — dashboard with year totals, year-over-year, and per-job summaries.</li>
+    <li><strong>Calendar</strong> — yearly mini-month grid plus a list of scheduled jobs.</li>
+    <li><strong>New Job</strong> — create job records and view per-job analytics.</li>
+    <li><strong>Transactions</strong> — the full ledger of income and expense entries.</li>
+    <li><strong>Analytics</strong> — ten analytical views in a single page (Year Matrix is the default).</li>
+    <li><strong>Invoices</strong> — list + editor for outgoing customer invoices.</li>
+    <li><strong>Mileage</strong> — per-trip vehicle mileage log and rate.</li>
+    <li><strong>Reports</strong> — printable financial summaries (P&amp;L, Schedule C, Sales Tax, etc.).</li>
+    <li><strong>Settings</strong> — gear icon at the bottom.</li>
+  </ol>
+
+  <h3>2.3 Mobile layout</h3>
+  <p>
+    Below 768px viewport the sidebar collapses. Navigation moves to:
+  </p>
+  <ul>
+    <li>A <strong>bottom tab bar</strong> with the five most-used pages (Overview · Transactions · Calendar · Analytics · More).</li>
+    <li>The <strong>More</strong> button opens a right-side flyout containing every other tab and Settings.</li>
+    <li>A <strong>hamburger</strong> icon on the top left opens the original sidebar from the left edge.</li>
+  </ul>
+  <p>
+    Each page has its own mobile-specific layout: toolbars wrap, tables stack
+    into card-like rows, big totals shrink, and charts apply font-size
+    overrides so SVG text reads clearly at phone width.
+  </p>
+
+  <h3>2.4 Themes</h3>
+  <p>
+    Click the moon/sun icon at the bottom of the sidebar to toggle dark/light
+    mode. The choice persists in <code>localStorage</code>.
+  </p>
+
+  <h3>2.5 Locked years (preview)</h3>
+  <p>
+    A small red dot in the bottom-right of a year pill (on Overview, etc.)
+    indicates the year is locked in Settings — no edits or deletes are
+    allowed to any record dated within that year. See <em>Locked Years</em>
+    later in this manual for details.
+  </p>
+</section>
+
+<!-- ============== 3. DATA MODEL & GLOSSARY ============== -->
+<section>
+  <h1>3. Data Model &amp; Glossary</h1>
+
+  <h3>3.1 Top-level state</h3>
+  <p>
+    All app data lives in one JavaScript object called <code>state</code>,
+    serialized to <code>localStorage</code> under the key
+    <code>photo-bookkeeping-v1</code>. Cloud sync mirrors the same object to
+    the Supabase table <code>app_state_v2</code>. The major collections are:
+  </p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>transactions</code></td><td>Array</td><td>Every income/expense entry.</td></tr>
+      <tr><td><code>jobs</code></td><td>Array</td><td>Job records (jobNo, customer, category, hours, status).</td></tr>
+      <tr><td><code>invoices</code></td><td>Array</td><td>Customer invoices with line items.</td></tr>
+      <tr><td><code>trips</code></td><td>Array</td><td>Vehicle mileage entries.</td></tr>
+      <tr><td><code>scheduledJobs</code></td><td>Array</td><td>Calendar events.</td></tr>
+      <tr><td><code>categories</code></td><td>Array&lt;string&gt;</td><td>Available category names (mix of jobs and bookkeeping types).</td></tr>
+      <tr><td><code>customers</code></td><td>Array&lt;string&gt;</td><td>Saved customer names.</td></tr>
+      <tr><td><code>vendors</code></td><td>Array&lt;string&gt;</td><td>Saved vendor names.</td></tr>
+      <tr><td><code>payees</code></td><td>Array&lt;string&gt;</td><td>Auto-populated unique payee list (used for autocomplete).</td></tr>
+      <tr><td><code>accounts</code></td><td>Array&lt;string&gt;</td><td>Bank/cash accounts.</td></tr>
+      <tr><td><code>chartAccounts</code></td><td>Array</td><td>Chart of Accounts entries (Sales, Cost of Goods Sold, etc.).</td></tr>
+      <tr><td><code>expensesTable</code></td><td>Array</td><td>Mapping table: Expense entry → Chart of Accounts COA + Job-related Y/N.</td></tr>
+      <tr><td><code>customerCategories</code></td><td>Array</td><td>Customer ↔ Category pairings (auto-built from job creation).</td></tr>
+      <tr><td><code>filterPresets</code></td><td>Array</td><td>Saved analytics filter snapshots.</td></tr>
+      <tr><td><code>lockedYears</code></td><td>Array&lt;string&gt;</td><td>List of "YYYY" strings whose records are read-only.</td></tr>
+      <tr><td><code>savingsGoal</code></td><td>Number</td><td>Annual savings target (used by Overview thermometer and Analytics goal bar).</td></tr>
+      <tr><td><code>mileageRate</code></td><td>Number</td><td>Default $/mile rate (e.g. 0.70).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 Transaction shape</h3>
+  <p>Each transaction has:</p>
+  <ul>
+    <li><code>id</code> — unique string.</li>
+    <li><code>date</code> — "YYYY-MM-DD".</li>
+    <li><code>type</code> — <code>"income"</code> or <code>"expense"</code>.</li>
+    <li><code>amount</code> — positive Number (sign comes from <code>type</code>).</li>
+    <li><code>payee</code> — string (who you paid or who paid you).</li>
+    <li><code>vendor</code> — string (optional, for expense rows).</li>
+    <li><code>customer</code> — string (optional, for income rows).</li>
+    <li><code>category</code> — string (typically a Job name like "Spring Sports", or a bookkeeping bucket like "Cost of Goods Sold").</li>
+    <li><code>chartAccount</code> — string (Chart of Accounts entry).</li>
+    <li><code>expenseIncome</code> — string (Expense Table entry name; cross-references the COA).</li>
+    <li><code>jobNo</code> — string (Job No. this tx is linked to).</li>
+    <li><code>account</code> — string (which bank/cash account).</li>
+    <li><code>memo</code> — string (optional note).</li>
+    <li><code>tags</code> — array of strings.</li>
+    <li><code>reconciled</code> — <code>""</code> | <code>"C"</code> (cleared) | <code>"R"</code> (reconciled).</li>
+  </ul>
+
+  <h3>3.3 Special category constants</h3>
+  <p>The app recognizes three named groups of categories:</p>
+  <table>
+    <thead><tr><th>Constant</th><th>Members</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>JOB_ORDER</code></td>
+        <td>Spring Sports, Softball, Baseball, Tee Ball, Fall Sports, Soccer, Preschool, Winter Sports, Banners, Dry Mount Prints, Framed Prints, Buy Sell</td>
+        <td>Canonical list of photography "Jobs". Used for the Job filter dropdown, the default sort order in lists, and to route the universal Job-vs-Category filter.</td>
+      </tr>
+      <tr>
+        <td><code>SAVINGS_CATEGORIES</code></td>
+        <td>Wealthfront, CiT Bank (and any other categories you create that the Savings/Savings Rate views treat as deposits)</td>
+        <td>Categories representing money you set aside. Excluded from job profit calculations.</td>
+      </tr>
+      <tr>
+        <td><code>NON_JOB_CATEGORIES</code></td>
+        <td>Roll Over, Correction</td>
+        <td>Bookkeeping carry-forward entries. Always excluded from every analytics view to prevent double-counting.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3.4 Glossary</h3>
+  <table>
+    <tbody>
+      <tr><td><strong>Job</strong></td><td>A category that has had at least one income transaction. Excludes savings categories and bookkeeping carry-forwards. Used by Flow / Trends / By Job views.</td></tr>
+      <tr><td><strong>Job No.</strong></td><td>Free-form identifier for a specific shoot/order. Suggested format <code>YY###</code> (e.g. <code>26002</code>). Tied to one customer + one category.</td></tr>
+      <tr><td><strong>Category</strong></td><td>Bucket assigned to a transaction. Can be a job name (e.g. "Spring Sports") or a bookkeeping type (e.g. "Office Supplies").</td></tr>
+      <tr><td><strong>Customer</strong></td><td>Who you billed / received income from.</td></tr>
+      <tr><td><strong>Payee</strong></td><td>The "name on the check" — who you paid for an expense, or who paid you for income.</td></tr>
+      <tr><td><strong>Vendor</strong></td><td>Optional finer-grained label for an expense's source (e.g. brand vs payee).</td></tr>
+      <tr><td><strong>Chart of Accounts (COA)</strong></td><td>QuickBooks-style accounting bucket: Sales, Cost of Goods Sold, Office Supplies, etc.</td></tr>
+      <tr><td><strong>Expense Entry</strong></td><td>A row in the Expense Table that maps a human-friendly label (e.g. "Camera Lens") to a COA bucket and a Job-related flag.</td></tr>
+      <tr><td><strong>Gross profit</strong></td><td>Sum of income amounts. No expenses subtracted.</td></tr>
+      <tr><td><strong>Net profit</strong></td><td>Income − Expenses.</td></tr>
+      <tr><td><strong>Profit base (Savings Rate)</strong></td><td>Income − Job Expenses − Cost of Goods. The denominator of the Savings Rate formula.</td></tr>
+      <tr><td><strong>Job Expense</strong></td><td>Expense whose category is in <code>JOB_ORDER</code> (a job-named cost).</td></tr>
+      <tr><td><strong>Cost of Goods</strong></td><td>Expense whose category is literally "Cost of Goods" or "Cost of Goods Sold".</td></tr>
+      <tr><td><strong>Drill-down</strong></td><td>Clicking a chart element (donut slice, year matrix cell, sankey node) to jump to the Transactions tab pre-filtered to that subset.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============== 4. OVERVIEW PAGE ============== -->
+<section>
+  <h1>4. Overview Page</h1>
+  <p>The default landing page. Designed for at-a-glance financial health.</p>
+
+  <h3>4.1 Year selector</h3>
+  <p>
+    A row of <strong>year pills</strong> at the top: <em>All</em>, every year
+    with data, and a <em>More ▾</em> drawer if you have more than ~6 years.
+    Click a year to scope every chart and total on the page to that year.
+    Locked years show a small red dot in the lower-right of the pill.
+  </p>
+  <p>
+    On mobile, year pills are replaced with a single dropdown that opens a
+    sheet. The same red lock indicator appears on each year in the sheet.
+  </p>
+
+  <h3>4.2 Summary cards (the four colored tiles)</h3>
+  <ul>
+    <li><strong>Income</strong> — total income for the selected year (or all years if "All").</li>
+    <li><strong>Expense</strong> — total non-savings expense for the selected year.</li>
+    <li><strong>Savings</strong> — net flow into savings categories (deposits − withdrawals).</li>
+    <li><strong>Net</strong> — Income − Expense (excludes savings transfers).</li>
+  </ul>
+  <div class="formula">
+    <strong>Net</strong> = Σ(income.amount) − Σ(non-savings expense.amount)<br>
+    <strong>Savings</strong> = Σ(savings expense.amount) − Σ(savings income.amount)
   </div>
-</section>
+  <p>
+    Roll Over / Correction categories are skipped in all four calculations to
+    prevent double-counting carry-forward entries.
+  </p>
 
-<!-- ============== 4. CALENDAR TAB ============== -->
-<section>
-  <h2>4. Calendar Tab</h2>
-  <p>Log every scheduled photo shoot here so nothing slips through the cracks.</p>
-
-  <h3>Year navigation</h3>
-  <p>The sticky top bar contains: <strong>‹ year ›</strong> arrows to jump years, a
-  <strong>Today</strong> button that snaps to the current year, and a
-  <strong>+ New Event</strong> button on the right (inline on mobile so everything
-  fits one row).</p>
-
-  <h3>Adding a new event</h3>
-  <ol>
-    <li>Tap <strong>+ New Event</strong>.</li>
-    <li>Fill out Date (required), Time, Job, Location, and Notes.</li>
-    <li>Save. The event appears in the Scheduled Jobs list below, sorted by date.</li>
-  </ol>
-
-  <h3>Editing / deleting an event</h3>
-  <p>Click any event row to reopen the modal — change values and Save, or click
-  Delete to remove it.</p>
-
-  <div class="tip">
-    Every event you schedule feeds the <strong>Un Invoiced</strong> queue on the
-    Invoices tab when a paid transaction for that job exists but hasn't been
-    linked to an invoice yet.
-  </div>
-</section>
-
-<!-- ============== 5. ANALYTICS TAB ============== -->
-<section>
-  <h2>5. Analytics Tab</h2>
-  <p>Two sub-tabs sit sticky at the top: <strong>Breakdown</strong> and
-  <strong>Trends</strong>. Switch freely — they share the same sidebar selection.</p>
-
-  <h3>Breakdown</h3>
-  <p>Pick a year from the pills. Three donuts summarize the slice —
-  <strong>Jobs</strong> (positive-net categories), <strong>Expenses</strong>, and
-  <strong>Savings</strong>. Empty buckets hide themselves so an unused year
-  shows only the relevant donuts.</p>
-  <p>Below the donuts is a grid of job cards. Each card shows the category name,
-  income, expenses, and net. Use the <strong>Gross | Net</strong> toggle on the
-  right (Gross is default) to flip how the Jobs donut and totals calculate.</p>
-
-  <div class="tip">
-    Click (desktop) or <strong>long-press</strong> (mobile) a job card to jump to
-    the Transactions tab filtered to that category + year. A Back arrow in the
-    Transactions toolbar brings you straight back to Analytics.
-  </div>
-
-  <h3>Trends</h3>
-  <p>Trends draws a historical bar chart. The toolbar controls what you're looking at:</p>
-  <ul>
-    <li><strong>View By</strong> — Year (single year, all jobs stacked) or Job
-      (one job across years).</li>
-    <li><strong>Year</strong> — multi-select when Job view is active; single-select
-      in Year view. Defaults to All Years in Job mode.</li>
-    <li><strong>Jobs</strong> — pick which category drives the chart in Job mode.</li>
-    <li><strong>Payees</strong> — filter by payee (defaults to <em>Job</em> for
-      photography income).</li>
-  </ul>
-  <p>In Job mode every bar is labeled with the dollar amount and
-  <strong>% change vs. the previous year</strong> (green for growth, red for
-  decline). A legend below the chart shows each segment's color and contribution.</p>
-</section>
-
-<!-- ============== 6. ALL TRANSACTIONS ============== -->
-<section>
-  <h2>6. All Transactions Tab</h2>
-  <p>The full ledger. Sort, filter, search, edit, reconcile — everything lives here.</p>
-
-  <h3>Top bar</h3>
-  <p>The running <strong>Selected</strong> count and <strong>Working Balance</strong>
-  sit in a sticky bar at the very top so they stay visible while you scroll.
-  Working Balance reflects your current filter set — narrow the list and the
-  number updates instantly.</p>
-
-  <h3>Toolbar</h3>
-  <ul>
-    <li><strong>+ New Transaction</strong> — opens the form.</li>
-    <li><strong>All Years</strong> / <strong>All Categories</strong> /
-      <strong>All Types</strong> — dropdown filters.</li>
-    <li><strong>Find (magnifying glass)</strong> — click the icon to expand an
-      inline search box. It matches across <em>payee, memo, vendor, customer,
-      category, tags,</em> and <em>amount</em>. Click the icon again to collapse
-      and clear.</li>
-    <li><strong>⋯ menu</strong> — opens the Reconcile modal, toggles Select Mode,
-      and hides/shows reconciled rows.</li>
-  </ul>
-
-  <h3>Table columns</h3>
-  <p>Checkbox • Date • Vendor • Customer • Payee • Category • Amount • Memo •
-  <strong>R</strong> (padlock) • <strong>Tag</strong> icon. The old <em>Account</em>
-  column is removed — the app uses a single default account under the hood.</p>
-
-  <h3>Padlock (R) states</h3>
-  <ul>
-    <li><strong>Dim open padlock</strong> — uncleared.</li>
-    <li><strong>Accent open padlock</strong> — cleared (C).</li>
-    <li><strong>Primary closed padlock</strong> — reconciled (R).</li>
-  </ul>
-  <p>Click the padlock to cycle through the three states.</p>
-
-  <h3>Tag icon</h3>
-  <p>The tag icon dims when the row has no tags and lights up in the primary
-  color when it does. Hover for a tooltip listing the tags.</p>
-
-  <h3>Adding a transaction</h3>
-  <ol>
-    <li>Click <strong>+ New Transaction</strong>.</li>
-    <li>Date is required. Vendor is optional.</li>
-    <li><strong>Customer</strong> is a dropdown of previously-saved names. Pick
-      <em>+ Add new…</em> to be prompted for a new value. Customer is
-      <strong>required</strong> when Payee is <em>Job</em>; optional otherwise.</li>
-    <li>Payee is required. Category is required.</li>
-    <li>Fill the <strong>Outflow</strong> (expense) or <strong>Inflow</strong>
-      (income) amount — not both. The swap arrow flips the two fields if you
-      typed in the wrong one.</li>
-    <li>Memo and Tags are optional.</li>
-    <li>Save. The transaction appears in the list immediately.</li>
-  </ol>
-
-  <h3>Editing / duplicating / deleting</h3>
-  <p>Click any row to open the edit modal. The <strong>Duplicate</strong> button
-  clones the transaction with a fresh ID (but today's date); the
-  <strong>Delete</strong> button removes it with a confirmation prompt.</p>
-
-  <h3>Reconciling against a bank statement</h3>
-  <ol>
-    <li>Open the <strong>⋯</strong> menu → <strong>Reconcile…</strong></li>
-    <li>Enter the statement date, the ending balance, and pick the account.</li>
-    <li>Check off every transaction that appears on the statement. The
-      <strong>Difference</strong> must reach $0.00.</li>
-    <li>Click <strong>Finalize</strong> to mark every checked row as Reconciled (R).</li>
-  </ol>
-
-  <div class="tip">
-    On mobile the instructions auto-hide — tap the small <strong>?</strong> beside
-    the title to toggle them. Cancel and Finalize live at the top-right so they
-    stay in reach while you scroll the transaction list.
-  </div>
-</section>
-
-<!-- ============== 7. INVOICES ============== -->
-<section>
-  <h2>7. Invoices Tab</h2>
-  <p>Build, send, and track invoices — and tie each one to the income transactions
-  it represents so your books stay clean.</p>
-
-  <h3>Summary cards</h3>
-  <p><strong>Total Invoiced</strong>, <strong>Total Paid</strong>,
-  <strong>Outstanding</strong>. All three honor the year filter — narrow to
-  2026 and only 2026 invoices count.</p>
-
-  <h3>Un Invoiced card</h3>
-  <p>Lists income transactions (from the current-filter year) that aren't linked
-  to any invoice yet. Columns: <strong>Date, Customer, Category, Amount</strong>,
-  ascending by date. When every qualifying transaction has an invoice link, the
-  card hides automatically.</p>
-
-  <h3>Invoices list</h3>
-  <p>Sorted by <strong>invoice number descending</strong>. Columns: Invoice # •
-  Total • Date • Bill To • Job • Status (Paid/Unpaid pill) •
-  <strong>Linked</strong> (chain icon with a blue count). On mobile, Total is
-  hidden (tap the invoice to see it); the other columns get wider real estate
-  and the table slides horizontally.</p>
-
-  <h3>Auto-numbering rules</h3>
-  <ul>
-    <li>First invoice of a new year: <strong>YY001</strong> (e.g. <code>26001</code> for 2026).</li>
-    <li>Subsequent new invoices fill the lowest gap in the current-year sequence.</li>
-    <li>Deleting an invoice frees its number for reuse.</li>
-    <li>Auto-numbers never drop below the current year's floor (e.g. won't re-use 25099).</li>
-    <li>Manual override: type any unused number. Duplicates are blocked at save time.</li>
-  </ul>
-
-  <h3>Creating or editing an invoice</h3>
-  <ol>
-    <li>Click <strong>+ New Invoice</strong> (or a row in the list).</li>
-    <li>Confirm the auto-populated <strong>Invoice #</strong> or type your own.</li>
-    <li>Set the <strong>Date</strong>, <strong>Bill To</strong> (multi-line — the
-      first line becomes the Customer), and <strong>Job</strong>.</li>
-    <li>Leave tax as <strong>NON-TAX</strong> (default) or flip to
-      <strong>Tax</strong>; for Tax, set label (e.g. <em>Ohio Sales Tax</em>) and rate.</li>
-    <li>Add line items: Item, Qty, Description, Price. Amount auto-calculates.</li>
-    <li>Link transactions (see below).</li>
-    <li>Click <strong>Save</strong>. Use <strong>Print / PDF</strong> to produce a
-      file to send the client.</li>
-  </ol>
-
-  <h3>Linking transactions to an invoice</h3>
-  <p>The <strong>Linked Transactions</strong> panel sits at the <em>top</em> of
-  the editor, above the printable sheet (it's <em>no-print</em> so it won't
-  appear on PDFs).</p>
-  <ol>
-    <li>Click <strong>+ Link Transactions…</strong> inside that panel.</li>
-    <li>The modal is already filtered to candidates whose <strong>Category</strong>
-      matches the invoice's <strong>Job</strong> AND whose <strong>Customer</strong>
-      matches the first line of <strong>Bill To</strong>.</li>
-    <li>Check the rows that make up this invoice's payment. The Customer column
-      on the right shows any other invoice already linking each row (helpful
-      for avoiding double-links).</li>
-    <li>Save the modal. The panel lists the selected rows with totals; deleted
-      transactions are pruned on the next save so the <em>Linked</em> count
-      stays accurate.</li>
-  </ol>
-
-  <h3>Marking paid / deleting</h3>
-  <p><strong>Mark as Paid</strong> toggles the invoice's paid state (and stamps a
-  paid date). The list immediately reflects the new status pill.
-  <strong>Delete</strong> removes the invoice — a confirmation prompts first.</p>
-</section>
-
-<!-- ============== 8. MILEAGE ============== -->
-<section>
-  <h2>8. Mileage Tab</h2>
-  <p>Log business trips so the IRS-rate deduction is just a click away at tax time.</p>
-
-  <h3>Year summary</h3>
-  <p>Shows total miles, total deduction (miles × IRS rate from Settings), and
-  trip count for the selected year.</p>
-
-  <h3>Adding a trip</h3>
-  <ol>
-    <li>Click <strong>+ New Trip</strong>.</li>
-    <li>Enter Date, From, To, Purpose.</li>
-    <li>Either type <strong>Miles</strong> directly, or fill <strong>Start/End
-      odometer</strong> and the miles auto-calculate.</li>
-    <li>Save. The trip appears in the list sorted by date.</li>
-  </ol>
-  <p>Click a trip row to edit or delete.</p>
-</section>
-
-<!-- ============== 9. REPORTS ============== -->
-<section>
-  <h2>9. Reports Tab</h2>
-  <p>Canned reports you can hand to your accountant:</p>
-  <ul>
-    <li><strong>Profit &amp; Loss</strong> — income, expenses, and net for the selected year.</li>
-    <li><strong>Sales Tax Liability</strong> — breaks down taxable / non-taxable
-      invoiced amounts and total tax collected.</li>
-    <li><strong>Customer Sales Summary</strong> — total revenue per customer.</li>
-  </ul>
-  <p>Every report respects the year filter at the top of the page. Use your
-  browser's Print function to save any report as a PDF.</p>
-</section>
-
-<!-- ============== 10. SETTINGS ============== -->
-<section>
-  <h2>10. Settings Tab</h2>
-  <p>Organized into cards. On mobile the <strong>Data</strong> card floats to
-  the top for one-tap access to backups.</p>
-
-  <h3>Data card</h3>
-  <ul>
-    <li><strong>Startup View</strong> — Overview or All Transactions.</li>
-    <li><strong>Overview Year</strong> — Current Year or All Years when the app first opens.</li>
-    <li><strong>Savings Goal ($)</strong> — drives the goal bar on Overview.</li>
-    <li><strong>Download Backup (JSON)</strong> — native save dialog; file name includes date + time.</li>
-    <li><strong>Backup to iCloud</strong> — remembered-folder backup (see next page).</li>
-    <li><strong>Restore from Backup</strong> — import any JBPhoto-*.json file.</li>
-    <li><strong>Import MoneyStats CSV</strong> — bulk-load transactions from a MoneyStats export.</li>
-    <li><strong>App Info</strong> — shows live line-of-code counts for <code>app.js</code>,
-      <code>styles.css</code>, and <code>index.html</code>.</li>
-    <li><strong>Delete Transactions in Date Range</strong> — type <em>yes</em> to confirm.</li>
-    <li><strong>Clear All Data</strong> — wipes everything in localStorage; also confirmation-gated.</li>
-  </ul>
-
-  <h3>Accounts card</h3>
-  <p>Manage the list of bank accounts / cash buckets. (The app operates on a
-  single default account today; this list is retained for future multi-account
-  support.)</p>
-
-  <h3>Chart of Accounts card</h3>
-  <p>Accounting-style categories. Each transaction can optionally be assigned to
-  a chart account for formal P&amp;L rollups. Add, edit, and nest sub-accounts here.</p>
-</section>
-
-<!-- ============== 11. BACKUP & RESTORE ============== -->
-<section>
-  <h2>11. Backup &amp; Restore</h2>
-  <p>Because every piece of data lives in your browser's localStorage, regular
-  backups are essential. The app gives you two paths.</p>
-
-  <h3>Download Backup (JSON)</h3>
-  <p>Click the button; your browser's native save dialog opens, starting in the
-  <em>Documents</em> folder. The default filename is
-  <code>JBPhoto-backup-YYYY-MM-DD_HH-MM-SS.json</code>, so successive saves
-  never overwrite each other. Navigate anywhere you like — including iCloud
-  Drive — and save.</p>
-
-  <h3>Backup to iCloud (recommended)</h3>
-  <ol>
-    <li>On the <strong>first click</strong> you'll be asked to pick a folder.
-      Browse to <em>iCloud Drive › JBPhoto</em> (create the folder if it doesn't
-      exist) and grant the permission.</li>
-    <li>The app stores the folder reference in your browser (IndexedDB).</li>
-    <li><strong>Every subsequent click</strong> writes straight to that folder
-      with a fresh date-stamped filename — no dialog, no clicks.</li>
-    <li>If you clear browser data or switch devices, the first click will prompt
-      you to choose the folder again.</li>
-  </ol>
-  <div class="tip">
-    Firefox and Safari don't yet support the folder-pick API. On those browsers
-    the button tells you to use <strong>Download Backup (JSON)</strong> instead
-    and pick iCloud Drive from the native save dialog.
+  <h3>4.3 Year-over-year cards</h3>
+  <p>
+    When a specific year is selected (not "All"), four small YoY tiles appear
+    showing the percentage change vs the same period in the prior year.
+    For the <em>current calendar year</em> the comparison is YTD-to-YTD
+    (e.g. Jan 1 → today's date in both years).
+  </p>
+  <div class="formula">
+    <strong>YoY %</strong> = ((current − prior) ÷ |prior|) × 100<br>
+    Edge cases: prior = 0 → "—"; current &gt; 0 → "+∞%"
   </div>
 
-  <h3>Restoring a backup</h3>
-  <ol>
-    <li>Click <strong>Restore from Backup</strong>.</li>
-    <li>Select any <code>JBPhoto-*.json</code> file.</li>
-    <li>Confirm the overwrite prompt.</li>
-    <li>The app replaces current state but preserves every field in the backup —
-      transactions, invoices, chart accounts, vendors, customers, mileage trips,
-      scheduled jobs, savings goal.</li>
-  </ol>
+  <h3>4.4 Savings Goal thermometer</h3>
+  <p>
+    Vertical (desktop) or horizontal (mobile) progress bar comparing Savings
+    YTD vs the goal set in <em>Settings → Savings Goal</em>. Fill width is
+    <code>(actual ÷ goal) × 100%</code>, capped at 100%. When met, the bar
+    label switches to "Goal met · $X over".
+  </p>
+
+  <h3>4.5 Open / Complete Jobs counters</h3>
+  <p>
+    Two small tiles count jobs in the selected year by status. A job counts
+    as "Complete" when its status field equals <code>"Paid"</code>; otherwise
+    it counts as "Open".
+  </p>
+
+  <h3>4.6 Total Income by Year chart</h3>
+  <p>
+    Vertical bar chart of yearly income with a 6-year sliding window
+    (use ◂ ▸ buttons to scroll older). Above each bar, the year's income
+    in dollars and a YoY % delta (green ▲ for up, red ▼ for down) appear.
+  </p>
+  <p>
+    <strong>Goal line</strong>: For the current calendar year only (and only
+    when not in YTD-only mode), a dashed accent line marks the "goal" =
+    average of the previous three years' income. Useful as an implicit
+    revenue target.
+  </p>
+
+  <h3>4.7 Income by Job donut</h3>
+  <p>
+    Donut chart and per-category list of income contributors for the
+    selected year. Categories without income that year are excluded.
+    Clicking a slice or list row jumps to the Transactions tab filtered
+    to that category × year.
+  </p>
+
+  <h3>4.8 Job / Category / Account summary tables</h3>
+  <p>
+    Three side-by-side tables at the bottom showing per-job income,
+    per-category expense, and per-account balance — all scoped to the
+    selected year. Each row sums to the four totals at the top.
+  </p>
 </section>
 
-<!-- ============== 12. TIPS & TRICKS ============== -->
+<!-- ============== 5. CALENDAR PAGE ============== -->
 <section>
-  <h2>12. Tips &amp; Tricks</h2>
+  <h1>5. Calendar Page</h1>
+
+  <h3>5.1 Year picker</h3>
+  <p>
+    A single dropdown at the top selects the year. Options include every
+    year that has scheduled jobs, plus the current calendar year and one
+    year on each side of the viewed year for easy navigation.
+  </p>
+
+  <h3>5.2 Mini-month grid</h3>
+  <p>
+    12 mini-calendars laid out in a grid (3 columns desktop, 2 columns
+    mobile). Each cell:
+  </p>
   <ul>
-    <li><strong>Drill-through navigation:</strong> long-press (mobile) or click
-      (desktop) a row in Overview's By Job / By Category tables to open its
-      transactions. The Back arrow on the Transactions toolbar returns you to
-      the exact tab you came from.</li>
-    <li><strong>Analytics job cards</strong> support the same long-press /
-      double-click behavior — a single tap on mobile selects the card, a
-      second tap within half a second opens the drill-through.</li>
-    <li><strong>Sticky top bars</strong> on mobile: year/status bars on
-      Overview, the Selected + Working Balance bar on Transactions, and the
-      Breakdown/Trends tabs on Analytics all stay put while you scroll.</li>
-    <li><strong>Customer autocomplete:</strong> every customer name you've ever
-      entered appears in the dropdown. Pick an existing name or add a new one
-      without leaving the form.</li>
-    <li><strong>Unified Find:</strong> one search box hunts across payee, memo,
-      vendor, customer, category, tags, and amount. Type a dollar figure to
-      find transactions at that price.</li>
-    <li><strong>Invoice auto-numbering</strong> always fills gaps first. Delete
-      26004 and the next new invoice reuses 26004; once current-year numbers
-      are fully used, it rolls forward to 26005, 26006, etc.</li>
-    <li><strong>Linked invoice filter</strong>: the + Link Transactions modal
-      is pre-filtered by the invoice's Bill To (Customer) and Job (Category),
-      so you rarely need to search.</li>
-    <li><strong>Keyboard shortcuts:</strong> <code>Esc</code> closes any open
-      modal; standard browser shortcuts (Cmd/Ctrl+F, Cmd/Ctrl+P) work as expected.</li>
-    <li><strong>Safe exit:</strong> every destructive action (clear data, delete
-      range, delete invoice) requires a typed confirmation. You can't
-      accidentally wipe your books.</li>
+    <li>If empty: muted background.</li>
+    <li>If 1+ scheduled events: the cell is filled with the first event's
+        per-job color (palette assigned deterministically per Job).</li>
+    <li>Today's date gets a primary-color outline.</li>
+  </ul>
+  <p>
+    Click any day cell to open the Schedule Event modal with the date pre-filled.
+  </p>
+
+  <h3>5.3 Scheduled Jobs list</h3>
+  <p>
+    Beneath the calendar, a table lists every event scheduled in the
+    selected year, sorted by date then time. Click any row to open and edit
+    that event.
+  </p>
+
+  <h3>5.4 + New Event button</h3>
+  <p>
+    Opens the Schedule Event modal: Date · Time · Job · Location · Notes.
+    On mobile the button sits on the right side of the year picker row.
+  </p>
+</section>
+
+<!-- ============== 6. NEW JOB PAGE ============== -->
+<section>
+  <h1>6. New Job Page</h1>
+
+  <h3>6.1 Adding a job</h3>
+  <p>
+    Click <strong>+ New Job</strong>. The modal collects:
+  </p>
+  <ul>
+    <li><strong>Date</strong> — shoot date.</li>
+    <li><strong>Job No.</strong> — your free-form identifier; suggested <code>YY###</code>.</li>
+    <li><strong>Customer</strong> — select from existing or type a new name via "+ Add new…".</li>
+    <li><strong>Category</strong> — same pattern.</li>
+    <li><strong>Hours</strong> — optional, used in some analytics.</li>
+  </ul>
+  <p>
+    Saving a job also stores the Customer ↔ Category pairing so the next
+    time you create a transaction for that customer the Category dropdown
+    suggests the same category first.
+  </p>
+
+  <h3>6.2 Job Analytics table</h3>
+  <p>
+    Beneath the "Add" controls is a per-job analytics table with these columns:
+  </p>
+  <ul>
+    <li><strong>Job No., Customer, Category, Hours</strong> — straight from the job record.</li>
+    <li><strong>Income</strong> — Σ(income tx amounts) where tx.jobNo matches.</li>
+    <li><strong>Expenses</strong> — Σ(expense tx amounts) where tx.jobNo matches.</li>
+    <li><strong>Profit</strong> — Income − Expenses for that job.</li>
+    <li><strong>Status</strong> — current job status (Ordered, Shot, Edited, Delivered, Invoiced, Paid).</li>
+  </ul>
+  <p>
+    Each row's status can be advanced inline through the 6-stage pipeline.
+    The Filters bar above the table narrows by year, customer, or category.
+  </p>
+
+  <h3>6.3 Swipe-to-edit (mobile)</h3>
+  <p>
+    On mobile in the 3-line layout, swipe a row left to reveal Edit /
+    Delete buttons. Swipe back or tap outside to dismiss.
+  </p>
+</section>
+
+<!-- ============== 7. TRANSACTIONS PAGE ============== -->
+<section>
+  <h1>7. Transactions Page</h1>
+  <p>The full ledger — every dollar in or out of the business.</p>
+
+  <h3>7.1 Running balance header</h3>
+  <p>
+    A pinned strip at the top shows the cumulative balance of the
+    currently-filtered list and, when select-mode is active, the count and
+    sum of the selected rows.
+  </p>
+
+  <h3>7.2 Toolbar</h3>
+  <ul>
+    <li><strong>+ New Transaction</strong> — opens the transaction modal.</li>
+    <li><strong>Clear filters</strong> — resets every filter on this page.</li>
+    <li><strong>All Years</strong> — quick year picker.</li>
+    <li><strong>Filters ▾</strong> — combined dropdown wrapping <em>All Jobs</em>, <em>All Categories</em>, and <em>All Charts</em>. Each nested panel is a single-select except Charts (multi-select with All / None controls).</li>
+    <li><strong>All Types</strong> — Income / Expense / both.</li>
+    <li><strong>Sort: Date / Sort: Job No.</strong> — only visible in "Only Jobs" mode; toggles the row sort.</li>
+    <li><strong>Find / 🔍</strong> — searches across every column.</li>
+    <li><strong>… (More actions)</strong> — Select Transactions, Reconcile mode, Bulk delete, Import / Export CSV, Backfill Job No., Print, Settings shortcuts.</li>
   </ul>
 
-  <p style="text-align: center; margin-top: 2em; color: var(--muted);">
-    <em>End of manual. Questions? Open the app, then Settings → App Info —
-    it shows the current live line-of-code counts as a sanity check that
-    you're running the latest build.</em>
+  <h3>7.3 Mobile toolbar reflow</h3>
+  <p>On mobile the toolbar wraps into rows:</p>
+  <ul>
+    <li><strong>Row 1</strong>: + New Transaction (right ⅓, alone)</li>
+    <li><strong>Row 2</strong>: Search · Clear filters · All Years</li>
+    <li><strong>Row 3</strong>: More · Filters · All Types</li>
+    <li><strong>Row 4</strong>: Sort (only when "Only Jobs" picked)</li>
+  </ul>
+  <p>
+    When you drill into Transactions from an Analytics view, a <strong>‹ Back</strong>
+    button appears at the top of the toolbar; it takes you back to whichever
+    analytics view you came from.
+  </p>
+
+  <h3>7.4 The transactions table</h3>
+  <p>Columns (all toggleable in Settings):</p>
+  <ul>
+    <li>Date · Vendor · Job No. · Customer · Payee · Category · Expense/Income · Chart of Accounts · Amount · Memo · Reconciled · Tags</li>
+  </ul>
+  <p>
+    Each cell is editable inline by clicking it; changes persist on blur.
+    The Reconciled column shows a small lock icon — click to cycle through
+    Uncleared → Cleared (gray, partial outline) → Reconciled (filled
+    primary).
+  </p>
+  <p>
+    The Job No. column shows a small blue invoice icon next to the job
+    number when the row's job has at least one invoice on file.
+  </p>
+
+  <h3>7.5 Highlight rules</h3>
+  <ul>
+    <li><strong>Non-job</strong> rows (Roll Over / Correction): muted gray background, second column shaded.</li>
+    <li><strong>Expinc-cat-match</strong>: when the Expense Table entry name matches the category, a subtle accent border.</li>
+    <li><strong>Sales chart</strong>: when Chart of Accounts contains "Sales", an income-green accent.</li>
+    <li><strong>Color rows by Job No.</strong> (optional via Settings): each unique job gets a deterministic palette tint applied to its rows.</li>
+  </ul>
+
+  <h3>7.6 New / Edit transaction modal</h3>
+  <p>Fields and behavior:</p>
+  <ul>
+    <li><strong>Date</strong> — defaults to today.</li>
+    <li><strong>Existing Job (Y/N)</strong> — toggle. When Y, a Job No. picker appears; selecting one auto-fills Customer + Category.</li>
+    <li><strong>Customer</strong> — select dropdown with "+ Add new…".</li>
+    <li><strong>Outflow / Inflow</strong> — mutually exclusive; typing in one clears the other. <code>$0.00</code> is allowed.</li>
+    <li><strong>Category</strong> — selectable list refreshes based on the chosen customer (cascade narrowing).</li>
+    <li><strong>Payee</strong> — typed value, with autocomplete from <code>state.payees</code> (auto-grown on save).</li>
+    <li><strong>Vendor</strong> — disabled when Inflow has a value.</li>
+    <li><strong>Expense/Income</strong> — pulls the Expense Table; picking an entry auto-sets Chart of Accounts to that entry's COA. Existing Job + Inflow forces COA = "Sales".</li>
+    <li><strong>Chart of Accounts</strong> — select dropdown from <code>chartAccounts</code>.</li>
+    <li><strong>Memo / Tags</strong> — free text.</li>
+    <li><strong>Account</strong> — the bank/cash account.</li>
+  </ul>
+  <p>
+    Validation: at least one of Outflow / Inflow must have a numeric value
+    (zero is allowed). Customer is required if Payee is literally "Job".
+  </p>
+
+  <h3>7.7 Locked years</h3>
+  <p>
+    Any attempt to create, edit, or delete a transaction whose date falls
+    in a locked year is blocked and a toast appears: "YYYY is locked in
+    Settings". Swipe-delete, modal-delete, bulk-delete, inline-edit, and
+    CSV import all enforce this.
+  </p>
+</section>
+
+<!-- ============== 8. ANALYTICS OVERVIEW ============== -->
+<section>
+  <h1>8. Analytics — Overview</h1>
+  <p>
+    The Analytics page is one section (<code>#jobs</code>) that contains
+    ten swappable inner views. The view-picker is a row of pills on
+    desktop, a dropdown on mobile.
+  </p>
+
+  <h3>8.1 The ten views</h3>
+  <ol>
+    <li><strong>Year Matrix</strong> — pivot of category × year income/expense.</li>
+    <li><strong>By Job</strong> — donut + jobs grid grouped by Customer / Category / Job No.</li>
+    <li><strong>Cash Flow</strong> — monthly bars + cumulative line, one year.</li>
+    <li><strong>By Category</strong> — donut/columns/treemap/rose chart of categorized spending or income.</li>
+    <li><strong>Trends (Spending Trends)</strong> — stacked monthly bars or per-category lines, one year.</li>
+    <li><strong>Flow</strong> — horizontal pill bars per Job (All Jobs) or per Year (One Job).</li>
+    <li><strong>vs Expense</strong> — monthly income vs expense overlay.</li>
+    <li><strong>Breakdown (Sankey)</strong> — multi-stage flow diagram with user-picked stages.</li>
+    <li><strong>Savings Rate</strong> — monthly % of profit saved.</li>
+    <li><strong>Savings</strong> — monthly $ deposits into savings accounts.</li>
+  </ol>
+
+  <h3>8.2 Universal filter bar</h3>
+  <p>
+    Right above the active view: <strong>Filters</strong> button, <strong>Presets</strong>
+    button, and any active filter chips. The filter state is shared across
+    every view — opening a different view immediately re-renders against
+    the same filter snapshot.
+  </p>
+
+  <h3>8.3 Default view</h3>
+  <p>
+    Year Matrix is the default on first open. The chosen view persists
+    via the pill's <code>.active</code> class (the active analytics view
+    is captured in any saved Preset).
+  </p>
+</section>
+
+<!-- ============== 9. ANALYTICS — YEAR MATRIX ============== -->
+<section>
+  <h1>9. Analytics — Year Matrix</h1>
+
+  <h3>9.1 Layout</h3>
+  <p>
+    A pivot table with categories down the left and years across the top
+    (newest year on the left). Each cell is the sum of income (or expense,
+    depending on the mode toggle) for that category in that year. A
+    "Total" row appears at the bottom and a "Total" column on the right.
+  </p>
+
+  <h3>9.2 Mode switch</h3>
+  <p>
+    Top right of the card: a two-button switch with Income ▲ / Expense ▼
+    icons. Income (default) shows positive amounts in green; Expense shows
+    in red.
+  </p>
+
+  <h3>9.3 Row order</h3>
+  <p>
+    Rows are pre-sorted in the user's preferred photography-job order:
+    Spring Sports · Baseball · Softball · Tee Ball · Fall Sports · Banners ·
+    Soccer · Preschool · Winter Sports · Framed Prints · Dry Mount Prints ·
+    Buy Sell. Any remaining categories fall through to descending lifetime
+    total.
+  </p>
+
+  <h3>9.4 Drill-down</h3>
+  <p>
+    Every cell, row-header, row-total, and column-total in the matrix is
+    clickable:
+  </p>
+  <ul>
+    <li><strong>Single cell</strong> ($X in 2026 under Spring Sports) → Transactions filtered to Spring Sports × 2026 × current mode.</li>
+    <li><strong>Row head / row total</strong> → all years for that category × current mode.</li>
+    <li><strong>Column total</strong> → all categories for that year × current mode.</li>
+  </ul>
+  <p>
+    A Back arrow appears on the Transactions toolbar; clicking it returns
+    you to the Year Matrix view. A "Drill: …" chip in the toolbar names
+    the subset you drilled into.
+  </p>
+
+  <h3>9.5 Category column width</h3>
+  <p>
+    The first column is locked at 155px so toggling Income/Expense doesn't
+    change widths. Long names truncate with "…".
+  </p>
+</section>
+
+<!-- ============== 10. ANALYTICS — BY JOB ============== -->
+<section>
+  <h1>10. Analytics — By Job</h1>
+
+  <h3>10.1 Donut row</h3>
+  <p>Three donuts at the top of the page:</p>
+  <ul>
+    <li><strong>Jobs</strong> — income contributions per Job category.</li>
+    <li><strong>Expenses</strong> — outgoing flows per non-savings category.</li>
+    <li><strong>Savings</strong> — deposits split by savings sub-category.</li>
+  </ul>
+  <p>
+    On mobile the desktop donuts are hidden and a single mobile-twin donut
+    appears at the top of each section beneath, sized for phone screens.
+  </p>
+
+  <h3>10.2 Jobs grid sections</h3>
+  <p>Three vertical sections — Jobs, Expenses, Savings. Each contains:</p>
+  <ul>
+    <li>A title with optional group toggle (By Customer / By Category / By Job No.) — only on the Jobs section.</li>
+    <li>A Gross / Net mode toggle.</li>
+    <li>A grid of cards. Each card represents one item (a customer, a category, or a job) and shows:
+      <ul>
+        <li>Title (with status badge if a Job).</li>
+        <li>Net or Gross dollar amount.</li>
+        <li>% of section total.</li>
+        <li>Mini-stats: in / out, count of transactions, hours.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>10.3 Group toggle</h3>
+  <ul>
+    <li><strong>By Customer</strong> — Jobs side groups by customer; Expenses side stays keyed by category.</li>
+    <li><strong>By Category</strong> — both sides group by category.</li>
+    <li><strong>By Job No.</strong> — Jobs side groups by job number with the format "<code>26002 — Customer / Category</code>"; Expenses stays by category.</li>
+  </ul>
+
+  <h3>10.4 Card drill-down</h3>
+  <p>
+    Click any card to jump to the Transactions tab filtered to that subset
+    (a synthetic <code>__txDrillFilter</code> predicate is set so the
+    filter survives even for non-trivial drill targets like "Unlinked"
+    or "Expense entry name").
+  </p>
+
+  <h3>10.5 Mobile-only layout (By Job section head)</h3>
+  <p>
+    The By Customer / By Category / By Job No. toggle is 3-up grid filling
+    the row; the Gross / Net toggle wraps to its own row beneath it,
+    right-aligned, to avoid getting pushed off-screen.
+  </p>
+</section>
+
+<!-- ============== 11. ANALYTICS — CASH FLOW ============== -->
+<section>
+  <h1>11. Analytics — Cash Flow</h1>
+
+  <h3>11.1 What it shows</h3>
+  <p>
+    Vertical bar chart with one bar per month for a single year. Each bar
+    stacks income (green, going up from $0) and expense (red, going down
+    from $0). A line overlay traces the running net (income − expense) at
+    the end of each month.
+  </p>
+
+  <h3>11.2 Year selection</h3>
+  <p>
+    Cash Flow always renders ONE year. Year choice:
+  </p>
+  <ol>
+    <li>If the universal Date Range filter has a selection → most recent of those years.</li>
+    <li>Else, if the current calendar year has any data → current year.</li>
+    <li>Else, the most recent year with any transaction data.</li>
+  </ol>
+
+  <h3>11.3 Toolbar</h3>
+  <p>
+    Flow / Trend mode switch — Flow shows the two-direction bars; Trend
+    hides bars and shows only the net line.
+  </p>
+
+  <h3>11.4 Stats sidebar</h3>
+  <p>
+    Right side of the card on desktop, stacks below on mobile.
+  </p>
+  <ul>
+    <li><strong>Net</strong>: total income − total expense for the year.</li>
+    <li><strong>Avg</strong>: net ÷ months in the period.</li>
+    <li><strong>Avg Out</strong>: expense total ÷ months.</li>
+    <li><strong>Total In</strong> / <strong>Total Out</strong>.</li>
+  </ul>
+
+  <h3>11.5 Mobile</h3>
+  <p>
+    Month labels rotate 45° clockwise to prevent overlap; padding bumps
+    accordingly. Y-axis ticks and month labels render at 20px (SVG units)
+    for legibility.
+  </p>
+</section>
+
+<!-- ============== 12. ANALYTICS — BY CATEGORY ============== -->
+<section>
+  <h1>12. Analytics — By Category</h1>
+
+  <h3>12.1 What it shows</h3>
+  <p>
+    Aggregate of either spending or income, grouped by Category, with four
+    selectable chart styles.
+  </p>
+
+  <h3>12.2 Switches</h3>
+  <ul>
+    <li><strong>Spending / Income</strong> — Total filters by transaction type.</li>
+    <li><strong>Gross / Net</strong> — Gross sums |amount|; Net subtracts opposite-type amounts in the same category.</li>
+    <li><strong>Donut / Columns / Treemap / Rose</strong> — chart style.</li>
+  </ul>
+
+  <h3>12.3 Donut chart</h3>
+  <p>
+    SVG donut. Each slice's label format is "<code>Category 24%</code>"
+    on a single line, with the dollar amount on the sub-line beneath.
+    Slices below 1.5% of total are aggregated into "Other".
+  </p>
+
+  <h3>12.4 Columns chart</h3>
+  <p>
+    Vertical bars in descending order. Each bar shows the dollar value;
+    a small % above each bar shows that category's share of total. On mobile,
+    x-axis category names rotate 45° to prevent overlap.
+  </p>
+
+  <h3>12.5 Treemap chart</h3>
+  <p>
+    Binary treemap — each rectangle's area is proportional to its category's
+    share. Long names truncate with "…". Font size auto-scales based on
+    cell area; mobile labels use a larger range (16–28 px in SVG units vs
+    11–20 on desktop).
+  </p>
+
+  <h3>12.6 Rose chart</h3>
+  <p>
+    Coxcomb / polar-area chart. Each wedge has equal angular width but
+    radius is scaled by <code>sqrt(value)</code> so visual area ≈ value.
+  </p>
+
+  <h3>12.7 Sidebar tiles</h3>
+  <ul>
+    <li><strong>Total</strong>, <strong>Avg / Month</strong>, <strong>Top Category</strong> (name + % share), <strong>Categories</strong> (count).</li>
+  </ul>
+</section>
+
+<!-- ============== 13. SPENDING TRENDS ============== -->
+<section>
+  <h1>13. Analytics — Trends (Spending Trends)</h1>
+
+  <h3>13.1 What it shows</h3>
+  <p>
+    Monthly breakdown of expenses for one year. Two chart modes:
+  </p>
+  <ul>
+    <li><strong>Stacked</strong>: per-month bars stacked by category (largest at the bottom).</li>
+    <li><strong>Lines</strong>: one polyline per category showing month-to-month spend; dots at each data point.</li>
+  </ul>
+
+  <h3>13.2 Year selection</h3>
+  <p>Same one-year rule as Cash Flow.</p>
+
+  <h3>13.3 Sidebar tiles</h3>
+  <ul>
+    <li><strong>Total Spending</strong> — Σ all expense rows in the year.</li>
+    <li><strong>Monthly Avg</strong> — Total ÷ months with data.</li>
+    <li><strong>Categories</strong> — count.</li>
+    <li><strong>Months</strong> — count of months with at least one expense.</li>
+  </ul>
+
+  <h3>13.4 Mobile reflow</h3>
+  <p>
+    X-axis month labels rotate 45° clockwise; the chart's viewBox matches
+    Cash Flow's 800×380 so the two cards render at the same height. Card
+    chrome is dropped on mobile so the chart hugs the available width.
+  </p>
+</section>
+
+<!-- ============== 14. FLOW ============== -->
+<section>
+  <h1>14. Analytics — Flow</h1>
+
+  <h3>14.1 What it shows</h3>
+  <p>
+    Horizontal pill-shaped bars representing net or gross income flow.
+    Two modes:
+  </p>
+  <ul>
+    <li><strong>All Jobs</strong> — one bar per Job category, summed across selected years.</li>
+    <li><strong>One Job</strong> — one bar per year for the chosen Job category.</li>
+  </ul>
+
+  <h3>14.2 Gross vs Net</h3>
+  <p>Two toggles control the bar values:</p>
+  <div class="formula">
+    <strong>Gross</strong> = Σ income amounts (per-payee positive sum)<br>
+    <strong>Net</strong> = Σ (income − expense), per Job
+  </div>
+
+  <h3>14.3 Year selection</h3>
+  <p>
+    Honors the universal Date Range. In <em>All Jobs</em> mode, all
+    selected years contribute to each Job's total. In <em>One Job</em>
+    mode, each year is its own bar.
+  </p>
+
+  <h3>14.4 Sidebar list</h3>
+  <p>
+    On the right, a list of every bar with name, $ value, and (in One Job
+    mode) a green ▲ / red ▼ year-over-year % chip showing the change vs
+    the prior calendar year.
+  </p>
+
+  <h3>14.5 Stats</h3>
+  <ul>
+    <li><strong>Total Net / Total Gross</strong></li>
+    <li><strong>Avg / Job</strong> (All Jobs) or <strong>Avg / Year</strong> (One Job)</li>
+    <li><strong>Count</strong> of jobs or years</li>
+    <li><strong>Months</strong> — months with any income tx in the filter set</li>
+  </ul>
+
+  <h3>14.6 Job-eligibility rule</h3>
+  <p>
+    A category counts as a Job (eligible for this view) when it has had at
+    least one income transaction, excluding savings and bookkeeping
+    carry-forward categories. Pure-expense categories (Office Supplies,
+    Cost of Goods Sold, etc.) are filtered out.
+  </p>
+
+  <h3>14.7 Mobile</h3>
+  <p>
+    The toolbar reflows: row 1 has All Jobs / One Job (left) and Gross /
+    Net (right) split 50/50; row 2 is the Job dropdown (full width, One
+    Job mode only). Bars are slimmer (12px tall, square-ended) and
+    label/axis fonts are tuned for phone size.
+  </p>
+</section>
+
+<!-- ============== 15. VS EXPENSE ============== -->
+<section>
+  <h1>15. Analytics — vs Expense</h1>
+
+  <h3>15.1 What it shows</h3>
+  <p>
+    Monthly grouped bars of income vs expense for the period selected
+    via the universal Date Range filter. Useful for spotting months where
+    expenses overtook income.
+  </p>
+
+  <h3>15.2 Stats</h3>
+  <p>
+    Sidebar shows totals for income, expense, and net, plus best/worst
+    months by net.
+  </p>
+</section>
+
+<!-- ============== 16. BREAKDOWN (SANKEY) ============== -->
+<section>
+  <h1>16. Analytics — Breakdown (Sankey)</h1>
+
+  <h3>16.1 What it shows</h3>
+  <p>
+    Multi-stage flow diagram using d3-sankey. Each transaction enters the
+    leftmost stage and flows through up to N user-picked stages on its
+    way to the rightmost stage.
+  </p>
+
+  <h3>16.2 Stage chips</h3>
+  <p>
+    Above the chart, draggable chips define the stages from left to
+    right. Click "+ Add stage" to insert any of: Customer · Vendor ·
+    Category · Payee · Job No. · Expense · Chart of Accounts · Year · Month.
+    Click an × on a chip to remove that stage.
+  </p>
+
+  <h3>16.3 Spending / Income switch</h3>
+  <p>
+    Controls which transaction type populates the diagram.
+  </p>
+
+  <h3>16.4 Mobile</h3>
+  <p>
+    The Sankey renders at its full 1200px intrinsic width inside a
+    horizontally scrollable container. Two-finger pinch-zoom (0.5×–4×)
+    zooms in/out around the pinch midpoint. Single-finger drag pans when
+    zoomed. Double-tap resets to 1×. Node labels render at 14px for
+    readability.
+  </p>
+</section>
+
+<!-- ============== 17. SAVINGS RATE ============== -->
+<section>
+  <h1>17. Analytics — Savings Rate</h1>
+
+  <h3>17.1 The headline rate</h3>
+  <div class="formula">
+    <strong>Savings Rate</strong> = Savings ÷ (Gross Profit − Job Expenses − Cost of Goods) × 100
+  </div>
+  <p>
+    Where:
+  </p>
+  <ul>
+    <li><strong>Savings</strong> = Σ expense rows whose category OR expense-table entry is a savings category.</li>
+    <li><strong>Gross Profit</strong> = Σ income rows (excluding Roll Over / Correction).</li>
+    <li><strong>Job Expenses</strong> = Σ expense rows whose category is in <code>JOB_ORDER</code>.</li>
+    <li><strong>Cost of Goods</strong> = Σ expense rows whose category is literally "Cost of Goods" or "Cost of Goods Sold".</li>
+  </ul>
+
+  <h3>17.2 Monthly chart</h3>
+  <p>
+    Vertical bars per month showing the per-month rate. Y-axis runs 0–100%
+    (or up to <code>ceil(maxRate ÷ 10) × 10</code> if any month exceeds 100%).
+    Months that have a savings deposit but no profit base (income ≤ Job
+    Exp + COGS) render as a <strong>faint capped "ghost" bar</strong> at
+    the top of the chart with a dashed outline and tooltip "saved $X (no
+    profit base to compute a rate)". This makes savings-without-income
+    months visible without claiming a misleading 100%.
+  </p>
+
+  <h3>17.3 Sidebar tiles</h3>
+  <ul>
+    <li><strong>Total Income</strong>, <strong>Job Exp + COGS</strong>, <strong>Profit Base</strong>, <strong>Saved</strong>.</li>
+  </ul>
+
+  <h3>17.4 Savings by Category list</h3>
+  <p>
+    Each savings sub-category (Wealthfront, CiT Bank, etc.) listed with
+    its total deposit for the period.
+  </p>
+
+  <h3>17.5 Deductions accordion</h3>
+  <p>
+    Click "Job Expenses + Cost of Goods" to expand a table of every
+    individual transaction contributing to the denominator's deductions.
+    Grouped by bucket (Job Expense or Cost of Goods); each row shows
+    Date · Payee · Category · Amount.
+  </p>
+
+  <h3>17.6 Year</h3>
+  <p>
+    Same one-year rule as Cash Flow / Spending Trends. The page header
+    reads <code>Savings Rate — YYYY</code>.
+  </p>
+</section>
+
+<!-- ============== 18. SAVINGS ============== -->
+<section>
+  <h1>18. Analytics — Savings</h1>
+
+  <h3>18.1 What it shows</h3>
+  <p>
+    Vertical bar chart of monthly savings deposits for one year, plus a
+    yellow cumulative-running-total line overlaying the bars.
+  </p>
+  <div class="formula">
+    For each month, <strong>months[m]</strong> = Σ savings-expense amounts − Σ savings-income amounts<br>
+    Savings rows = category OR expense-table entry in <code>SAVINGS_CATEGORIES</code>
+  </div>
+
+  <h3>18.2 Header chips</h3>
+  <ul>
+    <li><strong>Year</strong>: "Savings — YYYY" (same one-year rule as other views).</li>
+    <li><strong>Total</strong>: sum of all monthly deposits, green if positive, red if net withdrawal.</li>
+    <li><strong>YoY chip</strong>: ▲ or ▼ with % change vs prior year (hidden if prior year was 0).</li>
+    <li><strong>Subtitle</strong>: "Monthly deposits into Wealthfront / CiT Bank".</li>
+    <li><strong>Goal bar</strong>: progress toward <code>state.savingsGoal</code>. Caption shows "$X of $goal · $Y to go" or "Goal met · $X over". Hidden if no goal set.</li>
+  </ul>
+
+  <h3>18.3 Cumulative line</h3>
+  <p>
+    A yellow polyline + dots climbing across the bars showing the running
+    total at the end of each month. Uses its own Y-scale so the line uses
+    the full plot height. Hidden when the year total is 0.
+  </p>
+
+  <h3>18.4 Stats sidebar</h3>
+  <ul>
+    <li><strong>Avg / Month</strong> = Total ÷ months with deposits.</li>
+    <li><strong>Best Month</strong> = "Mon · $X" of the largest month.</li>
+    <li><strong>Months with Deposits</strong> — count of months with positive net flow.</li>
+    <li><strong>Largest Deposit</strong> — the single biggest savings transaction in the year.</li>
+  </ul>
+
+  <h3>18.5 Savings Transactions accordion</h3>
+  <p>
+    Below the chart, a collapsible "Savings Transactions" button shows
+    the year's running total. Click to expand a table grouped by bucket
+    (Wealthfront / CiT Bank / etc.), sorted by date descending, with
+    columns Date · Payee · Category · Amount. Withdrawals render with a
+    negative sign.
+  </p>
+</section>
+
+<!-- ============== 19. UNIVERSAL FILTERS ============== -->
+<section>
+  <h1>19. Universal Filters</h1>
+
+  <h3>19.1 The five filter dimensions</h3>
+  <table>
+    <thead><tr><th>Filter</th><th>Source</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Date Range</td><td>Years from <code>transactions[*].date</code></td><td>Multi-select. Defaults to all years.</td></tr>
+      <tr><td>Customer</td><td><code>state.customers</code></td><td>Multi-select with Include / Exclude modes.</td></tr>
+      <tr><td>Job</td><td><code>JOB_ORDER ∩ state.categories</code></td><td>Targets Job-named categories.</td></tr>
+      <tr><td>Category</td><td><code>state.categories</code> minus JOB_ORDER</td><td>Targets non-Job categories.</td></tr>
+      <tr><td>Payees</td><td><code>state.payees</code></td><td>Multi-select.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>19.2 Smart Job vs Category routing</h3>
+  <p>
+    For each transaction's category, the filter system uses
+    <code>filterPassesCategory(catValue)</code> which routes through the
+    Job filter when the value is in <code>JOB_ORDER</code>, and through
+    the Category filter otherwise. This means setting "Job: Spring Sports"
+    excludes both other jobs AND non-Job categories like "Office
+    Supplies" — matching the user intent "show me only Spring Sports
+    transactions".
+  </p>
+
+  <h3>19.3 Include vs Exclude mode</h3>
+  <p>
+    Each filter has two tabs at the top of its popover:
+  </p>
+  <ul>
+    <li><strong>Include</strong>: show only rows whose value is in the selected set.</li>
+    <li><strong>Exclude</strong>: show all rows EXCEPT those whose value is in the selected set.</li>
+  </ul>
+
+  <h3>19.4 The Filters panel</h3>
+  <p>
+    Click the <strong>Filters</strong> button (top-left of the Analytics
+    toolbar) to open the panel. Inside:
+  </p>
+  <ul>
+    <li><strong>Date Range</strong> row — always shown, with the current selection summarized inline (e.g. "2024, 2025, 2026" if ≤6 years; "3 of 18" otherwise).</li>
+    <li><strong>+ Add filter</strong> rows for any filters that aren't currently narrowing. Click to open that filter's multi-select popover.</li>
+    <li><strong>Clear all filters</strong> at the bottom.</li>
+  </ul>
+
+  <h3>19.5 Filter chips</h3>
+  <p>
+    When a filter is active (anything other than "All"), a pill chip
+    appears inline next to the Filters / Presets buttons, e.g.
+    <code>Customer: Acme  ×</code>. Click the body to edit; click the ×
+    to clear just that filter (which also closes the popover if it
+    happens to be open).
+  </p>
+
+  <h3>19.6 Popover behavior</h3>
+  <p>
+    The multi-select popover is anchored to whatever element you clicked
+    (filter row, chip, or +Add row). On mobile it clamps its width to the
+    viewport and shifts left if it would overflow the right edge. Two-tab
+    Include/Exclude header, search box, and All / None action buttons sit
+    at the top.
+  </p>
+</section>
+
+<!-- ============== 20. FILTER PRESETS ============== -->
+<section>
+  <h1>20. Filter Presets</h1>
+
+  <h3>20.1 What a preset captures</h3>
+  <p>
+    A snapshot of the entire universal filter state PLUS the active
+    Analytics view name. Applying a preset puts the user back in the same
+    configuration including which chart they were looking at.
+  </p>
+
+  <h3>20.2 Saving</h3>
+  <p>
+    Click <strong>Presets</strong> → <strong>Save current filters</strong>.
+    Give it a name. The new preset appears in the list.
+  </p>
+
+  <h3>20.3 Loading</h3>
+  <p>
+    Click a preset to apply it. The active-preset name appears as a
+    primary-colored chip in the toolbar with an × to clear.
+  </p>
+
+  <h3>20.4 Favorites</h3>
+  <p>
+    Star a preset to pin it to the top of the picker. Favorites render in
+    their own "Favorites" section above "All Presets".
+  </p>
+</section>
+
+<!-- ============== 21. INVOICES ============== -->
+<section>
+  <h1>21. Invoices Page</h1>
+
+  <h3>21.1 Summary card</h3>
+  <p>Four tiles at the top of the list view:</p>
+  <ul>
+    <li><strong>Total Invoiced</strong> — Σ totals of every invoice on file.</li>
+    <li><strong>Total Paid</strong> — Σ totals of invoices flagged as paid.</li>
+    <li><strong>Outstanding Balance</strong> — Total Invoiced − Total Paid.</li>
+    <li><strong>+ New Invoice</strong> action tile.</li>
+  </ul>
+
+  <h3>21.2 Jobs Not Invoiced card</h3>
+  <p>
+    Lists every job with income on file that has NO matching invoice yet.
+    A reminder to bill out the work you've already delivered.
+  </p>
+
+  <h3>21.3 List toolbar</h3>
+  <ul>
+    <li><strong>Sales Tax Liability</strong> — opens the Sales Tax report.</li>
+    <li>Year picker.</li>
+    <li>All Customers filter.</li>
+    <li>Search box (matches every field: number, date, Bill To, job, jobNo, status, paid date, total, line items).</li>
+    <li><strong>+ New Invoice</strong>.</li>
+  </ul>
+
+  <h3>21.4 Mobile reflow</h3>
+  <p>On mobile:</p>
+  <ul>
+    <li>Sales Tax button is hidden (still reachable from Reports).</li>
+    <li>Row 1: All Customers (½) · All Years (½).</li>
+    <li>Row 2: Search (full width).</li>
+    <li>Row 3: + New Invoice (full width).</li>
+  </ul>
+
+  <h3>21.5 List table</h3>
+  <p>
+    Columns: # · Total · Date · Bill To · Job · Status. Status renders as
+    a colored pill: green "Paid" / red "Unpaid".
+  </p>
+  <p>
+    Each row is expandable (▸ button) — clicking reveals the invoice's
+    line items in a mini-table beneath. On mobile each line item renders
+    as a stacked card: Item · Qty · Description on row 1, Price · Amount
+    on row 2 with mini labels.
+  </p>
+
+  <h3>21.6 Editor view</h3>
+  <p>Opens when you click an invoice or hit + New Invoice. Layout:</p>
+  <ul>
+    <li><strong>Toolbar</strong>: Back · Save · Mark as Paid · Print/PDF · Delete.</li>
+    <li><strong>Linked Transactions</strong> panel above the sheet — every income tx whose <code>jobNo</code> matches this invoice's job, with a count and running total.</li>
+    <li><strong>Sheet</strong> (full letter-page layout) with:
+      <ul>
+        <li>Header: logo · address · "Invoice" title · Date · Invoice #.</li>
+        <li>Bill To block + Job dropdown.</li>
+        <li>Line items table: Item · Qty · Description · Price · Amount.</li>
+        <li>Totals table: Subtotal · Tax (label + rate) · Total.</li>
+        <li>Tax controls: Tax / Non-Tax radios · Tax Label input · Rate dropdown (7.00 / 7.25).</li>
+        <li>+ Add Line button.</li>
+        <li>Footer: phone · email · website.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>21.7 Invoice math</h3>
+  <div class="formula">
+    <strong>Line amount</strong> = qty × price<br>
+    <strong>Subtotal</strong> = Σ line amounts<br>
+    <strong>Tax amount</strong> = Subtotal × (rate ÷ 100), only when Tax mode<br>
+    <strong>Total</strong> = Subtotal + Tax
+  </div>
+
+  <h3>21.8 Mark as Paid</h3>
+  <p>
+    Click <strong>Mark as Paid</strong> → prompt for the payment date
+    (defaults to today). The invoice gets a green PAID watermark stamped
+    diagonally across the sheet with the payment date underneath. Click
+    again to mark unpaid.
+  </p>
+
+  <h3>21.9 Inverted theme</h3>
+  <p>
+    Settings has a "Invert report colors" toggle for printing-friendly
+    rendering on dark mode. The PAID stamp is counter-inverted so it
+    stays green under inverted mode.
+  </p>
+
+  <h3>21.10 Mobile editor</h3>
+  <p>
+    On mobile the sheet reflows: header stacks vertically, line items
+    table becomes 2 lines per row (Item · Qty · Description on row 1;
+    Price · Amount on row 2 with a vertical divider between them and
+    mini-labels). Totals table label columns widen so "Ohio Sales Tax
+    (7.25%)" fits without clipping. Back / Print buttons share min-width
+    110px; Save / Delete share 90px.
+  </p>
+</section>
+
+<!-- ============== 22. MILEAGE ============== -->
+<section>
+  <h1>22. Mileage Page</h1>
+
+  <h3>22.1 Rate</h3>
+  <p>
+    Top toolbar shows the $/mile rate (default 0.70). Edit inline — value
+    persists immediately.
+  </p>
+
+  <h3>22.2 Total Miles tile</h3>
+  <p>
+    Right side of the row shows total miles for the currently-viewed year.
+    Updates as you change rate or year.
+  </p>
+
+  <h3>22.3 Year navigation</h3>
+  <p>
+    Dropdown selector listing every year with trips, the current calendar
+    year, and one year on each side of the viewed year for easy
+    navigation. + New Trip button sits on the right of the same row.
+  </p>
+
+  <h3>22.4 Summary by Vehicle table</h3>
+  <p>For the selected year, one row per vehicle:</p>
+  <ul>
+    <li>Vehicle · Miles · Mileage Expense (= miles × rate) · Trips count.</li>
+  </ul>
+
+  <h3>22.5 All Trips table</h3>
+  <p>
+    Every trip in the selected year: Date · Vehicle · Purpose · Miles · Delete.
+  </p>
+
+  <h3>22.6 Add Trip modal</h3>
+  <p>
+    Date · Vehicle (with datalist autocomplete) · Miles · Purpose (optional).
+  </p>
+
+  <h3>22.7 Mobile</h3>
+  <p>
+    Rate and Total Miles share row 1 (50/50, top-aligned). The Year
+    dropdown sits to the left of + New Trip on row 2. Trips can be
+    swiped left to reveal Edit / Delete buttons.
+  </p>
+</section>
+
+<!-- ============== 23. REPORTS ============== -->
+<section>
+  <h1>23. Reports</h1>
+
+  <h3>23.1 Picker</h3>
+  <p>
+    Top of the page: desktop pills, mobile dropdown. "Select Report" is
+    the default — no report shows until you pick one. Mobile shares a
+    single Print/PDF button next to the picker that forwards to whichever
+    report is currently visible.
+  </p>
+
+  <h3>23.2 Available reports</h3>
+  <ol>
+    <li><strong>Job/Category</strong> — drill-down by Customer / Category / Job No., per period.</li>
+    <li><strong>Income vs Expense</strong> — section totals for income and expense categories.</li>
+    <li><strong>Helper / Give Back</strong> — Σ transactions tagged for the helper / give-back program.</li>
+    <li><strong>Transactions</strong> — full ledger filtered by date range and a slew of dropdowns; printable.</li>
+    <li><strong>Mileage</strong> — printable mileage report for the period.</li>
+    <li><strong>Sales Tax Liability</strong> — tax collected on invoices, grouped by Tax Agency.</li>
+    <li><strong>Profit &amp; Loss</strong> — standard P&amp;L statement.</li>
+    <li><strong>Schedule C</strong> — IRS-form-style export for tax filing.</li>
+  </ol>
+
+  <h3>23.3 Common toolbar</h3>
+  <ul>
+    <li><strong>From / To</strong> date inputs.</li>
+    <li><strong>Preset dropdown</strong> — Custom · Year to Date · Last Quarter · 1st Half · 2nd Half · Last Year (specific to each report).</li>
+    <li>Report-specific filters (Type, Category, Customer, Payee, Vehicle, etc.).</li>
+    <li><strong>Print / PDF</strong> — opens the browser print dialog.</li>
+  </ul>
+
+  <h3>23.4 Report sheets</h3>
+  <p>
+    Every report renders as a letter-page "sheet" with a brand header
+    (logo · name · address), the report title, a date range subline, and
+    one or more tables. The sheet uses light-mode colors regardless of
+    your theme so printing is reliable. The "Invert report colors" Setting
+    flips the on-screen colors but leaves @media print untouched.
+  </p>
+
+  <h3>23.5 Schedule C</h3>
+  <p>
+    A category-mapping table that translates your categories into
+    Schedule C line numbers. Editable in Settings → Schedule C Mapping.
+    Drill into any line to see the contributing transactions.
+  </p>
+
+  <h3>23.6 Mobile reflow</h3>
+  <ul>
+    <li>Row 1: Print/PDF (right ⅓, alone).</li>
+    <li>Row 2: From (½) · To (½).</li>
+    <li>Row 3+: presets, checkboxes, Expand All wrap as needed.</li>
+  </ul>
+</section>
+
+<!-- ============== 24. SETTINGS ============== -->
+<section>
+  <h1>24. Settings Page</h1>
+  <p>
+    Every preference and master list lives here. Each section is a
+    collapsible card; state persists in <code>localStorage</code>.
+  </p>
+
+  <h3>24.1 Data card</h3>
+  <ul>
+    <li><strong>Import CSV</strong> — drop a CSV of transactions or invoices.</li>
+    <li><strong>Export CSV</strong> — download the current dataset.</li>
+    <li><strong>Backfill Job No.</strong> — scan legacy transactions and suggest matching jobs based on Customer + Category + date proximity. Each suggestion can be applied or skipped. Undo button restores the prior state.</li>
+    <li><strong>Reset App Data</strong> — wipe localStorage. Cloud copy is untouched.</li>
+  </ul>
+
+  <h3>24.2 Cloud Sync card</h3>
+  <ul>
+    <li><strong>Email + Password</strong> sign-in (Supabase auth).</li>
+    <li><strong>Force Upload</strong> — push local state to the cloud row.</li>
+    <li><strong>Force Download</strong> — pull cloud row, overwriting local state.</li>
+    <li><strong>Sign Out</strong>.</li>
+  </ul>
+  <p>
+    The push path has a safety guard: if local state is essentially empty
+    (no transactions) AND remote has data, the push is blocked and the
+    status changes to "Empty local — push blocked". Prevents accidental
+    wipe of cloud data when you open the app in a fresh browser.
+  </p>
+
+  <h3>24.3 Categories, Customers, Vendors, Payees, Accounts</h3>
+  <p>
+    Each is a card listing the current set with add/remove controls.
+    Removing a category that's referenced by transactions is allowed but
+    those tx will display the orphan category name (handled gracefully).
+  </p>
+
+  <h3>24.4 Chart of Accounts</h3>
+  <p>
+    Each entry has a name and a type (Sales, Cost of Goods Sold, Expense,
+    Income, etc.). Used by the Chart of Accounts dropdown on the
+    transaction modal.
+  </p>
+
+  <h3>24.5 Expenses Table</h3>
+  <p>
+    Mapping of expense entries to a Chart of Accounts plus a Job-related
+    flag (Y/N). Used by the Expense/Income dropdown on the transaction
+    modal — picking an entry auto-sets the Chart of Accounts.
+  </p>
+
+  <h3>24.6 Locked Years</h3>
+  <p>
+    List of YYYY years to mark read-only. Toggling a year on adds it to
+    <code>state.lockedYears</code>; once locked, any mutation to a
+    record dated in that year is blocked. The lock indicator (red dot)
+    appears on every year picker in the app. See <em>Locked Years</em>
+    chapter for the full enforcement list.
+  </p>
+
+  <h3>24.7 Savings Goal</h3>
+  <p>
+    Annual goal in dollars. Drives the Overview thermometer and the
+    Savings analytics goal bar.
+  </p>
+
+  <h3>24.8 Theme</h3>
+  <p>Dark / Light / System. Persists across sessions.</p>
+
+  <h3>24.9 Chart palette</h3>
+  <p>
+    Pick from Vibrant / Pastel / Earth palettes for the donut and column
+    charts.
+  </p>
+
+  <h3>24.10 Column toggles</h3>
+  <p>
+    Show / hide individual columns on the Transactions table (Date,
+    Vendor, Customer, Payee, Category, Chart, Amount). State stored on
+    the body element as <code>tx-hide-*</code> classes.
+  </p>
+
+  <h3>24.11 Mobile layout toggles</h3>
+  <ul>
+    <li><strong>Color rows by Job No.</strong> — tint rows on the Transactions table.</li>
+    <li><strong>3 lines per row</strong> — mobile-only stacked layout for Invoices list and Job Analytics table.</li>
+    <li><strong>Invert report colors</strong> — flip on-screen color palette of report sheets.</li>
+  </ul>
+
+  <h3>24.12 User Manual link</h3>
+  <p>
+    Opens this document (<code>manual.html</code>) in a new tab.
+  </p>
+</section>
+
+<!-- ============== 25. LOCKED YEARS ============== -->
+<section>
+  <h1>25. Locked Years</h1>
+
+  <h3>25.1 Concept</h3>
+  <p>
+    Once a year is locked in Settings, every record dated within that
+    year becomes immutable. Useful after you've filed taxes for a year
+    and want to prevent accidental edits.
+  </p>
+
+  <h3>25.2 What's enforced</h3>
+  <ul>
+    <li>Transaction create / edit / delete (modal, swipe-delete, bulk delete, inline edit, delete-in-range).</li>
+    <li>Transaction reconcile click.</li>
+    <li>MoneyStats CSV import.</li>
+    <li>Expense CSV import.</li>
+    <li>Backfill apply + undo.</li>
+    <li>Job add / edit / delete / swipe-delete / inline-status.</li>
+    <li>Trip add / edit / delete / swipe-delete.</li>
+    <li>Invoice save / delete / mark paid / unpaid.</li>
+  </ul>
+  <p>
+    Each blocked attempt shows a toast: "YYYY is locked in Settings".
+  </p>
+
+  <h3>25.3 Visual indicator</h3>
+  <p>
+    Every year picker shows a small red dot (lower-right corner of a
+    year pill, or lower-right of each option in the year picker sheet on
+    mobile) when that year is locked.
+  </p>
+</section>
+
+<!-- ============== 26. CLOUD SYNC ============== -->
+<section>
+  <h1>26. Cloud Sync &amp; Backup</h1>
+
+  <h3>26.1 What's mirrored</h3>
+  <p>
+    The entire <code>state</code> object is serialized to JSON and pushed
+    to Supabase as a single row keyed by your auth user_id. Every save
+    triggers a debounced push.
+  </p>
+
+  <h3>26.2 Pull on sign-in</h3>
+  <p>
+    When you sign in, the app fetches the cloud row and overwrites local
+    state with it. Useful when switching devices.
+  </p>
+
+  <h3>26.3 Safety guard</h3>
+  <p>
+    Before any push, if local <code>state.transactions</code> is empty
+    AND the cloud row has transactions, the push is blocked. This
+    prevents a fresh browser session from accidentally clearing your
+    cloud data. The status indicator changes to "Empty local — push
+    blocked" so you can investigate.
+  </p>
+
+  <h3>26.4 Manual recovery</h3>
+  <p>
+    If something goes wrong, paste this in the browser DevTools console
+    while signed in to restore from the cloud:
+  </p>
+  <pre>
+(async () => {
+  const r = await supa.from("app_state_v2")
+    .select("data")
+    .eq("user_id", supaUser.id)
+    .maybeSingle();
+  localStorage.setItem("photo-bookkeeping-v1", JSON.stringify(r.data.data));
+  location.reload();
+})();
+</pre>
+
+  <h3>26.5 Sync status pill</h3>
+  <p>
+    The sidebar shows a small status pill under the logo with a colored
+    dot: green = synced, yellow = syncing, red = error, gray = offline.
+    The label below shows the last sync timestamp.
+  </p>
+</section>
+
+<!-- ============== 27. MOBILE BEHAVIORS ============== -->
+<section>
+  <h1>27. Mobile-Specific Behaviors</h1>
+
+  <h3>27.1 Layout switches</h3>
+  <p>
+    Below 768px viewport width, every page applies its own mobile
+    reflow. The most common patterns:
+  </p>
+  <ul>
+    <li>Toolbar buttons wrap onto multiple rows.</li>
+    <li>Charts shrink card chrome and bump SVG-unit text size.</li>
+    <li>Tables can stack into card-like rows (Invoices, Job Analytics — via the 3-lines toggle in Settings).</li>
+    <li>Big card totals shrink from 32px to 22px.</li>
+    <li>X-axis labels on charts rotate 45° to prevent overlap.</li>
+  </ul>
+
+  <h3>27.2 Swipe gestures</h3>
+  <ul>
+    <li><strong>Swipe left</strong> on a transaction row (mobile, 3-line layout) → reveals Edit / Delete buttons.</li>
+    <li><strong>Swipe left</strong> on a mileage trip row → reveals Edit / Delete.</li>
+    <li><strong>Swipe left</strong> on a job row (mobile, 3-line layout) → reveals Edit / Delete.</li>
+    <li><strong>Pinch</strong> two fingers on the Breakdown Sankey → zoom 0.5×–4× anchored to pinch midpoint.</li>
+    <li><strong>Single-finger drag</strong> on the Sankey while zoomed → pan.</li>
+    <li><strong>Double-tap</strong> on the Sankey → reset zoom to 1×.</li>
+  </ul>
+
+  <h3>27.3 Mobile navigation</h3>
+  <ul>
+    <li>Bottom tab bar replaces sidebar for the five most-used tabs.</li>
+    <li>"More" button opens the right flyout containing the remaining tabs and Settings.</li>
+    <li>Hamburger button (top-left) opens the original sidebar from the left edge.</li>
+  </ul>
+
+  <h3>27.4 Disabled gestures</h3>
+  <p>
+    The viewport meta sets <code>user-scalable=no</code> to keep the app
+    UI stable. Pinch zoom only works in places where it's been
+    explicitly implemented in JS (currently just the Sankey chart).
+  </p>
+</section>
+
+<!-- ============== 28. PRINT & PDF ============== -->
+<section>
+  <h1>28. Print &amp; PDF Export</h1>
+
+  <h3>28.1 Available print targets</h3>
+  <ul>
+    <li>Any of the 8 report sheets (Print/PDF button on each report's toolbar, or the shared button on mobile).</li>
+    <li>The invoice editor sheet (Print/PDF button on its toolbar).</li>
+    <li>This user manual (Ctrl/⌘ + P in the browser).</li>
+  </ul>
+
+  <h3>28.2 What gets hidden</h3>
+  <p>
+    @media print rules hide the toolbar, the .no-print elements, and any
+    in-page chrome that isn't part of the printable sheet. Form controls
+    inside report sheets are stripped of borders / backgrounds / arrows
+    so they render as plain text on paper.
+  </p>
+
+  <h3>28.3 Page setup</h3>
+  <ul>
+    <li><strong>Size</strong>: Letter portrait (or Letter landscape for Transactions report when orientation is set to Landscape).</li>
+    <li><strong>Margins</strong>: 0.75in standard, 0.5in for the manual's print stylesheet.</li>
+    <li><strong>Page numbers</strong> on the manual via CSS @page bottom-right.</li>
+  </ul>
+
+  <h3>28.4 PAID stamp</h3>
+  <p>
+    Invoice editor: stamped diagonally across the sheet when marked
+    paid, with the payment date beneath. Green border + green text,
+    light translucent white background. Stays green even under the
+    Invert Reports theme via a counter-invert filter.
+  </p>
+</section>
+
+<!-- ============== 29. FORMULAS REFERENCE ============== -->
+<section>
+  <h1>29. Formulas Reference</h1>
+
+  <h3>29.1 Transaction-level</h3>
+  <div class="formula">
+    <strong>signed amount</strong> = (type === "income" ? +1 : −1) × amount<br>
+    <strong>linked to invoice</strong> = invoice exists whose jobNo === tx.jobNo<br>
+    <strong>is savings</strong> = SAVINGS_CATEGORIES.includes(category OR expenseIncome)
+  </div>
+
+  <h3>29.2 Overview totals</h3>
+  <div class="formula">
+    <strong>Income</strong> = Σ amount where type === "income" AND !NON_JOB AND (no year filter OR date.startsWith(year))<br>
+    <strong>Expense (display)</strong> = Σ expense.amount − Σ savings-expense.amount + Σ savings-income.amount<br>
+    <strong>Savings (display)</strong> = Σ savings-expense.amount − Σ savings-income.amount<br>
+    <strong>Net</strong> = Income − Expense (both as defined above)
+  </div>
+
+  <h3>29.3 Year-over-year</h3>
+  <div class="formula">
+    <strong>YoY %</strong> = ((current − prior) ÷ |prior|) × 100<br>
+    YTD vs YTD comparison uses today's MM-DD as the cutoff for both years.
+  </div>
+
+  <h3>29.4 Savings Goal progress</h3>
+  <div class="formula">
+    <strong>fill %</strong> = clamp(0, savings_actual ÷ goal × 100, 100)<br>
+    <strong>remaining</strong> = max(0, goal − savings_actual)
+  </div>
+
+  <h3>29.5 Goal line on Income by Year chart</h3>
+  <div class="formula">
+    <strong>goal</strong> = avg of the three prior calendar years' income totals<br>
+    Hidden when selected year ≠ current calendar year OR YTD mode is on.
+  </div>
+
+  <h3>29.6 Job analytics</h3>
+  <div class="formula">
+    <strong>Job income</strong> = Σ tx.amount where tx.jobNo === job.jobNo AND tx.type === "income"<br>
+    <strong>Job expenses</strong> = Σ tx.amount where tx.jobNo === job.jobNo AND tx.type === "expense"<br>
+    <strong>Job profit</strong> = Job income − Job expenses
+  </div>
+
+  <h3>29.7 Cash Flow chart</h3>
+  <div class="formula">
+    For each month m:<br>
+    &nbsp;&nbsp;in[m]  = Σ income.amount<br>
+    &nbsp;&nbsp;out[m] = Σ expense.amount<br>
+    &nbsp;&nbsp;net[m] = in[m] − out[m]<br>
+    <strong>Cumulative net</strong> at month m = Σ net[0..m]
+  </div>
+
+  <h3>29.8 Savings Rate (per month and overall)</h3>
+  <div class="formula">
+    For each month m:<br>
+    &nbsp;&nbsp;profitBase[m] = income[m] − jobExpense[m] − cogs[m]<br>
+    &nbsp;&nbsp;rate[m] = profitBase[m] &gt; 0 ? (sav[m] ÷ profitBase[m]) × 100 : 0<br>
+    <br>
+    Overall (annual):<br>
+    &nbsp;&nbsp;<strong>Rate</strong> = totalSavings ÷ (totalIncome − totalJobExp − totalCogs) × 100<br>
+    <br>
+    Ghost-bar rule: when sav[m] &gt; 0 AND profitBase[m] ≤ 0, render a
+    full-height faint bar instead of the percent.
+  </div>
+
+  <h3>29.9 Flow chart (per Job × Year)</h3>
+  <div class="formula">
+    posSum (Gross) = Σ income.amount per (year, job, payee) — RAW income, not netted<br>
+    negSum         = Σ signed-negative amounts per (year, job, payee)<br>
+    net            = posSum + negSum (signed sum)<br>
+    grossTotal     = Σ |amount| per (year, job)
+  </div>
+
+  <h3>29.10 By Category (Gross / Net)</h3>
+  <div class="formula">
+    <strong>Gross</strong> per category = Σ |amount| of wanted type<br>
+    <strong>Net</strong> per category = Gross − Σ opposite-type amount in same category
+  </div>
+
+  <h3>29.11 Invoice math</h3>
+  <div class="formula">
+    <strong>line.amount</strong> = (parseFloat(line.qty) || 1) × parseMoneyInput(line.price)<br>
+    <strong>subtotal</strong> = Σ line.amount<br>
+    <strong>tax</strong> = mode === "tax" ? subtotal × (rate ÷ 100) : 0<br>
+    <strong>total</strong> = subtotal + tax
+  </div>
+
+  <h3>29.12 Mileage</h3>
+  <div class="formula">
+    <strong>vehicleExpense</strong> = vehicleMiles × state.mileageRate<br>
+    <strong>totalMiles</strong> for year = Σ trip.miles where trip.date startsWith year
+  </div>
+
+  <h3>29.13 Donut slice percentages</h3>
+  <div class="formula">
+    <strong>slicePct</strong> = (item.value ÷ total) × 100<br>
+    Slices &lt; 1.5% are bucketed into "Other" so labels don't crowd.
+  </div>
+
+  <h3>29.14 Treemap font size</h3>
+  <div class="formula">
+    <strong>labelFont</strong> = clamp(min, sqrt(cell.w × cell.h) ÷ divisor, max)<br>
+    Desktop: min 11, max 20, divisor 9<br>
+    Mobile:  min 16, max 28, divisor 7
+  </div>
+
+  <h3>29.15 Job eligibility (Flow / Trends)</h3>
+  <p>
+    A category counts as a Job when:
+  </p>
+  <ol>
+    <li>It exists in <code>state.categories</code> OR appears on any transaction.</li>
+    <li>It's NOT in <code>SAVINGS_CATEGORIES</code>.</li>
+    <li>It's NOT in <code>NON_JOB_CATEGORIES</code>.</li>
+    <li>It has at least one income transaction.</li>
+  </ol>
+
+  <h3>29.16 Filter routing for categories</h3>
+  <p>
+    For any category value <code>c</code>:
+  </p>
+  <ul>
+    <li>If <code>JOB_ORDER.includes(c)</code> → routed through Job filter.</li>
+    <li>Else → routed through Category filter; but if Job filter is in restrictive Include mode and Category filter isn't, the row is excluded by default (matching "only show the chosen Jobs" intent).</li>
+  </ul>
+</section>
+
+<!-- ============== 30. SHORTCUTS ============== -->
+<section>
+  <h1>30. Keyboard &amp; Touch Shortcuts</h1>
+
+  <h3>30.1 Keyboard (desktop)</h3>
+  <table>
+    <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>Ctrl/⌘ + P</td><td>Print the current page or sheet</td></tr>
+      <tr><td>Esc</td><td>Close any open modal or popover</td></tr>
+      <tr><td>Shift + click checkbox</td><td>Select range of transactions (in Select mode)</td></tr>
+      <tr><td>Enter</td><td>Submit forms / save modal</td></tr>
+    </tbody>
+  </table>
+
+  <h3>30.2 Touch (mobile)</h3>
+  <table>
+    <thead><tr><th>Gesture</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>Swipe left on row</td><td>Reveal Edit / Delete (transactions, mileage, jobs)</td></tr>
+      <tr><td>Pinch two fingers on Sankey</td><td>Zoom 0.5×–4×</td></tr>
+      <tr><td>Single-finger drag (zoomed)</td><td>Pan the Sankey</td></tr>
+      <tr><td>Double-tap on Sankey</td><td>Reset zoom</td></tr>
+      <tr><td>Pull down to refresh</td><td>Browser native refresh (clears stale caches)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============== 31. TROUBLESHOOTING ============== -->
+<section>
+  <h1>31. Troubleshooting</h1>
+
+  <h3>31.1 "My data is gone"</h3>
+  <p>
+    Check the URL — make sure it's the production domain you usually use,
+    not a Vercel preview URL with a different localStorage scope. If
+    URL is correct, the data may still exist in the cloud row: open
+    Settings → Cloud Sync, sign in, and click <strong>Force Download</strong>.
+  </p>
+
+  <h3>31.2 "It still looks the same after I changed a setting"</h3>
+  <p>
+    Hard-refresh the browser: <kbd>Ctrl+Shift+R</kbd> (Windows) or
+    <kbd>⌘+Shift+R</kbd> (Mac). Vercel sometimes serves a stale cached
+    HTML that points to an older CSS / JS file.
+  </p>
+
+  <h3>31.3 "Why is the Savings Rate bar missing for a month I saved in?"</h3>
+  <p>
+    That month had no profit base (income ≤ Job Exp + COGS), so the rate
+    formula's denominator was 0 or negative. The renderer shows a faint
+    ghost bar at full height in those months to indicate savings happened
+    without a defined rate.
+  </p>
+
+  <h3>31.4 "Only one Job shows up under All Jobs on Flow"</h3>
+  <p>
+    The Job filter on the universal Filters bar may be set to a single
+    Job. Clear filters or check the chip in the toolbar. Otherwise,
+    category eligibility requires at least one income transaction; check
+    that the missing jobs have income on file.
+  </p>
+
+  <h3>31.5 "Force Download blocked by 'empty local'"</h3>
+  <p>
+    The push safety guard refuses to overwrite a non-empty cloud row with
+    an empty local state. To force a recovery from the cloud, paste the
+    manual restore script from §26.4 in DevTools.
+  </p>
+
+  <h3>31.6 "Locked year toast keeps blocking my edit"</h3>
+  <p>
+    Go to Settings → Locked Years and uncheck the year you want to
+    edit. The transaction's date is what's checked, not today's date.
+  </p>
+
+  <h3>31.7 "Print doesn't include the toolbar (or it does, ugly)"</h3>
+  <p>
+    Use the Print / PDF buttons inside the report or invoice editor — they
+    set the right @media print rules. Don't print via the browser File
+    menu directly; that may include navigation chrome.
   </p>
 </section>
 
