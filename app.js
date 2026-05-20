@@ -2040,6 +2040,7 @@ function renderSavings() {
   // Aggregate savings (SAVINGS_CATEGORIES) by month for the chosen year.
   // Treat both legacy category and the new-spec expense-table mapping as savings.
   const months = new Array(12).fill(0);
+  const savingsTxs = []; // every contributing tx — used by the breakdown list
   state.transactions.forEach(t => {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
     if (!filterPasses("customer",   t.customer || "")) return;
@@ -2057,6 +2058,10 @@ function renderSavings() {
     if (m < 0 || m > 11) return;
     const amt = +t.amount || 0;
     months[m] += t.type === "income" ? -amt : amt;
+    // Use the category label if it's a savings category, otherwise the
+    // expense-table entry name. Bucket determines section header in the list.
+    const bucket = (SAVINGS_CATEGORIES.includes(cat) ? cat : ei) || "Savings";
+    savingsTxs.push({ ...t, _bucket: bucket });
   });
 
   const total = months.reduce((s, v) => s + v, 0);
@@ -2110,7 +2115,69 @@ function renderSavings() {
       ${bars}
     </svg>
   `;
+
+  // ---- Savings transactions breakdown list ----
+  const txTotalEl = document.getElementById("sv-tx-total");
+  if (txTotalEl) txTotalEl.textContent = fmtMoney(total);
+
+  const txBody = document.getElementById("sv-tx-body");
+  if (txBody) {
+    if (!savingsTxs.length) {
+      txBody.innerHTML = `<div style="padding:14px;text-align:center;color:var(--muted);font-size:12px">No savings transactions in ${escapeHtml(svYear)}.</div>`;
+    } else {
+      // Group by bucket, sort each by date desc then amount desc
+      const groups = new Map();
+      savingsTxs.forEach(t => {
+        const key = t._bucket || "Savings";
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(t);
+      });
+      groups.forEach(arr =>
+        arr.sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.amount - a.amount))
+      );
+      const renderBucket = (name, arr) => {
+        if (!arr.length) return "";
+        const bucketTotal = arr.reduce((s, t) => s + ((t.type === "income" ? -1 : 1) * (+t.amount || 0)), 0);
+        return `
+          <tr class="sr-deduct-section-row">
+            <td colspan="4">${escapeHtml(name)} — ${arr.length} tx · ${fmtMoney(bucketTotal)}</td>
+          </tr>
+          ${arr.map(t => {
+            const signed = (t.type === "income" ? -1 : 1) * (+t.amount || 0);
+            return `
+              <tr>
+                <td>${escapeHtml(fmtDate(t.date))}</td>
+                <td>${escapeHtml(t.payee || "")}</td>
+                <td>${escapeHtml(t.category || t.expenseIncome || "")}</td>
+                <td class="amt">${fmtMoney(signed)}</td>
+              </tr>
+            `;
+          }).join("")}
+        `;
+      };
+      txBody.innerHTML = `
+        <table class="sr-deduct-table">
+          <thead>
+            <tr><th>Date</th><th>Payee</th><th>Category</th><th class="amt">Amount</th></tr>
+          </thead>
+          <tbody>
+            ${[...groups.entries()].map(([name, arr]) => renderBucket(name, arr)).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+  }
 }
+
+// Toggle handler for the Savings transactions breakdown list.
+document.getElementById("sv-tx-toggle")?.addEventListener("click", () => {
+  const btn  = document.getElementById("sv-tx-toggle");
+  const body = document.getElementById("sv-tx-body");
+  if (!btn || !body) return;
+  const opening = body.hidden;
+  body.hidden = !opening;
+  btn.classList.toggle("is-open", opening);
+});
 
 // --------- Year Matrix view ---------
 // Pivot table: rows = categories, columns = years, cells = income or expense $.
