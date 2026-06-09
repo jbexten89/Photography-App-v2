@@ -11437,9 +11437,9 @@ function renderIncomeByYearChart(years, opts = {}) {
         const up = pct >= 0;
         const color = up ? "var(--income)" : "var(--expense)";
         const label = `${up ? "+" : ""}${pct.toFixed(1)}%`;
-        deltaSvg = `<text x="${cx}" y="${y - 38}" style="text-anchor:middle;fill:${color};font-size:22px;font-weight:700">${escapeHtml(label)}</text>`;
+        deltaSvg = `<text class="trend-delta" x="${cx}" y="${y - 38}" style="text-anchor:middle;fill:${color};font-size:22px;font-weight:700">${escapeHtml(label)}</text>`;
       } else if (d.income > 0) {
-        deltaSvg = `<text x="${cx}" y="${y - 38}" style="text-anchor:middle;fill:var(--income);font-size:22px;font-weight:700">new</text>`;
+        deltaSvg = `<text class="trend-delta" x="${cx}" y="${y - 38}" style="text-anchor:middle;fill:var(--income);font-size:22px;font-weight:700">new</text>`;
       }
     }
 
@@ -11452,8 +11452,8 @@ function renderIncomeByYearChart(years, opts = {}) {
           stroke="var(--accent)" stroke-width="2">
           <title>Goal (avg of previous 3 years): ${fmtMoney(goal)}</title>
         </line>
-        <text x="${cx}" y="${yGoal - 36}" style="text-anchor:middle;fill:var(--accent);font-size:22px;font-weight:700">Goal</text>
-        <text x="${cx}" y="${yGoal - 10}" style="text-anchor:middle;fill:var(--accent);font-size:22px;font-weight:700">${fmtMoney(goal)}</text>
+        <text class="trend-goal-label" x="${cx}" y="${yGoal - 36}" style="text-anchor:middle;fill:var(--accent);font-size:22px;font-weight:700">Goal</text>
+        <text class="trend-goal-value" x="${cx}" y="${yGoal - 10}" style="text-anchor:middle;fill:var(--accent);font-size:22px;font-weight:700">${fmtMoney(goal)}</text>
       `;
     }
 
