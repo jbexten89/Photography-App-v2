@@ -6409,7 +6409,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   }
   #tx-form .tx-form-actions-with-payee #btn-delete-tx { display: none !important; }
   #tx-form .tx-form-actions-with-payee #btn-duplicate-tx { order: 1; margin-right: auto; }
-  #tx-form .tx-form-actions-with-payee #btn-cancel-tx { order: 2; }
+  #tx-form .tx-form-actions-with-payee #btn-cancel-tx { order: 2; min-width: 110px; padding-left: 18px; padding-right: 18px; }
   #tx-form .tx-form-actions-with-payee button[type="submit"] { order: 3; }
   /* Mark/Payee/Clear row: payee fills the middle on mobile */
   #tx-form .tx-mark-clear-row {
