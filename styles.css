@@ -10137,6 +10137,19 @@ body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highl
 .tx-mark-clear-row .nj-mark-row { margin: 0 !important; }
 #btn-tx-clear { min-width: 64px; text-align: center; }
 
+/* Smart Vendor autofill — brief highlight ring on fields the system filled in
+   so the user can see what was prefilled and adjust anything that's wrong. */
+#tx-form .tx-autofilled {
+  animation: txAutofillFlash 1.6s ease-out;
+  box-shadow: 0 0 0 2px rgba(59, 158, 255, 0.55);
+  border-radius: 6px;
+}
+@keyframes txAutofillFlash {
+  0%   { background-color: rgba(59, 158, 255, 0.18); }
+  60%  { background-color: rgba(59, 158, 255, 0.10); }
+  100% { background-color: transparent; }
+}
+
 /* Make the inactive Existing Job? pills and the Clear pill use the same
    hover treatment as the Cancel button — neutral surface that brightens to
    --hover, no primary-colored border/text. */

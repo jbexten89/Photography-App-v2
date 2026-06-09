@@ -13569,17 +13569,73 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 
   if (document.getElementById("tx-vendor")) {
     document.getElementById("tx-vendor").addEventListener("change", e => {
-      if (e.target.value !== "__new__") return;
-      const name = (prompt("New vendor name:") || "").trim();
-      if (!name) { e.target.value = ""; return; }
-      if (!state.vendors.includes(name)) {
-        state.vendors.push(name);
-        state.vendors.sort();
-        saveState();
+      if (e.target.value === "__new__") {
+        const name = (prompt("New vendor name:") || "").trim();
+        if (!name) { e.target.value = ""; return; }
+        if (!state.vendors.includes(name)) {
+          state.vendors.push(name);
+          state.vendors.sort();
+          saveState();
+        }
+        refreshTxVendorOptions();
+        e.target.value = name;
+        // Newly-added vendor has no history — nothing to autofill from.
+        return;
       }
-      refreshTxVendorOptions();
-      e.target.value = name;
+      // Existing vendor picked → smart-autofill empty fields from history.
+      applySmartVendorAutofill(e.target.value);
     });
+  }
+
+  // ------------------------------------------------------------
+  // Smart Vendor autofill
+  // When the user picks an existing vendor on a NEW transaction, prefill the
+  // related fields (Category, Expense, Chart Account, Payee) from the most
+  // recent expense transaction that used the same vendor — but only into
+  // fields the user hasn't already filled themselves.
+  // ------------------------------------------------------------
+  function applySmartVendorAutofill(vendorName) {
+    const name = (vendorName || "").trim();
+    if (!name || name === "__new__") return;
+    // Only autofill for NEW transactions (don't clobber an edit in progress).
+    const editingId = document.getElementById("tx-id")?.value || "";
+    if (editingId) return;
+    // Find the most recent expense transaction that used this vendor.
+    const ref = (state.transactions || [])
+      .filter(t => t.type === "expense" && (t.vendor || "").trim() === name)
+      .sort((a, b) => (b.date || "").localeCompare(a.date || ""))[0];
+    if (!ref) return;
+
+    const targets = [
+      { id: "tx-category",       value: ref.category },
+      { id: "tx-expense-income", value: ref.expenseIncome },
+      { id: "tx-chart-account",  value: ref.chartAccount },
+      { id: "tx-payee",          value: ref.payee },
+      { id: "tx-account",        value: ref.account },
+    ];
+    const filled = [];
+    targets.forEach(({ id, value }) => {
+      if (!value) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      // Don't clobber values the user (or the form) has already set.
+      if ((el.value || "").trim()) return;
+      // For <select>: only fill if the value is actually one of the options.
+      if (el.tagName === "SELECT" && ![...el.options].some(o => o.value === value)) return;
+      el.value = value;
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+      filled.push(el);
+    });
+    if (!filled.length) return;
+    // Brief visual cue so the user sees what got filled in.
+    filled.forEach(el => {
+      el.classList.add("tx-autofilled");
+      setTimeout(() => el.classList.remove("tx-autofilled"), 1800);
+    });
+    // Tiny toast so the action is discoverable without being obtrusive.
+    if (window.toast) {
+      window.toast(`Autofilled from last ${name} entry`, { kind: "info", ttl: 2200 });
+    }
   }
 
   // "+ Add new…" handler
