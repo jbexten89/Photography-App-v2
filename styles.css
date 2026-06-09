@@ -6569,7 +6569,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   }
   .running-balance .rb-label { font-size: 10px; white-space: nowrap; }
   .running-balance .rb-value { font-size: 14px; white-space: nowrap; }
-  .running-balance .rb-item.main .rb-value { font-size: 15px; }
+  .running-balance .rb-item.main { align-items: center; gap: 8px; }
+  .running-balance .rb-item.main .rb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  .running-balance .rb-item.main .rb-value { font-size: 22px; font-weight: 700; line-height: 1; }
   /* Hide the Selected item on mobile when nothing is selected — the user
      explicitly asked for it to disappear when Select Transactions is off. */
   .running-balance #rb-selection[hidden] { display: none !important; }
