@@ -10113,23 +10113,72 @@ body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highl
   grid-template-columns: 1fr auto !important;
 }
 .tx-existing-pill-label { justify-self: end; }
+/* ===== "Edited with new logic" pill toggle ===== */
 #tx-form .nj-mark-row {
-  display: flex !important;
+  display: inline-flex !important;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  padding: 5px 12px 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-soft, rgba(127,127,127,0.07));
   text-transform: none !important;
   letter-spacing: normal !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  color: var(--text) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--muted) !important;
   cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  height: 32px;
+  line-height: 1;
+  white-space: nowrap;
 }
+#tx-form .nj-mark-row:hover {
+  border-color: rgba(39, 174, 96, 0.45);
+  color: var(--text) !important;
+}
+/* Hide native checkbox but keep it accessible / clickable via the label */
 #tx-form .nj-mark-row input[type="checkbox"] {
-  width: auto !important;
+  position: absolute;
+  width: 1px !important;
+  height: 1px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
-  background: transparent !important;
+  opacity: 0;
+  pointer-events: none;
+}
+/* Custom dot indicator — gray ring when off, solid green with glow when on */
+#tx-form .nj-mark-row .nj-badge {
+  width: 10px;
+  height: 10px;
+  margin: 0;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid #9ca3af;
+  box-shadow: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  flex: 0 0 auto;
+}
+/* Checked state — uses :has() so the label restyles when the hidden checkbox flips */
+#tx-form .nj-mark-row:has(input[type="checkbox"]:checked) {
+  background: rgba(39, 174, 96, 0.12);
+  border-color: rgba(39, 174, 96, 0.55);
+  color: #1e8a4d !important;
+}
+[data-theme="dark"] #tx-form .nj-mark-row:has(input[type="checkbox"]:checked) {
+  color: #5fd494 !important;
+}
+#tx-form .nj-mark-row:has(input[type="checkbox"]:checked) .nj-badge {
+  background: #27ae60;
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.22);
+}
+/* Keyboard focus ring (label has focus-within when the hidden checkbox is focused) */
+#tx-form .nj-mark-row:focus-within {
+  outline: 2px solid rgba(59, 158, 255, 0.45);
+  outline-offset: 2px;
 }
 .nj-mark-text { display: inline-flex; align-items: center; gap: 4px; }
 #tx-table tr.nj-tagged td[data-col="date"] {
