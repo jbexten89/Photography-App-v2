@@ -6125,6 +6125,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      SVG-unit fonts (default 22) read clearly when the 900-wide viewBox is
      squeezed onto a phone screen. */
   #dashboard-income-chart text { font-size: 26px !important; }
+  /* Drop the year labels (under the bars) a touch on mobile so they don't
+     sit right against the x-axis line. */
+  #dashboard-income-chart text.trend-year-label { transform: translateY(14px); }
 
   /* Spending by Category donut + rose (#bcat-chart) — bump slice labels on
      mobile so they read clearly when the 260-wide viewBox is squeezed.
