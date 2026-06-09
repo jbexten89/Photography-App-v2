@@ -6841,19 +6841,25 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     padding-right: 6px !important;
   }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"] .nj-status-select {
-    background: transparent;
+    background-color: transparent;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='1,1 5,5 9,1'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 2px center;
+    background-size: 9px 6px;
     border: none;
-    padding: 0;
     margin: 0;
+    padding: 0 14px 0 0;
     font: inherit;
     color: inherit;
     text-align: right;
     text-align-last: right;
     appearance: none;
     -webkit-appearance: none;
+    -moz-appearance: none;
     width: 100%;
     cursor: pointer;
   }
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"] .nj-status-select::-ms-expand { display: none; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="profit"]  { grid-column: 3; grid-row: 1; font-weight: 700; font-size: 14px; text-align: right !important; }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="invoice"] { display: none !important; }
   /* Line 2 — Customer (col 1) · Category (cols 2-3 so it gets the most room) */
