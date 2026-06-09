@@ -12049,7 +12049,7 @@ function renderTransactions() {
     const tintColor = (t.jobNo && txJobColorMap.get(t.jobNo)) || "";
     const rowStyle = tintColor ? ` style="--row-tint: ${hexToRowTint(tintColor)}"` : "";
     return `
-    <tr data-id="${t.id}" class="${rowCls}"${rowStyle}>
+    <tr data-id="${t.id}" class="${rowCls}" data-recon="${rState}"${rowStyle}>
       ${checkboxCell}
       <td data-col="date">${fmtDate(t.date)}</td>
       <td data-col="vendor">${t.vendor ? escapeHtml(t.vendor) : "&nbsp;"}</td>
@@ -14776,23 +14776,64 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     let activeRow = null;
     let panel = null;
     let startX = 0, startY = 0, dx = 0, dy = 0, isSwiping = false, locked = false;
-    const REVEAL = 160; // total width of the action panel
-    const TRIGGER = 60; // px swipe distance to lock open
+    let direction = 0; // -1 left (actions), +1 right (reconcile), 0 unknown
+    const REVEAL = 160;        // total width of the left-action panel
+    const TRIGGER = 60;        // px swipe distance to lock left panel open
+    const RECON_TRIGGER = 80;  // px right-swipe distance to commit reconcile toggle
+    const RECON_MAX = 140;     // visual cap for the right-swipe drag
 
     function isMobile3Line() {
       return document.body.classList.contains("tx-mobile-3line") &&
              window.matchMedia("(max-width: 768px)").matches;
     }
 
+    function clearReconProgress(row) {
+      if (!row) return;
+      row.style.removeProperty("--tx-recon-progress");
+      row.classList.remove("tx-recon-dragging", "tx-recon-armed");
+    }
+
     function closeSwipe() {
       if (activeRow) {
         activeRow.style.transform = "";
         activeRow.classList.remove("tx-row-swiped");
+        clearReconProgress(activeRow);
       }
       if (panel) panel.remove();
       panel = null;
       activeRow = null;
       locked = false;
+      direction = 0;
+    }
+
+    function pulseReconcile(row, nowReconciled) {
+      const pulse = document.createElement("div");
+      pulse.className = "tx-recon-pulse " + (nowReconciled ? "on" : "off");
+      pulse.innerHTML = nowReconciled
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>`;
+      row.appendChild(pulse);
+      setTimeout(() => pulse.remove(), 700);
+    }
+
+    function commitReconToggle(row) {
+      const id = row.dataset.id;
+      const tx = (state.transactions || []).find(t => t.id === id);
+      if (!tx) return;
+      if (typeof isLockedDate === "function" && isLockedDate(tx.date)) {
+        if (typeof blockedToast === "function") blockedToast(tx.date.slice(0, 4));
+        return;
+      }
+      const wasReconciled = tx.reconciled === "R";
+      tx.reconciled = wasReconciled ? "" : "R";
+      row.dataset.recon = tx.reconciled;
+      pulseReconcile(row, !wasReconciled);
+      saveState();
+      // Re-render after the pulse animation has had a chance to play so the
+      // user sees confirmation before the list reshuffles/recomputes balance.
+      setTimeout(() => {
+        if (typeof renderTransactions === "function") renderTransactions();
+      }, 350);
     }
 
     function openActions(row) {
@@ -14841,6 +14882,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       startY = e.touches[0].clientY;
       dx = 0; dy = 0;
       isSwiping = false;
+      direction = 0;
     }, { passive: true });
 
     tbl.addEventListener("touchmove", (e) => {
@@ -14850,6 +14892,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       if (!isSwiping) {
         if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) {
           isSwiping = true;
+          // Lock direction on first qualifying horizontal motion.
+          // If the left-action panel is already open we only allow left motion.
+          direction = locked ? -1 : (dx < 0 ? -1 : 1);
         } else if (Math.abs(dy) > 10) {
           // vertical scroll wins — abandon swipe
           activeRow = null;
@@ -14858,24 +14903,48 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       }
       if (isSwiping) {
         if (e.cancelable) e.preventDefault();
-        const base = locked ? -REVEAL : 0;
-        const tx = Math.min(0, Math.max(-REVEAL, base + dx));
-        activeRow.style.transform = `translateX(${tx}px)`;
+        if (direction < 0) {
+          // Left-swipe → reveal actions (existing behavior)
+          const base = locked ? -REVEAL : 0;
+          const tx = Math.min(0, Math.max(-REVEAL, base + dx));
+          activeRow.style.transform = `translateX(${tx}px)`;
+        } else {
+          // Right-swipe → progressive green tint, no panel
+          const drag = Math.max(0, Math.min(RECON_MAX, dx));
+          const progress = drag / RECON_TRIGGER; // 1.0 = armed
+          activeRow.style.setProperty("--tx-recon-progress", String(Math.min(1, progress)));
+          activeRow.style.transform = `translateX(${drag * 0.4}px)`;
+          activeRow.classList.add("tx-recon-dragging");
+          activeRow.classList.toggle("tx-recon-armed", drag >= RECON_TRIGGER);
+        }
       }
     }, { passive: false });
 
     tbl.addEventListener("touchend", () => {
       if (!activeRow) return;
       if (isSwiping) {
-        const base = locked ? -REVEAL : 0;
-        const finalX = base + dx;
-        if (finalX < -TRIGGER) {
-          activeRow.style.transform = `translateX(-${REVEAL}px)`;
-          activeRow.classList.add("tx-row-swiped");
-          if (!panel) openActions(activeRow);
-          locked = true;
+        if (direction < 0) {
+          const base = locked ? -REVEAL : 0;
+          const finalX = base + dx;
+          if (finalX < -TRIGGER) {
+            activeRow.style.transform = `translateX(-${REVEAL}px)`;
+            activeRow.classList.add("tx-row-swiped");
+            if (!panel) openActions(activeRow);
+            locked = true;
+          } else {
+            closeSwipe();
+          }
         } else {
-          closeSwipe();
+          // Right-swipe release — commit if past threshold, otherwise snap back.
+          const armed = dx >= RECON_TRIGGER;
+          const row = activeRow;
+          activeRow.style.transform = "";
+          clearReconProgress(activeRow);
+          activeRow = null;
+          isSwiping = false;
+          direction = 0;
+          if (armed) commitReconToggle(row);
+          return;
         }
       }
       isSwiping = false;

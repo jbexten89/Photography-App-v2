@@ -7079,6 +7079,53 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-row-actions .tx-action-edit   { background: #3b82f6; }
   body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-row-actions .tx-action-delete { background: #ef4444; }
 
+  /* Right-swipe reconcile toggle — progressive green tint behind the row
+     while dragging, snaps to a stronger pulse when armed past threshold. */
+  body.tx-mobile-3line #tx-table tbody tr.tx-row.tx-recon-dragging {
+    background-color: rgba(39, 174, 96, calc(var(--tx-recon-progress, 0) * 0.28)) !important;
+    transition: background-color 0s;
+  }
+  body.tx-mobile-3line #tx-table tbody tr.tx-row.tx-recon-armed {
+    background-color: rgba(39, 174, 96, 0.32) !important;
+    box-shadow: inset 4px 0 0 #27ae60;
+  }
+  /* Center the ✓/✕ pulse on the row briefly after commit */
+  body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-recon-pulse {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 5;
+    animation: txReconPulse 0.65s ease-out forwards;
+  }
+  body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-recon-pulse svg {
+    width: 44px; height: 44px;
+    color: #fff;
+    background: #27ae60;
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 4px 14px rgba(39,174,96,0.45);
+  }
+  body.tx-mobile-3line #tx-table tbody tr.tx-row .tx-recon-pulse.off svg {
+    background: #9ca3af;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
+  @keyframes txReconPulse {
+    0%   { opacity: 0; transform: scale(0.6); }
+    25%  { opacity: 1; transform: scale(1.05); }
+    70%  { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.95); }
+  }
+  /* Persistent at-a-glance reconciled indicator — green left border */
+  body.tx-mobile-3line #tx-table tbody tr.tx-row[data-recon="R"] {
+    box-shadow: inset 4px 0 0 #27ae60;
+  }
+  body.tx-mobile-3line #tx-table tbody tr.tx-row[data-recon="C"] {
+    box-shadow: inset 4px 0 0 #f5a623;
+  }
+
   /* All Transactions: 3-line stacked layout (opt-in via Settings).
      Default (no select mode): content is flush-left, 3 grid columns.
      In select mode (.select-mode on #tx-table), a 32px checkbox column is
