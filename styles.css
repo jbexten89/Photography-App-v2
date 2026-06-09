@@ -6840,23 +6840,28 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     white-space: nowrap; overflow: hidden;
     padding-right: 6px !important;
   }
-  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"] .nj-status-select {
-    background-color: transparent;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='1,1 5,5 9,1'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 2px center;
-    background-size: 9px 6px;
-    border: none;
-    margin: 0;
-    padding: 0 14px 0 0;
-    font: inherit;
-    color: inherit;
-    text-align: right;
-    text-align-last: right;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 100%;
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"] .nj-status-select,
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"] .nj-status-select[data-status],
+  body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"] .nj-status-select[data-status=""] {
+    background-color: transparent !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='1,1 5,5 9,1'/></svg>") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0 center !important;
+    background-size: 9px 6px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 18px 0 0 !important;
+    min-width: 0 !important;
+    font: inherit !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    text-align: right !important;
+    text-align-last: right !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    width: 100% !important;
     cursor: pointer;
   }
   body.nj-mobile-3line #nj-analytics-table tbody tr.nj-row-edit td[data-col="status"] .nj-status-select::-ms-expand { display: none; }
