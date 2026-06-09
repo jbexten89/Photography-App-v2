@@ -2675,12 +2675,12 @@ select option {
   .dashboard-charts { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  /* Mobile stack order: Total Income by Year → Savings Goal → Income by Job
+  /* Mobile stack order: Total Income by Year → Income by Job → Savings Goal
      DOM order is 1=Income by Job, 2=Savings Goal, 3=Total Income by Year. */
   .dashboard-charts { display: flex; flex-direction: column; }
   .dashboard-charts > :nth-child(3) { order: 1; }  /* Total Income by Year */
-  .dashboard-charts > :nth-child(2) { order: 2; }  /* Savings Goal */
-  .dashboard-charts > :nth-child(1) { order: 3; }  /* Income by Job */
+  .dashboard-charts > :nth-child(1) { order: 2; }  /* Income by Job */
+  .dashboard-charts > :nth-child(2) { order: 3; }  /* Savings Goal */
 }
 
 /* Vertical savings-goal card (sits between Income by Job and Total Income by Year) */
