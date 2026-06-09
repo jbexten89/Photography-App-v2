@@ -7137,11 +7137,11 @@ function renderHGBReport() {
   const helperByPayee = new Map();
   txs.forEach(t => {
     if (!isHelper(t)) return;
-    const memo = (t.memo || "").trim() || "(no memo)";
+    const vendor = (t.vendor || "").trim() || "(no vendor)";
     const jobLabel = _helperJobLabel(t);
-    const key = memo + "‖" + jobLabel;
+    const key = vendor + "‖" + jobLabel;
     let row = helperByPayee.get(key);
-    if (!row) { row = { payee: memo, job: jobLabel, count: 0, amount: 0 }; helperByPayee.set(key, row); }
+    if (!row) { row = { payee: vendor, job: jobLabel, count: 0, amount: 0 }; helperByPayee.set(key, row); }
     row.count++;
     row.amount += t.amount || 0;
   });
