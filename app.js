@@ -659,6 +659,7 @@ function activateAnalyticsView(viewName) {
   if (viewName === "savings-rate" && typeof renderSavingsRate === "function") renderSavingsRate();
   if (viewName === "savings"      && typeof renderSavings      === "function") renderSavings();
   if (viewName === "year-matrix"  && typeof renderYearMatrix  === "function") renderYearMatrix();
+  if (viewName === "by-customer"  && typeof renderByCustomer  === "function") renderByCustomer();
 }
 
 document.querySelectorAll(".analytics-pill").forEach(btn => {
@@ -1419,6 +1420,7 @@ function rerenderActiveAnalyticsView() {
   if (activeView === "savings-rate")    renderSavingsRate();
   if (activeView === "savings")         renderSavings();
   if (activeView === "year-matrix")     renderYearMatrix();
+  if (activeView === "by-customer")     renderByCustomer();
 }
 
 // ===== Multi-select popover =====
@@ -2451,6 +2453,213 @@ document.getElementById("ym-table")?.addEventListener("click", (e) => {
   if (backBtn) backBtn.hidden = false;
   if (typeof renderTransactions === "function") renderTransactions();
   window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+});
+
+// ============================================================
+// BY CUSTOMER — Customer Profitability view
+// Shows Gross / Direct Costs / Net / Avg per Job for each customer.
+// Direct Costs = expenses linked to a job whose customer matches; non-job
+// overhead (rent, software) isn't attributed because it would skew the picture.
+// Gross = income tagged directly to the customer, plus income linked to a
+// job owned by that customer.
+// Universal filters (date-range, category, payee) narrow the input set.
+// ============================================================
+function renderByCustomer() {
+  const tbl = document.getElementById("bc-table");
+  const totalEl = document.getElementById("bc-total");
+  const metaEl = document.getElementById("bc-meta");
+  const chartEl = document.getElementById("bc-chart");
+  if (!tbl) return;
+
+  // jobNo → customer lookup
+  const jobCustomerOf = new Map((state.jobs || []).map(j => [j.jobNo, (j.customer || "").trim()]));
+  const jobYearOf = new Map((state.jobs || []).map(j => [j.jobNo, (j.date || "").slice(0, 4)]));
+
+  // A transaction belongs to a customer if it tags the customer directly,
+  // or it's linked to a job and that job's customer is set.
+  const customerFor = (t) => {
+    const direct = (t.customer || "").trim();
+    if (direct) return direct;
+    if (t.jobNo && jobCustomerOf.has(t.jobNo)) {
+      return jobCustomerOf.get(t.jobNo);
+    }
+    return "";
+  };
+
+  const passes = (t) => {
+    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (SAVINGS_CATEGORIES.includes(t.category)) return false;
+    if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
+    if (!filterPassesCategory(t.category)) return false;
+    if (!filterPasses("payees", t.payee || "")) return false;
+    return true;
+  };
+
+  // Aggregate per customer
+  const agg = new Map(); // name -> { gross, costs, jobs:Set }
+  const ensure = (name) => {
+    if (!agg.has(name)) agg.set(name, { gross: 0, costs: 0, jobs: new Set() });
+    return agg.get(name);
+  };
+
+  // Income & expenses from transactions
+  state.transactions.forEach(t => {
+    if (!passes(t)) return;
+    const cust = customerFor(t);
+    if (!cust) return;
+    const row = ensure(cust);
+    if (t.type === "income")  row.gross += (+t.amount || 0);
+    if (t.type === "expense" && t.jobNo) row.costs += (+t.amount || 0);
+  });
+
+  // Job counts — count any job that falls inside the selected year range and
+  // whose customer matches. (Date filter on jobs uses j.date.)
+  (state.jobs || []).forEach(j => {
+    const cust = (j.customer || "").trim();
+    if (!cust) return;
+    const yr = (j.date || "").slice(0, 4);
+    if (yr && !filterPasses("date-range", yr)) return;
+    ensure(cust).jobs.add(j.jobNo);
+  });
+
+  const rows = [...agg.entries()]
+    .map(([name, v]) => ({
+      name,
+      gross: v.gross,
+      costs: v.costs,
+      net: v.gross - v.costs,
+      jobs: v.jobs.size,
+      avg: v.jobs.size ? (v.gross - v.costs) / v.jobs.size : 0,
+    }))
+    .filter(r => r.gross !== 0 || r.costs !== 0 || r.jobs > 0)
+    .sort((a, b) => b.net - a.net);
+
+  const totalNet   = rows.reduce((s, r) => s + r.net, 0);
+  const totalGross = rows.reduce((s, r) => s + r.gross, 0);
+  const totalCosts = rows.reduce((s, r) => s + r.costs, 0);
+  const totalJobs  = rows.reduce((s, r) => s + r.jobs, 0);
+
+  if (totalEl) {
+    totalEl.textContent = fmtMoney(totalNet);
+    totalEl.style.color = totalNet >= 0 ? "var(--income)" : "var(--expense)";
+  }
+  if (metaEl) {
+    metaEl.textContent = `${rows.length} customer${rows.length === 1 ? "" : "s"} · ${totalJobs} job${totalJobs === 1 ? "" : "s"} · Gross ${fmtMoney(totalGross)} · Costs ${fmtMoney(totalCosts)}`;
+  }
+
+  // Top-10 horizontal bar chart by Net
+  if (chartEl) {
+    const top = rows.slice(0, 10);
+    if (!top.length) {
+      chartEl.innerHTML = "";
+    } else {
+      const W = 900, H = Math.max(140, top.length * 28 + 20);
+      chartEl.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      const padL = 220, padR = 110, padT = 8, padB = 8;
+      const plotW = W - padL - padR;
+      const maxAbs = Math.max(1, ...top.map(r => Math.abs(r.net)));
+      const barH = Math.min(22, (H - padT - padB) / top.length - 6);
+      const bars = top.map((r, i) => {
+        const y = padT + i * ((H - padT - padB) / top.length);
+        const w = (Math.abs(r.net) / maxAbs) * plotW;
+        const color = r.net >= 0 ? "var(--income)" : "var(--expense)";
+        const labelText = r.name.length > 26 ? r.name.slice(0, 25) + "…" : r.name;
+        return `
+          <text x="${padL - 10}" y="${y + barH * 0.7}" text-anchor="end" font-size="13" fill="var(--text)">${escapeHtml(labelText)}</text>
+          <rect class="bc-bar" data-name="${escapeHtml(r.name)}" x="${padL}" y="${y}" width="${w}" height="${barH}" rx="3" fill="${color}" style="cursor:pointer">
+            <title>${escapeHtml(r.name)} — Net ${fmtMoney(r.net)} · ${r.jobs} job${r.jobs === 1 ? "" : "s"}</title>
+          </rect>
+          <text x="${padL + w + 6}" y="${y + barH * 0.7}" font-size="12" fill="var(--muted)">${fmtMoney(r.net)}</text>
+        `;
+      }).join("");
+      chartEl.innerHTML = bars;
+    }
+  }
+
+  // Table
+  if (!rows.length) {
+    tbl.innerHTML = `
+      <thead><tr><th>Customer</th><th class="num">Jobs</th><th class="num">Gross</th><th class="num">Direct Costs</th><th class="num">Net</th><th class="num">Avg / Job</th></tr></thead>
+      <tbody><tr><td colspan="6" class="muted" style="text-align:center;padding:18px">No customers match the current filters.</td></tr></tbody>`;
+    return;
+  }
+  const body = rows.map(r => `
+    <tr class="bc-row" data-name="${escapeHtml(r.name)}">
+      <td>${escapeHtml(r.name)}</td>
+      <td class="num">${r.jobs}</td>
+      <td class="num income">${fmtMoney(r.gross)}</td>
+      <td class="num expense">${fmtMoney(r.costs)}</td>
+      <td class="num ${r.net >= 0 ? "income" : "expense"}"><strong>${fmtMoney(r.net)}</strong></td>
+      <td class="num">${fmtMoney(r.avg)}</td>
+    </tr>
+  `).join("");
+  const foot = `
+    <tr class="bc-total-row">
+      <td><strong>Total</strong></td>
+      <td class="num"><strong>${totalJobs}</strong></td>
+      <td class="num income"><strong>${fmtMoney(totalGross)}</strong></td>
+      <td class="num expense"><strong>${fmtMoney(totalCosts)}</strong></td>
+      <td class="num ${totalNet >= 0 ? "income" : "expense"}"><strong>${fmtMoney(totalNet)}</strong></td>
+      <td class="num">—</td>
+    </tr>`;
+  tbl.innerHTML = `
+    <thead><tr>
+      <th>Customer</th>
+      <th class="num">Jobs</th>
+      <th class="num">Gross</th>
+      <th class="num">Direct Costs</th>
+      <th class="num">Net</th>
+      <th class="num">Avg / Job</th>
+    </tr></thead>
+    <tbody>${body}</tbody>
+    <tfoot>${foot}</tfoot>`;
+}
+
+// Drill-down — click a customer row or its bar in the chart to jump to
+// Transactions filtered to that customer.
+function bcDrillIntoCustomer(custName) {
+  const name = (custName || "").trim();
+  if (!name) return;
+  const jobCustomerOf = new Map((state.jobs || []).map(j => [j.jobNo, (j.customer || "").trim()]));
+  __txDrillFilter = (t) => {
+    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (SAVINGS_CATEGORIES.includes(t.category)) return false;
+    const direct = (t.customer || "").trim();
+    const viaJob = t.jobNo ? (jobCustomerOf.get(t.jobNo) || "") : "";
+    return direct === name || viaJob === name;
+  };
+  if (typeof __txDrillLabel !== "undefined") {
+    __txDrillLabel = `${name} · Customer`;
+  }
+  if (typeof refreshTxDrillChip === "function") setTimeout(refreshTxDrillChip, 0);
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelector('.tab-btn[data-tab="transactions"]').classList.add("active");
+  document.getElementById("transactions").classList.add("active");
+  const searchAll = document.getElementById("tx-search-all");
+  if (searchAll) searchAll.value = "";
+  const tfType = document.getElementById("tx-filter-type");
+  const tfCat  = document.getElementById("tx-filter-category");
+  const tfYr   = document.getElementById("tx-filter-year");
+  if (tfType) tfType.value = "";
+  if (tfCat)  tfCat.value  = "";
+  if (tfYr)   tfYr.value   = "";
+  window.__txBackToAnalytics = true;
+  window.__txBackToAnalyticsView = "by-customer";
+  const backBtn = document.getElementById("btn-tx-back");
+  if (backBtn) backBtn.hidden = false;
+  if (typeof renderTransactions === "function") renderTransactions();
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+}
+document.getElementById("bc-table")?.addEventListener("click", (e) => {
+  const row = e.target.closest("tr.bc-row");
+  if (!row) return;
+  bcDrillIntoCustomer(row.dataset.name);
+});
+document.getElementById("bc-chart")?.addEventListener("click", (e) => {
+  const bar = e.target.closest("rect.bc-bar");
+  if (!bar) return;
+  bcDrillIntoCustomer(bar.dataset.name);
 });
 
 // Wire the Income / Expense mode-switch on the Year Matrix card.

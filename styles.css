@@ -5259,6 +5259,78 @@ select option {
   #sv-chart .sv-xaxis { font-size: 20px !important; }
 }
 
+/* ===== By Customer (Customer Profitability) view ===== */
+.bc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px 12px;
+}
+.bc-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.bc-eyebrow { font-size: 13px; color: var(--muted); }
+.bc-total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.bc-total { font-size: 24px; font-weight: 700; color: var(--income); font-variant-numeric: tabular-nums; }
+.bc-meta  { font-size: 12px; font-variant-numeric: tabular-nums; }
+
+.bc-chart-wrap {
+  margin: 8px 0 16px;
+  padding: 8px 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-soft);
+}
+#bc-chart { width: 100%; height: auto; display: block; }
+#bc-chart rect.bc-bar:hover { opacity: 0.85; }
+
+.bc-table-wrap { overflow-x: auto; }
+.bc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.bc-table th,
+.bc-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.bc-table th {
+  background: var(--bg-soft);
+  text-align: left;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+}
+.bc-table td.num,
+.bc-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.bc-table td.income  { color: var(--income); }
+.bc-table td.expense { color: var(--expense); }
+.bc-table tbody tr.bc-row { cursor: pointer; }
+.bc-table tbody tr.bc-row:hover { background: rgba(127,127,127,0.06); }
+.bc-table tfoot tr.bc-total-row td {
+  border-top: 2px solid var(--border);
+  background: var(--bg-soft);
+  font-weight: 700;
+}
+@media (max-width: 768px) {
+  .bc-card { padding: 12px 12px 8px; }
+  .bc-table th, .bc-table td { padding: 6px 6px; font-size: 12px; }
+  /* Hide the Avg / Job column on small screens — too noisy for phone width */
+  .bc-table thead th:nth-child(6),
+  .bc-table tbody td:nth-child(6),
+  .bc-table tfoot td:nth-child(6) { display: none; }
+}
+
 /* ===== Year Matrix view ===== */
 .ym-card {
   background: var(--surface);
