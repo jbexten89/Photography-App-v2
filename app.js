@@ -13466,13 +13466,17 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     return !!(txExistingY && txExistingY.checked);
   }
 
-  function refreshJobLinkOptions() {
+  function refreshJobLinkOptions(preserveJobNo) {
     if (!txJobLink) return;
     const cur = txJobLink.value;
-    // Hide completed jobs — but keep the currently-linked one visible so an
-    // existing transaction's link doesn't silently disappear from the picker.
+    // Hide completed jobs — but keep the currently-linked one (cur) visible so
+    // an existing transaction's link doesn't silently disappear from the picker.
+    // `preserveJobNo` lets the edit-modal flow whitelist the saved jobNo BEFORE
+    // it's been written to the select (otherwise a Paid job would be filtered
+    // out and the subsequent `select.value = jobNo` would fail silently).
+    const keep = preserveJobNo || cur;
     const jobs = (state.jobs || [])
-      .filter(j => getJobStatus(j) !== "Paid" || j.jobNo === cur)
+      .filter(j => getJobStatus(j) !== "Paid" || j.jobNo === keep)
       .slice()
       .sort((a, b) => (b.jobNo || "").localeCompare(a.jobNo || ""));
     txJobLink.innerHTML = `<option value="">— Select job —</option>` +
@@ -13735,7 +13739,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
           if (txExistingN) txExistingN.checked = true;
         }
         if (typeof syncExistingPills === "function") syncExistingPills();
-        refreshJobLinkOptions();
+        refreshJobLinkOptions(linkedJobNo);
         if (txJobLink) txJobLink.value = linkedJobNo;
         applyTxConditionalUI();
         // Re-apply the saved vendor onto the now-populated select.
