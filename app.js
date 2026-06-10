@@ -15792,6 +15792,11 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     let jobExp = 0;
     let savings = 0;
     let totalExp = 0;
+    // Non-operational adjustments (kept separate — never affect Gross /
+    // Net / Savings Rate). Each is income−expense signed so the displayed
+    // value reflects the net carry-over / reconciliation impact for the year.
+    let rolloverNet = 0;
+    let correctionNet = 0;
     const incomeByCat = new Map();   // job-income categories
     const expenseByCat = new Map();  // every non-savings expense category
     const jobExpByCat = new Map();   // job-category breakdown of jobExp ({ count, sum })
@@ -15804,7 +15809,15 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     txs.forEach(t => {
       const cat = (t.category || "Uncategorized").trim();
       const amt = +t.amount || 0;
-      if (NON_JOB_CATEGORIES.includes(cat)) return;
+      if (NON_JOB_CATEGORIES.includes(cat)) {
+        // Tally separately for the bottom-of-report adjustments row.
+        // Signed: income transactions add, expenses subtract — so the value
+        // shown reflects net carry-over / reconciliation impact.
+        const signed = (t.type === "income" ? +amt : -amt);
+        if (cat === "Roll Over")   rolloverNet   += signed;
+        if (cat === "Correction")  correctionNet += signed;
+        return;
+      }
 
       if (t.type === "income") {
         // Income only counts as Gross when its category is a job category.
@@ -15984,6 +15997,21 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const totalJobExpCount = [...jobExpByCat.values()].reduce((s, v) => s + v.count, 0);
     setText("ye-jobexp-count", String(totalJobExpCount));
     setText("ye-jobexp-total", fmtMoney(jobExp));
+
+    // ---------- Non-Operational Adjustments ----------
+    const nonopSection = document.getElementById("ye-nonop");
+    const rollWrap   = document.getElementById("ye-nonop-rollover-wrap");
+    const corrWrap   = document.getElementById("ye-nonop-correction-wrap");
+    const rollHasVal = Math.abs(rolloverNet)   > 0.005;
+    const corrHasVal = Math.abs(correctionNet) > 0.005;
+    if (nonopSection) nonopSection.hidden = !(rollHasVal || corrHasVal);
+    if (rollWrap) rollWrap.hidden = !rollHasVal;
+    if (corrWrap) corrWrap.hidden = !corrHasVal;
+    // Signed money: negative renders as "-$X.XX" via fmtMoney's built-in
+    // sign handling (just pass the signed value).
+    const signedMoney = (n) => (n < 0 ? "-" : "") + fmtMoney(Math.abs(n));
+    if (rollHasVal) setText("ye-nonop-rollover",   signedMoney(rolloverNet));
+    if (corrHasVal) setText("ye-nonop-correction", signedMoney(correctionNet));
 
     // ---------- Generated stamp ----------
     const stampEl = document.getElementById("ye-report-genstamp");

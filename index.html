@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=560" />
+<link rel="stylesheet" href="styles.css?v=561" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2139,6 +2139,25 @@
             </div>
           </div>
 
+          <!-- Non-operational adjustments — Roll Over (carried-forward
+               balance) and Correction (reconciliation tweaks). Hidden when
+               both are zero so the section never wastes space. -->
+          <div class="ye-nonop" id="ye-nonop" hidden>
+            <div class="ye-nonop-title">Non-Operational Adjustments
+              <span class="muted ye-nonop-note">(not included in Gross / Net / Savings Rate)</span>
+            </div>
+            <div class="ye-nonop-row">
+              <span class="ye-nonop-item" id="ye-nonop-rollover-wrap" hidden>
+                <span class="ye-nonop-label">Roll Over:</span>
+                <span class="ye-nonop-value" id="ye-nonop-rollover">$0.00</span>
+              </span>
+              <span class="ye-nonop-item" id="ye-nonop-correction-wrap" hidden>
+                <span class="ye-nonop-label">Correction:</span>
+                <span class="ye-nonop-value" id="ye-nonop-correction">$0.00</span>
+              </span>
+            </div>
+          </div>
+
           <div class="invoice-footer">
             <div>419-551-2103</div>
             <div>jbexten89@gmail.com</div>
@@ -3180,6 +3199,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=317"></script>
+  <script src="app.js?v=318"></script>
 </body>
 </html>
