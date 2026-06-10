@@ -15820,13 +15820,23 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
           return;
         }
         totalExp += amt;
-        // Bucket "Job Expenses" = expense whose category is a JOB_ORDER label
-        // (i.e. it's tied to a job-type, like Spring Sports / Banners).
-        // COGS = anything categorized "CoGS" or "Cost of Goods" etc.
-        if (JOB_ORDER.includes(cat)) {
-          jobExp += amt;
-        } else if (/cogs|cost of goods/i.test(cat) || /cogs|cost of goods/i.test(t.expenseIncome || "")) {
+        // Bucket logic — each transaction goes to AT MOST one of COGS / JobExp.
+        // CoGS detection looks at the Chart Account first (that's where the
+        // user actually classifies cost of goods — "CoGS" lives in the COA,
+        // not the Category column). Falls back to category text for legacy
+        // entries tagged "Cost of Goods" / "CoGS" directly.
+        // COGS takes precedence over JobExp — a Baseball-category expense
+        // with COA=CoGS is cost of goods, not a job expense.
+        const ca = (t.chartAccount || "").trim();
+        const isCogs =
+          /^cogs$/i.test(ca) ||
+          /cost of goods/i.test(ca) ||
+          /^cogs$/i.test(cat) ||
+          /cost of goods/i.test(cat);
+        if (isCogs) {
           cogs += amt;
+        } else if (JOB_ORDER.includes(cat)) {
+          jobExp += amt;
         }
         expenseByCat.set(cat, (expenseByCat.get(cat) || 0) + amt);
       }
