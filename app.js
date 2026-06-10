@@ -2561,7 +2561,7 @@ function renderByCustomer() {
       const W       = isMobile ? 600 : 900;
       const rowH    = isMobile ? 34  : 28;
       const padL    = isMobile ? 200 : 220;
-      const padR    = isMobile ? 90  : 110;
+      const padR    = isMobile ? 150 : 110;
       const padT    = isMobile ? 8   : 8;
       const padB    = isMobile ? 8   : 8;
       const fontLbl = isMobile ? 16  : 13;
