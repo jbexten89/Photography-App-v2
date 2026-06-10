@@ -5329,14 +5329,10 @@ select option {
   .bc-table thead th:nth-child(6),
   .bc-table tbody td:nth-child(6),
   .bc-table tfoot td:nth-child(6) { display: none; }
-  /* Footer row often has the longest dollar amounts — shrink type and tighten
-     padding so all five columns fit; let the wrap scroll horizontally if
-     things still overflow on very narrow phones. */
-  .bc-table tfoot tr.bc-total-row td {
-    padding: 6px 4px;
-    font-size: 11px;
-  }
-  .bc-table tfoot tr.bc-total-row td:first-child { padding-left: 6px; }
+  /* On mobile the table's grid is too narrow for a 5-cell totals row without
+     wrapping. The same totals already render in the header (bc-total + bc-meta),
+     so hide tfoot here and let the top of the card carry the summary. */
+  .bc-table tfoot { display: none !important; }
   .bc-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
