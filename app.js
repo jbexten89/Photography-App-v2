@@ -16007,7 +16007,8 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   // ---- Build the search index. Rebuilt every open so it always reflects
   //      current state without us having to invalidate on every save. ----
   function buildIndex() {
-    const state = window.state || {};
+    // `state` is a top-level `let` in app.js — accessible by lexical scope,
+    // NOT on `window` (script `let` declarations don't attach to the global).
     const idx = [];
 
     (state.transactions || []).forEach(t => {
@@ -16175,7 +16176,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     if (!row) return;
     close();
     if (row.type === "tx" && typeof openTxModal === "function") {
-      const tx = (window.state.transactions || []).find(t => t.id === row.id);
+      const tx = (state.transactions || []).find(t => t.id === row.id);
       if (tx) openTxModal(tx);
     } else if (row.type === "job" && typeof window.openJobEditModal === "function") {
       window.openJobEditModal(row.raw);
