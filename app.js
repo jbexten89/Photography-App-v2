@@ -15865,10 +15865,13 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     });
     const mileageDeduct = totalMiles * mileageRate;
 
-    // Profit base for savings rate = Gross - JobExp - COGS (matches manual §29).
-    const profitBase = gross - jobExp - cogs;
-    const savingsRate = profitBase > 0 ? (savings / profitBase) * 100 : 0;
+    // Savings Rate on Year-End uses Net Profit as the denominator (changed
+    // 2026-06 at user request — Net Profit is more intuitive at a glance
+    // than the Profit Base used by the Savings Rate analytics view).
+    //   Savings Rate = Savings ÷ Net Profit × 100
+    //   Net Profit   = Gross − Total Expenses
     const netProfit = gross - totalExp;
+    const savingsRate = netProfit > 0 ? (savings / netProfit) * 100 : 0;
 
     // ---------- Render header ----------
     const rangeEl = document.getElementById("ye-report-range");
@@ -15885,7 +15888,8 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       // the color correctly — reports-inverted pre-inverts --income/--expense.
       netEl.style.color = netProfit >= 0 ? "var(--income)" : "var(--expense)";
     }
-    setText("ye-tile-srate", profitBase > 0 ? `${savingsRate.toFixed(1)}%` : "—");
+    setText("ye-tile-savings", fmtMoney(savings));
+    setText("ye-tile-srate", netProfit > 0 ? `${savingsRate.toFixed(1)}%` : "—");
 
     // ---------- Mileage table ----------
     const mileageBody = document.getElementById("ye-mileage-body");

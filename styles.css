@@ -5157,8 +5157,8 @@ select option {
 /* ===== Year-End Summary report ===== */
 .ye-report-sheet .ye-tile-row {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
   margin: 16px 0 24px;
 }
 .ye-report-sheet .ye-tile {
