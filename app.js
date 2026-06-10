@@ -11550,11 +11550,11 @@ let dashboardIncomeYearOffset = 0;
 function renderIncomeByYearChart(years, opts = {}) {
   const svg = document.getElementById(opts.svgId || "dashboard-income-chart");
   if (!svg) return;
-  // Let the SVG fill the card's flex slot in BOTH dimensions instead of
-  // letterboxing on height — bars stretch to use the dead space below.
-  // Text gets slightly taller too but reads fine on a simple bar chart.
+  // Top-align so any leftover letterbox space falls at the bottom only
+  // (not centered top+bottom). Aspect is still preserved → text stays
+  // proportional, only bar/plot pixel-height changes with viewBox H.
   if (svg.id === "dashboard-income-chart") {
-    svg.setAttribute("preserveAspectRatio", "none");
+    svg.setAttribute("preserveAspectRatio", "xMidYMin meet");
   }
 
   // Newest year on the left, oldest on the right
@@ -11614,7 +11614,14 @@ function renderIncomeByYearChart(years, opts = {}) {
     return;
   }
 
-  const W = 900, H = 360;
+  // Dashboard card slot is taller than the SVG's natural aspect (2.5:1).
+  // A taller viewBox makes the plot area bigger in SVG units, which
+  // translates to taller bars on screen WITHOUT distorting text (since
+  // aspect ratio is still preserved via meet). Trends variant keeps the
+  // original aspect since its card has different proportions.
+  const isDashboard = (opts.svgId || "dashboard-income-chart") === "dashboard-income-chart";
+  const W = 900;
+  const H = isDashboard ? 500 : 360;
   // Tightened padding so the plot area uses more of the SVG (chart looks
   // larger inside the same card). padL fits the 20px y-axis money labels.
   const padL = 90, padR = 10, padT = 10, padB = 32;
