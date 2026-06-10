@@ -1273,10 +1273,7 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   padding: 0;
   display: flex;
   flex-direction: column;
-  /* Capped so the sidebar's height matches the chart card's natural
-     height instead of growing tall with the full 12-month list.
-     The list scrolls internally past the cap. */
-  max-height: 320px;
+  max-height: 480px;
   overflow-y: auto;
 }
 .cf-row {
