@@ -5324,11 +5324,20 @@ select option {
 }
 @media (max-width: 768px) {
   .bc-card { padding: 12px 12px 8px; }
-  .bc-table th, .bc-table td { padding: 6px 6px; font-size: 12px; }
+  .bc-table th, .bc-table td { padding: 6px 6px; font-size: 12px; white-space: nowrap !important; }
   /* Hide the Avg / Job column on small screens — too noisy for phone width */
   .bc-table thead th:nth-child(6),
   .bc-table tbody td:nth-child(6),
   .bc-table tfoot td:nth-child(6) { display: none; }
+  /* Footer row often has the longest dollar amounts — shrink type and tighten
+     padding so all five columns fit; let the wrap scroll horizontally if
+     things still overflow on very narrow phones. */
+  .bc-table tfoot tr.bc-total-row td {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+  .bc-table tfoot tr.bc-total-row td:first-child { padding-left: 6px; }
+  .bc-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
 /* ===== Year Matrix view ===== */
