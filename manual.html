@@ -132,7 +132,7 @@
     across devices. No build step, no framework, no installation — open the
     URL and start working.
   </p>
-  <div class="version">Manual rev 2026-05 · App v2</div>
+  <div class="version">Manual rev 2026-06 · App v2</div>
 </div>
 
 <!-- ============== TOC ============== -->
@@ -144,32 +144,33 @@
     <li><span>Data Model &amp; Glossary</span><span>5</span></li>
     <li><span>Overview Page</span><span>7</span></li>
     <li><span>Calendar Page</span><span>9</span></li>
-    <li><span>New Job Page</span><span>10</span></li>
+    <li><span>Jobs Page</span><span>10</span></li>
     <li><span>Transactions Page</span><span>11</span></li>
     <li><span>Analytics — Overview</span><span>14</span></li>
     <li><span>Analytics — Year Matrix</span><span>15</span></li>
     <li><span>Analytics — By Job</span><span>16</span></li>
-    <li><span>Analytics — Cash Flow</span><span>17</span></li>
-    <li><span>Analytics — By Category</span><span>18</span></li>
-    <li><span>Analytics — Trends (Spending Trends)</span><span>19</span></li>
-    <li><span>Analytics — Flow</span><span>20</span></li>
-    <li><span>Analytics — vs Expense</span><span>21</span></li>
-    <li><span>Analytics — Breakdown (Sankey)</span><span>22</span></li>
-    <li><span>Analytics — Savings Rate</span><span>23</span></li>
-    <li><span>Analytics — Savings</span><span>24</span></li>
-    <li><span>Universal Filters</span><span>25</span></li>
-    <li><span>Filter Presets</span><span>26</span></li>
-    <li><span>Invoices Page</span><span>27</span></li>
-    <li><span>Mileage Page</span><span>29</span></li>
-    <li><span>Reports</span><span>30</span></li>
-    <li><span>Settings Page</span><span>32</span></li>
-    <li><span>Locked Years</span><span>34</span></li>
-    <li><span>Cloud Sync &amp; Backup</span><span>35</span></li>
-    <li><span>Mobile-Specific Behaviors</span><span>36</span></li>
-    <li><span>Print &amp; PDF Export</span><span>37</span></li>
-    <li><span>Formulas Reference</span><span>38</span></li>
-    <li><span>Keyboard &amp; Touch Shortcuts</span><span>40</span></li>
-    <li><span>Troubleshooting</span><span>41</span></li>
+    <li><span>Analytics — By Category</span><span>17</span></li>
+    <li><span>Analytics — By Customer (Customer Profitability)</span><span>18</span></li>
+    <li><span>Analytics — Cash Flow</span><span>19</span></li>
+    <li><span>Analytics — Trends (Spending Trends)</span><span>20</span></li>
+    <li><span>Analytics — Flow</span><span>21</span></li>
+    <li><span>Analytics — vs Expense</span><span>22</span></li>
+    <li><span>Analytics — Breakdown (Sankey)</span><span>23</span></li>
+    <li><span>Analytics — Savings Rate</span><span>24</span></li>
+    <li><span>Analytics — Savings</span><span>25</span></li>
+    <li><span>Universal Filters</span><span>26</span></li>
+    <li><span>Filter Presets</span><span>27</span></li>
+    <li><span>Invoices Page</span><span>28</span></li>
+    <li><span>Mileage Page</span><span>30</span></li>
+    <li><span>Reports</span><span>31</span></li>
+    <li><span>Settings Page</span><span>33</span></li>
+    <li><span>Locked Years</span><span>35</span></li>
+    <li><span>Cloud Sync &amp; Backup</span><span>36</span></li>
+    <li><span>Mobile-Specific Behaviors (incl. swipe gestures)</span><span>37</span></li>
+    <li><span>Print &amp; PDF Export</span><span>38</span></li>
+    <li><span>Formulas Reference</span><span>39</span></li>
+    <li><span>Keyboard &amp; Touch Shortcuts</span><span>41</span></li>
+    <li><span>Troubleshooting</span><span>42</span></li>
   </ol>
 </section>
 
@@ -511,9 +512,14 @@
   </p>
 </section>
 
-<!-- ============== 6. NEW JOB PAGE ============== -->
+<!-- ============== 6. JOBS PAGE ============== -->
 <section>
-  <h1>6. New Job Page</h1>
+  <h1>6. Jobs Page</h1>
+  <p class="muted" style="font-size:10pt">
+    Sidebar / More-menu label: <strong>Jobs</strong> (renamed from "New Job"
+    in App v2 · 2026-06). The page heading and the in-page add button still
+    read "+ New Job" since that's the action.
+  </p>
 
   <h3>6.1 Adding a job</h3>
   <p>
@@ -644,6 +650,70 @@
     Settings". Swipe-delete, modal-delete, bulk-delete, inline-edit, and
     CSV import all enforce this.
   </p>
+
+  <h3>7.8 Smart Vendor autofill <span class="muted" style="font-size:10pt; font-weight:400;">(new — 2026-06)</span></h3>
+  <p>
+    Picking an <em>existing</em> vendor on a <em>new</em> transaction
+    automatically prefills <strong>Category, Expense, Chart Account,
+    Payee, and Account</strong> from that vendor's most recent expense
+    transaction. The intent: typing "Adobe" or "Speedway" shouldn't make
+    you re-pick the same five fields you always pair with that vendor.
+  </p>
+  <p>Rules:</p>
+  <ul>
+    <li>Only runs on <strong>new</strong> transactions. Opening an existing transaction for edit never triggers autofill.</li>
+    <li>Never clobbers a field you've already filled — autofill only writes into empty fields.</li>
+    <li>For <code>&lt;select&gt;</code> fields, it only writes a value that's actually one of the current options (prevents stale/orphaned strings).</li>
+    <li>Each filled field briefly glows blue (≈1.6s) so you can see what was prefilled and override anything that's wrong.</li>
+    <li>An info toast pops at the bottom: <em>"Autofilled from last [vendor] entry"</em>.</li>
+    <li>Brand-new vendors added via "+ Add new…" have no history — autofill silently skips.</li>
+  </ul>
+  <p>
+    Source: the most-recent (not most-common) expense transaction for
+    that vendor — matches the assumption that your current habits are
+    more relevant than what you did three years ago.
+  </p>
+
+  <h3>7.9 Mobile swipe gestures <span class="muted" style="font-size:10pt; font-weight:400;">(updated — 2026-06)</span></h3>
+  <p>
+    On mobile, the All Transactions list responds to two opposite swipe
+    directions. Both run only when the 3-line stacked layout is active
+    (the default mobile view).
+  </p>
+  <h4>Left-swipe → Edit / Delete panel</h4>
+  <ul>
+    <li>Drag a row to the left past about 60px to reveal two buttons: <strong>Edit</strong> (blue) opens the transaction modal; <strong>Delete</strong> (red) removes the row after a confirm.</li>
+    <li>Tap anywhere outside the row, or swipe a different row, to close the panel.</li>
+    <li>Locked-year transactions block Delete with the standard toast.</li>
+  </ul>
+  <h4>Right-swipe → Toggle Reconciled</h4>
+  <ul>
+    <li>Drag a row to the right. The row paints progressively greener as your finger moves.</li>
+    <li>Past the 80px threshold, the green deepens and a 4px green stripe pops on the left edge — that's the "release now to commit" signal.</li>
+    <li>Release past threshold: the row flips Reconciled (or un-flips if it was already reconciled), a centered ✓ (or ✕) pulse plays for ~700ms, then the list re-renders so the running balance updates.</li>
+    <li>Release before threshold: snaps back, nothing changes.</li>
+    <li>Locked years block the toggle with the standard toast before any mutation.</li>
+  </ul>
+  <h4>At-a-glance status indicator</h4>
+  <p>
+    Every reconciled row gets a thin <strong>green left border</strong>;
+    rows in the intermediate Cleared state get an <strong>amber left
+    border</strong>. Visible whether you swiped to reconcile or used the
+    dot in the recon column.
+  </p>
+  <p>
+    Direction-locks on the first 10px of horizontal motion, so the two
+    gestures never fight each other.
+  </p>
+
+  <h3>7.10 Paid jobs in the edit modal</h3>
+  <p>
+    The Job No. dropdown normally hides jobs whose status is
+    <strong>Paid</strong> to keep the picker clean. When you open an
+    <em>existing</em> transaction that's linked to a Paid job, that
+    specific Paid job is still shown in the dropdown so its link doesn't
+    silently disappear. (Bug fix · 2026-06.)
+  </p>
 </section>
 
 <!-- ============== 8. ANALYTICS OVERVIEW ============== -->
@@ -651,16 +721,18 @@
   <h1>8. Analytics — Overview</h1>
   <p>
     The Analytics page is one section (<code>#jobs</code>) that contains
-    ten swappable inner views. The view-picker is a row of pills on
-    desktop, a dropdown on mobile.
+    eleven swappable inner views. The view-picker is a row of pills on
+    desktop and a dropdown on mobile. The pill order (left-to-right) is
+    the order listed below.
   </p>
 
-  <h3>8.1 The ten views</h3>
+  <h3>8.1 The eleven views</h3>
   <ol>
     <li><strong>Year Matrix</strong> — pivot of category × year income/expense.</li>
     <li><strong>By Job</strong> — donut + jobs grid grouped by Customer / Category / Job No.</li>
-    <li><strong>Cash Flow</strong> — monthly bars + cumulative line, one year.</li>
     <li><strong>By Category</strong> — donut/columns/treemap/rose chart of categorized spending or income.</li>
+    <li><strong>By Customer (Customer Profitability)</strong> — ranks customers by Net (Gross − Direct Costs), with a top-10 bar chart and full table. New in App v2 · 2026-06.</li>
+    <li><strong>Cash Flow</strong> — monthly bars + cumulative line, one year.</li>
     <li><strong>Trends (Spending Trends)</strong> — stacked monthly bars or per-category lines, one year.</li>
     <li><strong>Flow</strong> — horizontal pill bars per Job (All Jobs) or per Year (One Job).</li>
     <li><strong>vs Expense</strong> — monthly income vs expense overlay.</li>
@@ -885,6 +957,72 @@
   <h3>12.7 Sidebar tiles</h3>
   <ul>
     <li><strong>Total</strong>, <strong>Avg / Month</strong>, <strong>Top Category</strong> (name + % share), <strong>Categories</strong> (count).</li>
+  </ul>
+</section>
+
+<!-- ============== 12B. ANALYTICS — BY CUSTOMER ============== -->
+<section>
+  <h1>12B. Analytics — By Customer (Customer Profitability)</h1>
+  <p class="muted" style="font-size:10pt">
+    New in App v2 · 2026-06. Sits between By Category and Cash Flow in the
+    Analytics pill nav. Universal filters apply.
+  </p>
+
+  <h3>12B.1 What it shows</h3>
+  <p>
+    Ranks every customer by Net (Gross − Direct Costs) so you can see at a
+    glance which customers actually move the business. The card has three
+    parts:
+  </p>
+  <ul>
+    <li><strong>Header</strong> — big Net total (green if positive, red if negative) and a meta line: number of customers · number of jobs · total Gross · total Direct Costs.</li>
+    <li><strong>Top-10 bar chart</strong> — horizontal bars, one per customer, sorted by Net. Click a bar to drill in.</li>
+    <li><strong>Full table</strong> — every customer with: <em>Customer · Jobs · Gross · Direct Costs · Net · Avg / Job</em>. Sorted by Net descending. Click any row to drill in.</li>
+  </ul>
+
+  <h3>12B.2 How the numbers are computed</h3>
+  <p>
+    A transaction "belongs" to a customer if (a) its <code>customer</code>
+    field is set directly, OR (b) it's linked to a <code>jobNo</code> whose
+    job's <code>customer</code> is set. So both invoice-style income (where
+    you tagged the customer) and older job-linked income (only jobNo set)
+    both surface.
+  </p>
+  <div class="formula">
+    <strong>Gross</strong> = Σ <em>income</em> transactions belonging to that customer<br>
+    <strong>Direct Costs</strong> = Σ <em>expense</em> transactions tagged to a <em>job</em> whose customer matches<br>
+    <strong>Net</strong> = Gross − Direct Costs<br>
+    <strong>Jobs</strong> = count of state.jobs whose customer matches (filtered by date-range)<br>
+    <strong>Avg / Job</strong> = Net ÷ Jobs
+  </div>
+  <p>
+    <strong>Non-job overhead</strong> (rent, software, insurance — anything
+    not linked to a specific job) is intentionally excluded from Direct
+    Costs because it can't be fairly attributed to one customer. The Net
+    figure is therefore a "contribution margin" per customer, not a fully-
+    loaded profit.
+  </p>
+  <p>
+    Categories in <code>NON_JOB_CATEGORIES</code> (Roll Over, Correction)
+    and <code>SAVINGS_CATEGORIES</code> are also excluded so they don't
+    distort customer Net.
+  </p>
+
+  <h3>12B.3 Drill-down</h3>
+  <p>
+    Clicking a customer row or its bar in the chart jumps to the
+    Transactions page filtered to every transaction belonging to that
+    customer (direct or via job). A <strong>‹ Back</strong> button appears
+    on the Transactions toolbar; tapping it returns to the By Customer
+    view.
+  </p>
+
+  <h3>12B.4 Mobile</h3>
+  <ul>
+    <li>The chart uses a narrower viewBox (600 SVG units wide) with bigger fonts so labels and value numbers read cleanly on a phone.</li>
+    <li>Customer names truncate at 16 characters (with "…") so they don't collide with the bar area.</li>
+    <li>The <em>Avg / Job</em> column is hidden in the table — five numeric columns are too noisy for phone width. Use the desktop view if you need that number.</li>
+    <li>The table's tfoot (Total row) is hidden on mobile because the same totals are already in the header meta line.</li>
   </ul>
 </section>
 
@@ -1395,7 +1533,7 @@
   <ol>
     <li><strong>Job/Category</strong> — drill-down by Customer / Category / Job No., per period.</li>
     <li><strong>Income vs Expense</strong> — section totals for income and expense categories.</li>
-    <li><strong>Helper / Give Back</strong> — Σ transactions tagged for the helper / give-back program.</li>
+    <li><strong>Helper / Give Back</strong> — Σ transactions tagged for the helper / give-back program. The Helper section's "Payee" column shows each transaction's <em>Vendor</em> field (changed from Memo · 2026-06), grouped by vendor + job; blank vendors collapse to "(no vendor)".</li>
     <li><strong>Transactions</strong> — full ledger filtered by date range and a slew of dropdowns; printable.</li>
     <li><strong>Mileage</strong> — printable mileage report for the period.</li>
     <li><strong>Sales Tax Liability</strong> — tax collected on invoices, grouped by Tax Agency.</li>
@@ -1634,6 +1772,7 @@
   <h3>27.2 Swipe gestures</h3>
   <ul>
     <li><strong>Swipe left</strong> on a transaction row (mobile, 3-line layout) → reveals Edit / Delete buttons.</li>
+    <li><strong>Swipe right</strong> on a transaction row → toggle Reconciled. Progressive green tint as you drag; release past the 80px threshold to commit; ✓ pulse confirms. Reconciled rows keep a green left-border; Cleared rows an amber left-border. (New · 2026-06 — full details in §7.9.)</li>
     <li><strong>Swipe left</strong> on a mileage trip row → reveals Edit / Delete.</li>
     <li><strong>Swipe left</strong> on a job row (mobile, 3-line layout) → reveals Edit / Delete.</li>
     <li><strong>Pinch</strong> two fingers on the Breakdown Sankey → zoom 0.5×–4× anchored to pinch midpoint.</li>
