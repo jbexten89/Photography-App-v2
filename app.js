@@ -2559,16 +2559,16 @@ function renderByCustomer() {
       // ~5px which is unreadable).
       const isMobile = window.matchMedia("(max-width: 768px)").matches;
       const W       = isMobile ? 600 : 900;
-      const rowH    = isMobile ? 34  : 28;
+      const rowH    = isMobile ? 44  : 28;
       const padL    = isMobile ? 200 : 220;
-      const padR    = isMobile ? 150 : 110;
-      const padT    = isMobile ? 8   : 8;
-      const padB    = isMobile ? 8   : 8;
-      const fontLbl = isMobile ? 16  : 13;
-      const fontVal = isMobile ? 16  : 12;
-      const barH    = isMobile ? 22  : 22;
-      const truncAt = isMobile ? 20  : 26;
-      const H = Math.max(isMobile ? 140 : 140, top.length * rowH + padT + padB);
+      const padR    = isMobile ? 170 : 110;
+      const padT    = isMobile ? 10  : 8;
+      const padB    = isMobile ? 10  : 8;
+      const fontLbl = isMobile ? 22  : 13;
+      const fontVal = isMobile ? 22  : 12;
+      const barH    = isMobile ? 30  : 22;
+      const truncAt = isMobile ? 16  : 26;
+      const H = Math.max(isMobile ? 160 : 140, top.length * rowH + padT + padB);
       chartEl.setAttribute("viewBox", `0 0 ${W} ${H}`);
       const plotW = W - padL - padR;
       const maxAbs = Math.max(1, ...top.map(r => Math.abs(r.net)));
