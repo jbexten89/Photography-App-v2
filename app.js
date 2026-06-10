@@ -11550,6 +11550,12 @@ let dashboardIncomeYearOffset = 0;
 function renderIncomeByYearChart(years, opts = {}) {
   const svg = document.getElementById(opts.svgId || "dashboard-income-chart");
   if (!svg) return;
+  // Let the SVG fill the card's flex slot in BOTH dimensions instead of
+  // letterboxing on height — bars stretch to use the dead space below.
+  // Text gets slightly taller too but reads fine on a simple bar chart.
+  if (svg.id === "dashboard-income-chart") {
+    svg.setAttribute("preserveAspectRatio", "none");
+  }
 
   // Newest year on the left, oldest on the right
   let yearAsc = [...years].sort((a, b) => b.localeCompare(a));
