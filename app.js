@@ -11608,13 +11608,10 @@ function renderIncomeByYearChart(years, opts = {}) {
     return;
   }
 
-  // viewBox height set so the SVG's aspect ratio (~1.88:1) matches the
-  // dashboard-income-chart-card's flex slot — otherwise the SVG renders
-  // letterboxed and leaves dead space below the bars on desktop.
-  const W = 900, H = 480;
+  const W = 900, H = 360;
   // Tightened padding so the plot area uses more of the SVG (chart looks
   // larger inside the same card). padL fits the 20px y-axis money labels.
-  const padL = 90, padR = 10, padT = 10, padB = 40;
+  const padL = 90, padR = 10, padT = 10, padB = 32;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 

@@ -2897,8 +2897,8 @@ select option {
 .dashboard-charts .dashboard-income-chart-card {
   display: flex;
   flex-direction: column;
-  height: 310px;
-  max-height: 310px;
+  height: 370px;
+  max-height: 370px;
 }
 
 .dashboard-income-chart-card {
