@@ -8974,7 +8974,10 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 24px;
-  align-items: start;
+  /* Stretch (default) instead of start so the left chart card grows to
+     match the right sidebar's height — keeps the row visually balanced
+     when the sidebar's category list runs long. */
+  align-items: stretch;
 }
 .bcat-main {
   background: var(--surface);
