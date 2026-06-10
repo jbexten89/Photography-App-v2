@@ -15956,3 +15956,276 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   window.renderNjJobsTable = renderNjJobsTable;
   window.renderNjAnalytics = renderNjAnalytics;
 })();
+
+// ============================================================
+// GLOBAL FUZZY SEARCH
+// One bar, four collections (transactions, jobs, invoices, mileage trips).
+// Tokenized substring matching: every space-separated token must match
+// somewhere in the item's text. Up to ~30 results, grouped by type.
+// Ctrl+K / Cmd+K opens; Esc closes; ↑/↓ navigate; Enter opens the row.
+// ============================================================
+(function setupGlobalSearch() {
+  const modal     = document.getElementById("gsearch-modal");
+  const backdrop  = document.getElementById("gsearch-backdrop");
+  const input     = document.getElementById("gsearch-input");
+  const resultsEl = document.getElementById("gsearch-results");
+  const countEl   = document.getElementById("gsearch-count");
+  const openBtn1  = document.getElementById("btn-gsearch-open");
+  const openBtn2  = document.getElementById("btn-gsearch-open-flyout");
+  if (!modal || !input || !resultsEl) return;
+
+  let activeIdx = 0;
+  let flatRows  = []; // flat list of clickable rows in display order
+
+  const TYPE_ICONS = {
+    tx:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>`,
+    job: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/></svg>`,
+    inv: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>`,
+    trip:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>`,
+  };
+  const TYPE_HEADS = { tx: "Transactions", job: "Jobs", inv: "Invoices", trip: "Mileage" };
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function fmtMoneyLocal(n) {
+    n = +n || 0;
+    return (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+  function highlight(text, tokens) {
+    let s = esc(text || "");
+    tokens.forEach(t => {
+      if (!t) return;
+      const re = new RegExp("(" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "ig");
+      s = s.replace(re, "<mark>$1</mark>");
+    });
+    return s;
+  }
+
+  // ---- Build the search index. Rebuilt every open so it always reflects
+  //      current state without us having to invalidate on every save. ----
+  function buildIndex() {
+    const state = window.state || {};
+    const idx = [];
+
+    (state.transactions || []).forEach(t => {
+      const parts = [
+        t.date, t.payee, t.vendor, t.customer, t.category, t.account,
+        t.memo, t.expenseIncome, t.chartAccount, t.jobNo,
+        (t.tags || []).join(" "),
+        String(t.amount || ""),
+      ].filter(Boolean);
+      idx.push({
+        type: "tx",
+        id: t.id,
+        date: t.date || "",
+        haystack: parts.join(" ").toLowerCase(),
+        title: t.payee || t.vendor || t.customer || t.category || "(transaction)",
+        sub: [t.date, t.category, t.memo].filter(Boolean).join(" · "),
+        amount: +t.amount || 0,
+        ttype: t.type,
+        raw: t,
+      });
+    });
+
+    (state.jobs || []).forEach(j => {
+      const parts = [
+        j.jobNo, j.date, j.customer, j.category,
+        String(j.hours || ""),
+      ].filter(Boolean);
+      idx.push({
+        type: "job",
+        id: j.jobNo,
+        date: j.date || "",
+        haystack: parts.join(" ").toLowerCase(),
+        title: `${j.jobNo || ""} — ${j.customer || ""}`.trim(),
+        sub: [j.date, j.category, j.hours ? `${j.hours} hr` : ""].filter(Boolean).join(" · "),
+        amount: null,
+        raw: j,
+      });
+    });
+
+    (state.invoices || []).forEach(inv => {
+      const items = (inv.items || []).map(i => i.description || i.name || "").join(" ");
+      const parts = [
+        inv.invoiceNumber, inv.date, inv.dueDate, inv.customer, inv.notes, items,
+      ].filter(Boolean);
+      idx.push({
+        type: "inv",
+        id: inv.id || inv.invoiceNumber,
+        date: inv.date || "",
+        haystack: parts.join(" ").toLowerCase(),
+        title: `#${inv.invoiceNumber || "?"} — ${inv.customer || ""}`.trim(),
+        sub: [inv.date, inv.paidDate ? "Paid " + inv.paidDate : "Unpaid"].filter(Boolean).join(" · "),
+        amount: +inv.total || +inv.amount || 0,
+        ttype: "income",
+        raw: inv,
+      });
+    });
+
+    (state.trips || []).forEach(tr => {
+      const parts = [
+        tr.date, tr.vehicle, tr.destination, tr.start, tr.end, tr.memo,
+        String(tr.miles || ""),
+      ].filter(Boolean);
+      idx.push({
+        type: "trip",
+        id: tr.id,
+        date: tr.date || "",
+        haystack: parts.join(" ").toLowerCase(),
+        title: `${tr.destination || tr.memo || "(trip)"} — ${tr.vehicle || ""}`.trim(),
+        sub: [tr.date, tr.miles ? `${tr.miles} mi` : ""].filter(Boolean).join(" · "),
+        amount: null,
+        raw: tr,
+      });
+    });
+
+    return idx;
+  }
+
+  function runSearch(query) {
+    const q = (query || "").trim().toLowerCase();
+    if (!q) return [];
+    const tokens = q.split(/\s+/).filter(Boolean);
+    const idx = buildIndex();
+    const matches = [];
+    for (const it of idx) {
+      let ok = true;
+      let coverage = 0;
+      for (const t of tokens) {
+        if (it.haystack.includes(t)) coverage++;
+        else { ok = false; break; }
+      }
+      if (ok) matches.push({ ...it, _coverage: coverage });
+    }
+    // Sort: more tokens matched first, then newer date first.
+    matches.sort((a, b) => {
+      if (b._coverage !== a._coverage) return b._coverage - a._coverage;
+      return (b.date || "").localeCompare(a.date || "");
+    });
+    return matches.slice(0, 30);
+  }
+
+  function render(query) {
+    const results = runSearch(query);
+    flatRows = [];
+    if (!query) {
+      resultsEl.innerHTML = `<div class="gsearch-empty">Start typing to search transactions, jobs, invoices, and mileage trips.</div>`;
+      if (countEl) countEl.textContent = "";
+      return;
+    }
+    if (!results.length) {
+      resultsEl.innerHTML = `<div class="gsearch-empty">No matches for "<strong>${esc(query)}</strong>".</div>`;
+      if (countEl) countEl.textContent = "0 results";
+      return;
+    }
+    const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const groups = { tx: [], job: [], inv: [], trip: [] };
+    results.forEach(r => groups[r.type].push(r));
+    let html = "";
+    let displayIdx = 0;
+    for (const type of ["tx", "job", "inv", "trip"]) {
+      const grp = groups[type];
+      if (!grp.length) continue;
+      html += `<div class="gsearch-group-head">${TYPE_HEADS[type]} <span class="muted">(${grp.length})</span></div>`;
+      grp.forEach(r => {
+        const amtHtml = r.amount != null
+          ? `<span class="gsearch-row-amt ${r.ttype || ""}">${r.ttype === "expense" ? "-" : ""}${fmtMoneyLocal(Math.abs(r.amount))}</span>`
+          : `<span></span>`;
+        html += `
+          <div class="gsearch-row" data-type="${type}" data-id="${esc(r.id)}" data-idx="${displayIdx}">
+            <span class="gsearch-row-icon">${TYPE_ICONS[type]}</span>
+            <span class="gsearch-row-main">
+              <span class="gsearch-row-title">${highlight(r.title, tokens)}</span>
+              <span class="gsearch-row-sub">${highlight(r.sub, tokens)}</span>
+            </span>
+            ${amtHtml}
+          </div>`;
+        flatRows.push({ type, id: r.id, raw: r.raw });
+        displayIdx++;
+      });
+    }
+    resultsEl.innerHTML = html;
+    if (countEl) countEl.textContent = `${results.length} result${results.length === 1 ? "" : "s"}`;
+    activeIdx = 0;
+    updateActive();
+  }
+
+  function updateActive() {
+    const rows = resultsEl.querySelectorAll(".gsearch-row");
+    rows.forEach((el, i) => el.classList.toggle("active", i === activeIdx));
+    const cur = rows[activeIdx];
+    if (cur) cur.scrollIntoView({ block: "nearest" });
+  }
+
+  function open() {
+    modal.hidden = false;
+    backdrop.hidden = false;
+    input.value = "";
+    render("");
+    setTimeout(() => input.focus(), 0);
+  }
+  function close() {
+    modal.hidden = true;
+    backdrop.hidden = true;
+  }
+  function activate(row) {
+    if (!row) return;
+    close();
+    if (row.type === "tx" && typeof openTxModal === "function") {
+      const tx = (window.state.transactions || []).find(t => t.id === row.id);
+      if (tx) openTxModal(tx);
+    } else if (row.type === "job" && typeof window.openJobEditModal === "function") {
+      window.openJobEditModal(row.raw);
+    } else if (row.type === "inv" && typeof openInvoiceEditor === "function") {
+      openInvoiceEditor(row.raw);
+    } else if (row.type === "trip" && typeof openTripModal === "function") {
+      openTripModal(row.raw);
+    }
+  }
+
+  // ---- Wire ----
+  openBtn1?.addEventListener("click", open);
+  openBtn2?.addEventListener("click", () => {
+    // Close the right flyout first if it's open, then open search
+    document.getElementById("right-flyout")?.classList.remove("open");
+    document.getElementById("right-flyout-backdrop")?.classList.remove("show");
+    open();
+  });
+  backdrop.addEventListener("click", close);
+
+  // Cmd+K / Ctrl+K from anywhere
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
+      e.preventDefault();
+      modal.hidden ? open() : close();
+    }
+  });
+
+  // Modal keys
+  modal.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (flatRows.length) { activeIdx = (activeIdx + 1) % flatRows.length; updateActive(); }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (flatRows.length) { activeIdx = (activeIdx - 1 + flatRows.length) % flatRows.length; updateActive(); }
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      activate(flatRows[activeIdx]);
+    }
+  });
+  input.addEventListener("input", () => render(input.value));
+  resultsEl.addEventListener("click", (e) => {
+    const row = e.target.closest(".gsearch-row");
+    if (!row) return;
+    const i = parseInt(row.dataset.idx, 10);
+    activate(flatRows[i]);
+  });
+
+  // Expose
+  window.openGlobalSearch = open;
+})();

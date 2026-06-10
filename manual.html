@@ -1542,6 +1542,35 @@
     <li><strong>Year-End Summary</strong> — single-page accountant snapshot for one calendar year (new · 2026-06). Six big-number tiles at the top (Gross Income · Job Expenses · COGS · Total Expenses · Net Profit · Savings Rate), a mileage section (per-vehicle if multiple), Income by Job category (with job counts), and Expenses by category (with % share). Year picker; Print / PDF prints to one or two pages of letter paper.</li>
   </ol>
 
+  <h3 style="margin-top:1em">23.4 Global Search (Cmd/Ctrl+K) <span class="muted" style="font-size:10pt; font-weight:400;">(new · 2026-06)</span></h3>
+  <p>
+    A "Search" button at the top of the sidebar (and inside the mobile
+    More menu) opens a global search overlay. Press <strong>Ctrl+K</strong>
+    (Windows) or <strong>Cmd+K</strong> (Mac) from anywhere to open it.
+    <strong>Esc</strong> closes; <strong>↑/↓</strong> navigate results;
+    <strong>Enter</strong> opens the highlighted result.
+  </p>
+  <p>
+    What gets searched (in order of typical hit-rate): Transactions
+    (payee, vendor, customer, memo, category, account, expense field,
+    chart of accounts, tags, amount, date) · Jobs (job no., customer,
+    category, date, hours) · Invoices (invoice number, customer, line-item
+    descriptions, notes) · Mileage Trips (vehicle, destination, memo,
+    date, miles).
+  </p>
+  <p>
+    Matching is tokenized substring — type one or more words separated
+    by spaces; every token must match somewhere in the item's text.
+    Case-insensitive. Results are capped at 30 across all types,
+    grouped by type, sorted by token coverage and then newest date.
+    Matched tokens are highlighted with a soft yellow background.
+  </p>
+  <p>
+    Clicking a result jumps straight into its editor — transactions and
+    trips open their respective modals; invoices open the invoice editor;
+    jobs open the job edit modal.
+  </p>
+
   <h3>23.3 Common toolbar</h3>
   <ul>
     <li><strong>From / To</strong> date inputs.</li>
