@@ -5178,6 +5178,14 @@ select option {
   color: #6b7280;
   font-weight: 700;
   margin-bottom: 4px;
+  /* Reserve exactly two lines of vertical space so every tile aligns the
+     same way regardless of whether the label is one word ("COGS") or two
+     ("Total Expenses", "Savings Rate"). Without this, single-word labels
+     fall on one line and shift their value tile up relative to the
+     wrapping siblings. */
+  line-height: 1.25;
+  min-height: calc(9px * 1.25 * 2);
+  display: block;
 }
 .ye-report-sheet .ye-tile-value {
   font-size: 16px;
