@@ -11551,10 +11551,13 @@ function renderIncomeByYearChart(years, opts = {}) {
   const svg = document.getElementById(opts.svgId || "dashboard-income-chart");
   if (!svg) return;
   // Top-align so any leftover letterbox space falls at the bottom only
-  // (not centered top+bottom). Aspect is still preserved → text stays
-  // proportional, only bar/plot pixel-height changes with viewBox H.
-  if (svg.id === "dashboard-income-chart") {
+  // (not centered top+bottom). Aspect still preserved → text proportions
+  // are correct. Only applied on desktop dashboard variant — mobile keeps
+  // the default centering since its viewBox stays at H=360.
+  if (svg.id === "dashboard-income-chart" && !window.matchMedia("(max-width: 768px)").matches) {
     svg.setAttribute("preserveAspectRatio", "xMidYMin meet");
+  } else if (svg.id === "dashboard-income-chart") {
+    svg.removeAttribute("preserveAspectRatio");
   }
 
   // Newest year on the left, oldest on the right
@@ -11614,14 +11617,17 @@ function renderIncomeByYearChart(years, opts = {}) {
     return;
   }
 
-  // Dashboard card slot is taller than the SVG's natural aspect (2.5:1).
-  // A taller viewBox makes the plot area bigger in SVG units, which
-  // translates to taller bars on screen WITHOUT distorting text (since
-  // aspect ratio is still preserved via meet). Trends variant keeps the
-  // original aspect since its card has different proportions.
+  // Dashboard card slot on desktop is taller than the SVG's natural
+  // aspect (2.5:1), so use a taller viewBox there to grow the plot area
+  // in SVG units → taller bars on screen without distorting text
+  // (aspect still preserved via "meet"). Mobile keeps the original
+  // 360 viewBox because the mobile card uses a fixed CSS height and the
+  // pre-existing mobile rules (font bumps, year-label translateY) were
+  // calibrated against H=360.
   const isDashboard = (opts.svgId || "dashboard-income-chart") === "dashboard-income-chart";
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
   const W = 900;
-  const H = isDashboard ? 500 : 360;
+  const H = (isDashboard && !isMobile) ? 500 : 360;
   // Tightened padding so the plot area uses more of the SVG (chart looks
   // larger inside the same card). padL fits the 20px y-axis money labels.
   const padL = 90, padR = 10, padT = 10, padB = 32;
