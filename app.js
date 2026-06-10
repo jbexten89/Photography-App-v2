@@ -15794,6 +15794,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     let totalExp = 0;
     const incomeByCat = new Map();   // job-income categories
     const expenseByCat = new Map();  // every non-savings expense category
+    const jobExpByCat = new Map();   // job-category breakdown of jobExp ({ count, sum })
     const jobsByCat = new Map();
     jobs.forEach(j => {
       const c = (j.category || "Uncategorized").trim();
@@ -15837,6 +15838,10 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
           cogs += amt;
         } else if (JOB_ORDER.includes(cat)) {
           jobExp += amt;
+          const je = jobExpByCat.get(cat) || { count: 0, sum: 0 };
+          je.count++;
+          je.sum += amt;
+          jobExpByCat.set(cat, je);
         }
         expenseByCat.set(cat, (expenseByCat.get(cat) || 0) + amt);
       }
@@ -15941,6 +15946,40 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       }
     }
     setText("ye-expense-total", fmtMoney(totalExp));
+
+    // ---------- Job Expenses by Job Category ----------
+    const jobExpBody = document.getElementById("ye-jobexp-body");
+    if (jobExpBody) {
+      // Sort: JOB_ORDER first (canonical order), then any "stray" job
+      // categories not in JOB_ORDER (rare but possible after a rename)
+      // by total descending.
+      const rows = [...jobExpByCat.entries()];
+      rows.sort((a, b) => {
+        const ai = JOB_ORDER.indexOf(a[0]);
+        const bi = JOB_ORDER.indexOf(b[0]);
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+        return b[1].sum - a[1].sum;
+      });
+      if (!rows.length) {
+        jobExpBody.innerHTML = `<tr><td colspan="4" class="muted" style="text-align:center;padding:8px">No job expenses for ${year}.</td></tr>`;
+      } else {
+        jobExpBody.innerHTML = rows.map(([cat, v]) => {
+          const pct = jobExp > 0 ? (v.sum / jobExp) * 100 : 0;
+          return `
+            <tr>
+              <td>${escapeHtml(cat)}</td>
+              <td class="num">${v.count}</td>
+              <td class="num">${fmtMoney(v.sum)}</td>
+              <td class="num">${pct.toFixed(1)}%</td>
+            </tr>`;
+        }).join("");
+      }
+    }
+    const totalJobExpCount = [...jobExpByCat.values()].reduce((s, v) => s + v.count, 0);
+    setText("ye-jobexp-count", String(totalJobExpCount));
+    setText("ye-jobexp-total", fmtMoney(jobExp));
 
     // ---------- Generated stamp ----------
     const stampEl = document.getElementById("ye-report-genstamp");
