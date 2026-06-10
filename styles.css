@@ -1159,12 +1159,10 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 24px;
-  /* Back to align-items: start. Stretching forced the chart card to
-     grow tall enough to push the page off-screen when we also tried
-     to grow the SVG to fill it — the trade-off wasn't worth it. The
-     chart card uses min-height: 480px below; sidebar stays its own
-     natural height. */
-  align-items: start;
+  /* Sidebar list is capped (max-height: 320px below) so the two
+     columns end up at similar natural heights. Stretching here just
+     evens out the last few pixels without pushing anything off-screen. */
+  align-items: stretch;
 }
 .cash-flow-main {
   background: var(--surface);
@@ -1275,7 +1273,10 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   padding: 0;
   display: flex;
   flex-direction: column;
-  max-height: 480px;
+  /* Capped so the sidebar's height matches the chart card's natural
+     height instead of growing tall with the full 12-month list.
+     The list scrolls internally past the cap. */
+  max-height: 320px;
   overflow-y: auto;
 }
 .cf-row {
