@@ -15849,14 +15849,22 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
           /cost of goods/i.test(cat);
         if (isCogs) {
           cogs += amt;
+          // CoGS stays in expenseByCat so it appears in the "Other Expenses
+          // by Category" list (it's not a job expense, just a different
+          // top-tile bucket). User has CoGS as a meaningful operating
+          // category they want to see broken down.
+          expenseByCat.set(cat, (expenseByCat.get(cat) || 0) + amt);
         } else if (JOB_ORDER.includes(cat)) {
           jobExp += amt;
           const je = jobExpByCat.get(cat) || { count: 0, sum: 0 };
           je.count++;
           je.sum += amt;
           jobExpByCat.set(cat, je);
+          // Intentionally NOT added to expenseByCat — job-category expenses
+          // already have their own breakdown section above.
+        } else {
+          expenseByCat.set(cat, (expenseByCat.get(cat) || 0) + amt);
         }
-        expenseByCat.set(cat, (expenseByCat.get(cat) || 0) + amt);
       }
     });
 
@@ -15944,15 +15952,19 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     setText("ye-income-jobs", String(totalIncomeJobs));
     setText("ye-income-total", fmtMoney(gross));
 
-    // ---------- Expenses by category ----------
+    // ---------- Other Expenses by category ----------
+    // expenseByCat now excludes JOB_ORDER categories (they're broken out
+    // in the Job Expenses table above). % is computed against the
+    // filtered subtotal so the column adds to 100% within this section.
     const expenseBody = document.getElementById("ye-expense-body");
+    const otherExpTotal = [...expenseByCat.values()].reduce((s, n) => s + n, 0);
     if (expenseBody) {
       const expenseRows = [...expenseByCat.entries()].sort((a, b) => b[1] - a[1]);
       if (!expenseRows.length) {
-        expenseBody.innerHTML = `<tr><td colspan="3" class="muted" style="text-align:center;padding:8px">No expenses for ${year}.</td></tr>`;
+        expenseBody.innerHTML = `<tr><td colspan="3" class="muted" style="text-align:center;padding:8px">No non-job expenses for ${year}.</td></tr>`;
       } else {
         expenseBody.innerHTML = expenseRows.map(([cat, amt]) => {
-          const pct = totalExp > 0 ? (amt / totalExp) * 100 : 0;
+          const pct = otherExpTotal > 0 ? (amt / otherExpTotal) * 100 : 0;
           return `
             <tr>
               <td>${escapeHtml(cat)}</td>
@@ -15962,7 +15974,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
         }).join("");
       }
     }
-    setText("ye-expense-total", fmtMoney(totalExp));
+    setText("ye-expense-total", fmtMoney(otherExpTotal));
 
     // ---------- Job Expenses by Job Category ----------
     const jobExpBody = document.getElementById("ye-jobexp-body");
