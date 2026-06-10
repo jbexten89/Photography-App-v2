@@ -5959,6 +5959,20 @@ body.reports-inverted .invoice-sheet .ie-section-row td,
 body.reports-inverted .invoice-sheet .sr-deduct-section-row td {
   background: #e0dbd4 !important;
 }
+/* Year-End tiles: default light-mode bg (#fff) inverts to pure black and
+   sticks out against the surrounding dark sheet. Use the same #e0dbd4
+   pre-invert value as the table band so they all render at the same
+   dark-gray post-filter. */
+body.reports-inverted .invoice-sheet .ye-tile,
+body.reports-inverted .invoice-sheet .ye-tile.primary {
+  background: #e0dbd4 !important;
+  border-color: #4a4a4a !important;
+}
+/* Primary tile keeps a subtle blue emphasis via a pre-inverted border tint
+   (the inverse of rgba(44,110,203,0.55) ≈ rgba(211,145,52,0.55)). */
+body.reports-inverted .invoice-sheet .ye-tile.primary {
+  border-color: rgba(211, 145, 52, 0.55) !important;
+}
 @media print {
   body.reports-inverted .invoice-sheet { filter: none; border: none !important; }
 }
