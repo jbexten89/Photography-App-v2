@@ -4995,9 +4995,14 @@ select option {
   color: #1f2937;
   line-height: 1.1;
 }
-.ye-report-sheet .ye-tile-value.income  { color: #27ae60; }
-.ye-report-sheet .ye-tile-value.expense { color: #c0392b; }
-.ye-report-sheet .ye-tile.primary .ye-tile-value { color: #2c6ecb; }
+/* Use the CSS custom properties so the colors flip correctly when the
+   reports-inverted filter is on — body.reports-inverted .invoice-sheet
+   pre-inverts --income / --expense so they render at the expected
+   green/red after the parent filter: invert(1). Literal hex values
+   here would get inverted into pink/cyan. */
+.ye-report-sheet .ye-tile-value.income  { color: var(--income); }
+.ye-report-sheet .ye-tile-value.expense { color: var(--expense); }
+.ye-report-sheet .ye-tile.primary .ye-tile-value { color: var(--primary); }
 .ye-report-sheet .ye-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

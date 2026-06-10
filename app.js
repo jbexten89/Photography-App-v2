@@ -15866,7 +15866,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const netEl = document.getElementById("ye-tile-net");
     if (netEl) {
       netEl.textContent = fmtMoney(netProfit);
-      netEl.style.color = netProfit >= 0 ? "#27ae60" : "#c0392b";
+      // CSS variables (not hex literals) so the inverted-report filter flips
+      // the color correctly — reports-inverted pre-inverts --income/--expense.
+      netEl.style.color = netProfit >= 0 ? "var(--income)" : "var(--expense)";
     }
     setText("ye-tile-srate", profitBase > 0 ? `${savingsRate.toFixed(1)}%` : "—");
 
