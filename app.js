@@ -2578,8 +2578,10 @@ function renderByCustomer() {
         const color = r.net >= 0 ? "var(--income)" : "var(--expense)";
         const labelText = r.name.length > truncAt ? r.name.slice(0, truncAt - 1) + "…" : r.name;
         const textY = y + barH * 0.72;
+        const labelX     = isMobile ? 4 : padL - 10;
+        const labelAnchor = isMobile ? "start" : "end";
         return `
-          <text x="${padL - 10}" y="${textY}" text-anchor="end" font-size="${fontLbl}" fill="var(--text)">${escapeHtml(labelText)}</text>
+          <text x="${labelX}" y="${textY}" text-anchor="${labelAnchor}" font-size="${fontLbl}" fill="var(--text)">${escapeHtml(labelText)}</text>
           <rect class="bc-bar" data-name="${escapeHtml(r.name)}" x="${padL}" y="${y}" width="${w}" height="${barH}" rx="3" fill="${color}" style="cursor:pointer">
             <title>${escapeHtml(r.name)} — Net ${fmtMoney(r.net)} · ${r.jobs} job${r.jobs === 1 ? "" : "s"}</title>
           </rect>
