@@ -5277,7 +5277,7 @@ select option {
   .sv-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  .sv-card { padding: 12px 14px; }
+  .sv-card { padding: 12px 14px; min-height: 0; }
   .sv-total { font-size: 22px; }
   /* Bump chart text on mobile so the SVG-unit fonts read clearly. */
   #sv-chart .sv-yaxis { font-size: 20px !important; }
