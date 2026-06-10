@@ -15798,8 +15798,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     let rolloverNet = 0;
     let correctionNet = 0;
     const incomeByCat = new Map();   // job-income categories
-    const expenseByCat = new Map();  // every non-savings expense category
+    const expenseByCat = new Map();  // non-job, non-CoGS, non-savings expenses ("Other")
     const jobExpByCat = new Map();   // job-category breakdown of jobExp ({ count, sum })
+    const cogsByCat = new Map();     // CoGS breakdown by category ({ count, sum })
     const jobsByCat = new Map();
     jobs.forEach(j => {
       const c = (j.category || "Uncategorized").trim();
@@ -15849,11 +15850,12 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
           /cost of goods/i.test(cat);
         if (isCogs) {
           cogs += amt;
-          // CoGS stays in expenseByCat so it appears in the "Other Expenses
-          // by Category" list (it's not a job expense, just a different
-          // top-tile bucket). User has CoGS as a meaningful operating
-          // category they want to see broken down.
-          expenseByCat.set(cat, (expenseByCat.get(cat) || 0) + amt);
+          // Tracked in its own CoGS-by-Category table — not in expenseByCat
+          // (which is now strictly "Other Expenses").
+          const ce = cogsByCat.get(cat) || { count: 0, sum: 0 };
+          ce.count++;
+          ce.sum += amt;
+          cogsByCat.set(cat, ce);
         } else if (JOB_ORDER.includes(cat)) {
           jobExp += amt;
           const je = jobExpByCat.get(cat) || { count: 0, sum: 0 };
@@ -15863,6 +15865,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
           // Intentionally NOT added to expenseByCat — job-category expenses
           // already have their own breakdown section above.
         } else {
+          // "Other" — non-job, non-CoGS, non-savings operating expenses.
           expenseByCat.set(cat, (expenseByCat.get(cat) || 0) + amt);
         }
       }
@@ -15951,6 +15954,29 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const totalIncomeJobs = [...jobsByCat.values()].reduce((s, n) => s + n, 0);
     setText("ye-income-jobs", String(totalIncomeJobs));
     setText("ye-income-total", fmtMoney(gross));
+
+    // ---------- CoGS by category ----------
+    const cogsBody = document.getElementById("ye-cogs-body");
+    if (cogsBody) {
+      const cogsRows = [...cogsByCat.entries()].sort((a, b) => b[1].sum - a[1].sum);
+      if (!cogsRows.length) {
+        cogsBody.innerHTML = `<tr><td colspan="4" class="muted" style="text-align:center;padding:8px">No CoGS expenses for ${year}.</td></tr>`;
+      } else {
+        cogsBody.innerHTML = cogsRows.map(([cat, v]) => {
+          const pct = cogs > 0 ? (v.sum / cogs) * 100 : 0;
+          return `
+            <tr>
+              <td>${escapeHtml(cat)}</td>
+              <td class="num">${v.count}</td>
+              <td class="num">${fmtMoney(v.sum)}</td>
+              <td class="num">${pct.toFixed(1)}%</td>
+            </tr>`;
+        }).join("");
+      }
+    }
+    const totalCogsCount = [...cogsByCat.values()].reduce((s, v) => s + v.count, 0);
+    setText("ye-cogs-count", String(totalCogsCount));
+    setText("ye-cogs-total", fmtMoney(cogs));
 
     // ---------- Other Expenses by category ----------
     // expenseByCat now excludes JOB_ORDER categories (they're broken out

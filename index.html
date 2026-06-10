@@ -2088,8 +2088,8 @@
           </div>
 
           <!-- Job Expenses breakdown — sits above the two-column body so the
-               accountant sees the job-cost split first, then the broader
-               Income / Expenses tables. -->
+               accountant sees the job-cost split first, then CoGS, then the
+               broader Income / Other Expenses tables. -->
           <div class="tax-report-section">
             <h3 class="tax-report-section-title">Job Expenses by Job Category</h3>
             <table class="tax-report-table">
@@ -2101,6 +2101,24 @@
                 <tr><td><strong>Total</strong></td>
                     <td class="num" id="ye-jobexp-count"><strong>0</strong></td>
                     <td class="num" id="ye-jobexp-total"><strong>$0.00</strong></td>
+                    <td class="num"><strong>100%</strong></td></tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- CoGS breakdown — every expense whose Chart Account is CoGS
+               (or category matches /cost of goods/), grouped by Category. -->
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">CoGS by Category</h3>
+            <table class="tax-report-table">
+              <thead>
+                <tr><th>Category</th><th class="num">Transactions</th><th class="num">Total</th><th class="num">% of CoGS</th></tr>
+              </thead>
+              <tbody id="ye-cogs-body"></tbody>
+              <tfoot>
+                <tr><td><strong>Total</strong></td>
+                    <td class="num" id="ye-cogs-count"><strong>0</strong></td>
+                    <td class="num" id="ye-cogs-total"><strong>$0.00</strong></td>
                     <td class="num"><strong>100%</strong></td></tr>
               </tfoot>
             </table>
@@ -3199,6 +3217,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=319"></script>
+  <script src="app.js?v=320"></script>
 </body>
 </html>
