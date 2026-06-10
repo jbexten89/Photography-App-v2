@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=553" />
+<link rel="stylesheet" href="styles.css?v=554" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1269,6 +1269,7 @@
         <button type="button" class="report-picker-btn" data-report="tax">Sales Tax Liability</button>
         <button type="button" class="report-picker-btn" data-report="pl">Profit &amp; Loss</button>
         <button type="button" class="report-picker-btn" data-report="sc">Schedule C</button>
+        <button type="button" class="report-picker-btn" data-report="ye">Year-End Summary</button>
       </div>
       <!-- Mobile pull-down (richer than native <select>, same look as Analytics amvp) -->
       <div class="rmvp-row no-print">
@@ -1289,6 +1290,7 @@
             <button type="button" class="amvp-item"        data-report="tax"     role="option"><span>Sales Tax Liability</span></button>
             <button type="button" class="amvp-item"        data-report="pl"      role="option"><span>Profit &amp; Loss</span></button>
             <button type="button" class="amvp-item"        data-report="sc"      role="option"><span>Schedule C</span></button>
+            <button type="button" class="amvp-item"        data-report="ye"      role="option"><span>Year-End Summary</span></button>
           </div>
         </div>
         <button type="button" id="rmvp-print-btn" class="btn">Print / PDF</button>
@@ -2002,6 +2004,103 @@
             <div>jbexten89@gmail.com</div>
             <div>www.jbextenphotography.com</div>
           </div>
+        </div>
+      </div>
+
+      <!-- YEAR-END SUMMARY REPORT -->
+      <div id="ye-report-container" hidden>
+        <div class="toolbar no-print">
+          <label class="date-range">Year
+            <select id="ye-report-year" class="btn"></select>
+          </label>
+          <span style="flex:1"></span>
+          <button id="btn-ye-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
+        </div>
+        <div class="invoice-sheet ye-report-sheet" id="ye-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Year-End Summary</div>
+              <div class="tax-report-range" id="ye-report-range">—</div>
+              <div class="muted" style="font-size:11px;margin-top:4px">High-density single-page snapshot for the accountant.</div>
+            </div>
+          </div>
+
+          <!-- Big-number tile row -->
+          <div class="ye-tile-row">
+            <div class="ye-tile"><div class="ye-tile-label">Gross Income</div><div class="ye-tile-value income" id="ye-tile-gross">$0.00</div></div>
+            <div class="ye-tile"><div class="ye-tile-label">Job Expenses</div><div class="ye-tile-value expense" id="ye-tile-jobexp">$0.00</div></div>
+            <div class="ye-tile"><div class="ye-tile-label">COGS</div><div class="ye-tile-value expense" id="ye-tile-cogs">$0.00</div></div>
+            <div class="ye-tile"><div class="ye-tile-label">Total Expenses</div><div class="ye-tile-value expense" id="ye-tile-totexp">$0.00</div></div>
+            <div class="ye-tile primary"><div class="ye-tile-label">Net Profit</div><div class="ye-tile-value" id="ye-tile-net">$0.00</div></div>
+            <div class="ye-tile"><div class="ye-tile-label">Savings Rate</div><div class="ye-tile-value" id="ye-tile-srate">0.0%</div></div>
+          </div>
+
+          <!-- Mileage row -->
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Mileage</h3>
+            <table class="tax-report-table">
+              <thead>
+                <tr><th>Vehicle</th><th class="num">Trips</th><th class="num">Miles</th><th class="num">Rate</th><th class="num">Deduction</th></tr>
+              </thead>
+              <tbody id="ye-mileage-body"></tbody>
+              <tfoot>
+                <tr><td><strong>Total</strong></td>
+                    <td class="num" id="ye-mileage-trips"><strong>0</strong></td>
+                    <td class="num" id="ye-mileage-miles"><strong>0</strong></td>
+                    <td class="num">—</td>
+                    <td class="num" id="ye-mileage-deduct"><strong>$0.00</strong></td></tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Two-column body: income by job category + expense by category -->
+          <div class="ye-grid">
+            <div class="tax-report-section">
+              <h3 class="tax-report-section-title">Income by Job Category</h3>
+              <table class="tax-report-table">
+                <thead>
+                  <tr><th>Category</th><th class="num">Jobs</th><th class="num">Gross</th></tr>
+                </thead>
+                <tbody id="ye-income-body"></tbody>
+                <tfoot>
+                  <tr><td><strong>Total</strong></td>
+                      <td class="num" id="ye-income-jobs"><strong>0</strong></td>
+                      <td class="num" id="ye-income-total"><strong>$0.00</strong></td></tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div class="tax-report-section">
+              <h3 class="tax-report-section-title">Expenses by Category</h3>
+              <table class="tax-report-table">
+                <thead>
+                  <tr><th>Category</th><th class="num">Total</th><th class="num">% of Exp</th></tr>
+                </thead>
+                <tbody id="ye-expense-body"></tbody>
+                <tfoot>
+                  <tr><td><strong>Total</strong></td>
+                      <td class="num" id="ye-expense-total"><strong>$0.00</strong></td>
+                      <td class="num"><strong>100%</strong></td></tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+          <div class="muted ye-footer-note" id="ye-report-genstamp"></div>
         </div>
       </div>
     </section>
@@ -3037,6 +3136,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=309"></script>
+  <script src="app.js?v=310"></script>
 </body>
 </html>

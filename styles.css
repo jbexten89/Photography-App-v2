@@ -4963,6 +4963,66 @@ select option {
   background: #f4f4f4;
 }
 
+/* ===== Year-End Summary report ===== */
+.ye-report-sheet .ye-tile-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin: 16px 0 24px;
+}
+.ye-report-sheet .ye-tile {
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff;
+}
+.ye-report-sheet .ye-tile.primary {
+  background: rgba(44, 110, 203, 0.06);
+  border-color: rgba(44, 110, 203, 0.4);
+}
+.ye-report-sheet .ye-tile-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.ye-report-sheet .ye-tile-value {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #1f2937;
+  line-height: 1.1;
+}
+.ye-report-sheet .ye-tile-value.income  { color: #27ae60; }
+.ye-report-sheet .ye-tile-value.expense { color: #c0392b; }
+.ye-report-sheet .ye-tile.primary .ye-tile-value { color: #2c6ecb; }
+.ye-report-sheet .ye-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.ye-report-sheet .ye-grid .tax-report-section { margin-bottom: 16px; }
+.ye-report-sheet .tax-report-table { font-size: 11px; }
+.ye-report-sheet .tax-report-table th,
+.ye-report-sheet .tax-report-table td { padding: 4px 8px; }
+.ye-report-sheet .tax-report-table th.num,
+.ye-report-sheet .tax-report-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.ye-report-sheet .ye-footer-note {
+  margin-top: 12px;
+  font-size: 10px;
+  text-align: right;
+}
+@media (max-width: 768px) {
+  .ye-report-sheet .ye-tile-row { grid-template-columns: repeat(2, 1fr); }
+  .ye-report-sheet .ye-grid { grid-template-columns: 1fr; gap: 12px; }
+}
+@media print {
+  .ye-report-sheet .ye-tile-value { font-size: 13px; }
+  .ye-report-sheet .ye-tile-label { font-size: 8px; }
+}
+
 /* When Mileage Expense is excluded, hide the rightmost column on every
    .tax-report-detail table inside the mileage report (header, body, footer). */
 #mileage-report-sheet.hide-expense .tax-report-detail th:last-child,
