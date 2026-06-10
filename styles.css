@@ -1356,8 +1356,13 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   border-radius: 10px;
   padding: 20px 24px;
   min-height: 420px;
+  /* Flex column so the bars area fills the card vertically when the
+     grid stretches .flow-main to match the sidebar height — bars no
+     longer cluster at the top with dead space below. */
+  display: flex;
+  flex-direction: column;
 }
-.flow-header { margin-bottom: 16px; }
+.flow-header { margin-bottom: 16px; flex: 0 0 auto; }
 .flow-eyebrow {
   font-size: 12px;
   font-weight: 700;
@@ -1378,6 +1383,10 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 }
 .flow-bars-wrap {
   position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 .flow-bars {
   display: flex;
@@ -1386,7 +1395,13 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   padding: 8px 0 32px;
   position: relative;
   z-index: 1;
+  flex: 1;
+  min-height: 0;
 }
+/* Let each year row stretch to fill the available vertical space, so the
+   chart visually fills the card instead of stacking at the top. Rows are
+   capped so bars don't become unreasonably thick on tall cards / few rows. */
+.flow-bar-row { flex: 1 1 auto; min-height: 22px; max-height: 36px; display: flex; align-items: stretch; }
 /* Faint vertical gridlines overlay — one span per tick at left:N% */
 .flow-gridlines {
   position: absolute;
@@ -1406,7 +1421,8 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 .flow-bar-track {
   position: relative;
   width: 100%;
-  height: 18px;
+  height: 100%;
+  min-height: 18px;
   display: flex;
   align-items: center;
 }
