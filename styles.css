@@ -1078,8 +1078,8 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   margin-bottom: 4px;
 }
 .breakdown-total {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--income);
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
@@ -1184,8 +1184,8 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   margin-bottom: 4px;
 }
 .cash-flow-total {
-  font-size: 32px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   letter-spacing: -0.5px;
   color: var(--income);
   font-variant-numeric: tabular-nums;
@@ -1367,8 +1367,8 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   margin-bottom: 6px;
 }
 .flow-total {
-  font-size: 32px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
@@ -3035,7 +3035,7 @@ select option {
 }
 
 .trend-jobs-total-value {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -5172,8 +5172,8 @@ select option {
   flex-wrap: wrap;
 }
 .sv-total {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--income);
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
@@ -8692,8 +8692,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   margin-bottom: 4px;
 }
 .spend-trends-total {
-  font-size: 32px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   letter-spacing: -0.5px;
   color: var(--text);
   font-variant-numeric: tabular-nums;
@@ -8828,8 +8828,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 .sr-head { margin-bottom: 16px; }
 .sr-eyebrow { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
 .sr-rate {
-  font-size: 38px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   letter-spacing: -0.5px;
   color: var(--income);
   font-variant-numeric: tabular-nums;
@@ -9002,8 +9002,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   margin-bottom: 4px;
 }
 .bcat-total {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   letter-spacing: -0.5px;
   color: var(--text);
   font-variant-numeric: tabular-nums;
