@@ -8837,7 +8837,10 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 24px;
-  align-items: start;
+  /* Stretch so the right sidebar grows to match the left chart card
+     (chart + deductions row makes the left side tall). Matches the
+     Trends / By Category / Cash Flow / By Customer treatment. */
+  align-items: stretch;
 }
 .sr-main {
   background: var(--surface);
