@@ -5177,6 +5177,9 @@ select option {
   border-radius: 10px;
   padding: 16px 20px;
   min-width: 0;
+  /* Match the Trends main card height so swapping between Trends,
+     Savings Rate, and Savings doesn't feel like the layout jumps. */
+  min-height: 760px;
 }
 .sv-head { margin-bottom: 12px; }
 .sv-eyebrow {
@@ -8700,7 +8703,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 20px 24px;
-  min-height: 480px;
+  /* Same min-height as Savings Rate and Savings so the three feel
+     like a consistent set when swapping views. */
+  min-height: 760px;
   min-width: 0;
 }
 .spend-trends-head {
@@ -8850,7 +8855,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 20px 24px;
-  min-height: 420px;
+  /* Match the Trends main card height so swapping between Trends,
+     Savings Rate, and Savings doesn't feel like the layout jumps. */
+  min-height: 760px;
   min-width: 0;
 }
 .sr-head { margin-bottom: 16px; }
