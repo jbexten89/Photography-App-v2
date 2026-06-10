@@ -5166,7 +5166,10 @@ select option {
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: 24px;
-  align-items: start;
+  /* Stretch so the right sidebar grows to match the left card height.
+     Matches the Trends / By Category / Cash Flow / By Customer /
+     Savings Rate treatment. */
+  align-items: stretch;
 }
 .sv-card {
   background: var(--surface);
