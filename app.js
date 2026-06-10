@@ -3467,11 +3467,7 @@ function renderCashFlow() {
 
   // Build the chart SVG
   const isMobile = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
-  // Desktop: taller viewBox so the SVG fills the card vertically when the
-  // grid stretches .cash-flow-main to match the sidebar's monthly list.
-  // Mobile keeps the original 380 height since its card is fixed via CSS.
-  const baseWidth = 800;
-  const height = isMobile ? 380 : 700;
+  const baseWidth = 800, height = 380;
   // On mobile we rotate month labels 45° to prevent overlap, so reserve more
   // bottom padding for them.
   const padL = 64, padR = 20, padT = 18, padB = isMobile ? 80 : 36;

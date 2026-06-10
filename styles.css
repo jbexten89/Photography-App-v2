@@ -1159,10 +1159,12 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 24px;
-  /* Stretch so the left chart card matches the right sidebar height
-     when the monthly list grows. Single-column mobile (<900px) is
-     unaffected since stretch collapses to natural in a 1fr layout. */
-  align-items: stretch;
+  /* Back to align-items: start. Stretching forced the chart card to
+     grow tall enough to push the page off-screen when we also tried
+     to grow the SVG to fill it — the trade-off wasn't worth it. The
+     chart card uses min-height: 480px below; sidebar stays its own
+     natural height. */
+  align-items: start;
 }
 .cash-flow-main {
   background: var(--surface);
