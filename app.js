@@ -2553,23 +2553,37 @@ function renderByCustomer() {
     if (!top.length) {
       chartEl.innerHTML = "";
     } else {
-      const W = 900, H = Math.max(140, top.length * 28 + 20);
+      // Mobile uses a narrower viewBox + taller bars + bigger fonts so the
+      // chart actually reads on a phone (viewBox shrinks with screen width
+      // proportionally — at 900-wide on a 350px screen, fonts render at
+      // ~5px which is unreadable).
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+      const W       = isMobile ? 600 : 900;
+      const rowH    = isMobile ? 56  : 28;
+      const padL    = isMobile ? 240 : 220;
+      const padR    = isMobile ? 130 : 110;
+      const padT    = isMobile ? 12  : 8;
+      const padB    = isMobile ? 12  : 8;
+      const fontLbl = isMobile ? 26  : 13;
+      const fontVal = isMobile ? 24  : 12;
+      const barH    = isMobile ? 40  : 22;
+      const truncAt = isMobile ? 16  : 26;
+      const H = Math.max(isMobile ? 200 : 140, top.length * rowH + padT + padB);
       chartEl.setAttribute("viewBox", `0 0 ${W} ${H}`);
-      const padL = 220, padR = 110, padT = 8, padB = 8;
       const plotW = W - padL - padR;
       const maxAbs = Math.max(1, ...top.map(r => Math.abs(r.net)));
-      const barH = Math.min(22, (H - padT - padB) / top.length - 6);
       const bars = top.map((r, i) => {
-        const y = padT + i * ((H - padT - padB) / top.length);
+        const y = padT + i * rowH;
         const w = (Math.abs(r.net) / maxAbs) * plotW;
         const color = r.net >= 0 ? "var(--income)" : "var(--expense)";
-        const labelText = r.name.length > 26 ? r.name.slice(0, 25) + "…" : r.name;
+        const labelText = r.name.length > truncAt ? r.name.slice(0, truncAt - 1) + "…" : r.name;
+        const textY = y + barH * 0.72;
         return `
-          <text x="${padL - 10}" y="${y + barH * 0.7}" text-anchor="end" font-size="13" fill="var(--text)">${escapeHtml(labelText)}</text>
+          <text x="${padL - 10}" y="${textY}" text-anchor="end" font-size="${fontLbl}" fill="var(--text)">${escapeHtml(labelText)}</text>
           <rect class="bc-bar" data-name="${escapeHtml(r.name)}" x="${padL}" y="${y}" width="${w}" height="${barH}" rx="3" fill="${color}" style="cursor:pointer">
             <title>${escapeHtml(r.name)} — Net ${fmtMoney(r.net)} · ${r.jobs} job${r.jobs === 1 ? "" : "s"}</title>
           </rect>
-          <text x="${padL + w + 6}" y="${y + barH * 0.7}" font-size="12" fill="var(--muted)">${fmtMoney(r.net)}</text>
+          <text x="${padL + w + 8}" y="${textY}" font-size="${fontVal}" fill="var(--muted)">${fmtMoney(r.net)}</text>
         `;
       }).join("");
       chartEl.innerHTML = bars;
