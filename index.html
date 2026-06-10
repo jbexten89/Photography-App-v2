@@ -2063,7 +2063,7 @@
             <div class="ye-tile"><div class="ye-tile-label">Gross Income</div><div class="ye-tile-value income" id="ye-tile-gross">$0.00</div></div>
             <div class="ye-tile"><div class="ye-tile-label">Job Expenses</div><div class="ye-tile-value expense" id="ye-tile-jobexp">$0.00</div></div>
             <div class="ye-tile"><div class="ye-tile-label">COGS</div><div class="ye-tile-value expense" id="ye-tile-cogs">$0.00</div></div>
-            <div class="ye-tile"><div class="ye-tile-label">Total Expenses</div><div class="ye-tile-value expense" id="ye-tile-totexp">$0.00</div></div>
+            <div class="ye-tile"><div class="ye-tile-label">Total Exp</div><div class="ye-tile-value expense" id="ye-tile-totexp">$0.00</div></div>
             <div class="ye-tile primary"><div class="ye-tile-label">Net Profit</div><div class="ye-tile-value" id="ye-tile-net">$0.00</div></div>
             <div class="ye-tile"><div class="ye-tile-label">Total Savings</div><div class="ye-tile-value income" id="ye-tile-savings">$0.00</div></div>
             <div class="ye-tile"><div class="ye-tile-label">Savings Rate</div><div class="ye-tile-value" id="ye-tile-srate">0.0%</div></div>
@@ -2083,6 +2083,25 @@
                     <td class="num" id="ye-mileage-miles"><strong>0</strong></td>
                     <td class="num">—</td>
                     <td class="num" id="ye-mileage-deduct"><strong>$0.00</strong></td></tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Job Expenses breakdown — sits above the two-column body so the
+               accountant sees the job-cost split first, then the broader
+               Income / Expenses tables. -->
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Job Expenses by Job Category</h3>
+            <table class="tax-report-table">
+              <thead>
+                <tr><th>Category</th><th class="num">Transactions</th><th class="num">Total</th><th class="num">% of Job Exp</th></tr>
+              </thead>
+              <tbody id="ye-jobexp-body"></tbody>
+              <tfoot>
+                <tr><td><strong>Total</strong></td>
+                    <td class="num" id="ye-jobexp-count"><strong>0</strong></td>
+                    <td class="num" id="ye-jobexp-total"><strong>$0.00</strong></td>
+                    <td class="num"><strong>100%</strong></td></tr>
               </tfoot>
             </table>
           </div>
@@ -2118,23 +2137,6 @@
                 </tfoot>
               </table>
             </div>
-          </div>
-
-          <!-- Job Expenses breakdown -->
-          <div class="tax-report-section">
-            <h3 class="tax-report-section-title">Job Expenses by Job Category</h3>
-            <table class="tax-report-table">
-              <thead>
-                <tr><th>Category</th><th class="num">Transactions</th><th class="num">Total</th><th class="num">% of Job Exp</th></tr>
-              </thead>
-              <tbody id="ye-jobexp-body"></tbody>
-              <tfoot>
-                <tr><td><strong>Total</strong></td>
-                    <td class="num" id="ye-jobexp-count"><strong>0</strong></td>
-                    <td class="num" id="ye-jobexp-total"><strong>$0.00</strong></td>
-                    <td class="num"><strong>100%</strong></td></tr>
-              </tfoot>
-            </table>
           </div>
 
           <div class="invoice-footer">
