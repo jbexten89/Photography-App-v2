@@ -2560,14 +2560,14 @@ function renderByCustomer() {
       const isMobile = window.matchMedia("(max-width: 768px)").matches;
       const W       = isMobile ? 600 : 900;
       const rowH    = isMobile ? 34  : 28;
-      const padL    = isMobile ? 200 : 220;
-      const padR    = isMobile ? 110 : 110;
+      const padL    = isMobile ? 290 : 220;
+      const padR    = isMobile ? 90  : 110;
       const padT    = isMobile ? 8   : 8;
       const padB    = isMobile ? 8   : 8;
       const fontLbl = isMobile ? 17  : 13;
       const fontVal = isMobile ? 16  : 12;
       const barH    = isMobile ? 22  : 22;
-      const truncAt = isMobile ? 16  : 26;
+      const truncAt = isMobile ? 24  : 26;
       const H = Math.max(isMobile ? 140 : 140, top.length * rowH + padT + padB);
       chartEl.setAttribute("viewBox", `0 0 ${W} ${H}`);
       const plotW = W - padL - padR;
