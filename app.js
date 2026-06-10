@@ -16190,9 +16190,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   // ---- Wire ----
   openBtn1?.addEventListener("click", open);
   openBtn2?.addEventListener("click", () => {
-    // Close the right flyout first if it's open, then open search
-    document.getElementById("right-flyout")?.classList.remove("open");
-    document.getElementById("right-flyout-backdrop")?.classList.remove("show");
+    // Close the right flyout first if it's open (it uses body.right-flyout-open,
+    // not a class on the flyout element itself), then open search.
+    document.body.classList.remove("right-flyout-open");
     open();
   });
   backdrop.addEventListener("click", close);

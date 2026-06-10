@@ -3650,7 +3650,17 @@ select option {
     height: 100vh;
     border-radius: 0;
     transform: none;
+    z-index: 2000; /* sit above the mobile right-flyout (z-index 120) */
   }
+  .gsearch-backdrop { z-index: 1999; }
+  /* iOS notch / status bar safe-area — without this, the input row hides
+     under the system bar and there's no visible place to type. */
+  .gsearch-head {
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+    padding-left: calc(16px + env(safe-area-inset-left, 0px));
+    padding-right: calc(16px + env(safe-area-inset-right, 0px));
+  }
+  #gsearch-input { font-size: 16px; min-width: 0; } /* 16px prevents iOS zoom */
   .gsearch-foot { display: none; }
 }
 .sidebar-cloud-dot {
