@@ -1845,13 +1845,18 @@ function renderSavingsRate() {
     if (mi === undefined) return;
     const amt = t.amount || 0;
     if (t.type === "income") {
-      // Exclude income tagged with a savings category (e.g. bank interest
-      // recorded against "Savings" / "Wealthfront"). That's investment
-      // income, not photography revenue — it doesn't belong in Profit
-      // Base. Matches Year-End report's Gross Income definition so the
-      // two views report the same Profit Base and Savings Rate.
       const cat = t.category || "";
-      if (SAVINGS_CATEGORIES.includes(cat)) return;
+      // Income tagged with a savings category isn't photography revenue —
+      // it's a pullback from a savings account (the inverse of a savings
+      // deposit). Treat it as a NEGATIVE entry on the savings bucket so
+      // the net saved amount reflects deposits − pullbacks. Without this,
+      // a $4k deposit then $2k pullback shows $4k saved in Savings Rate
+      // (wrong) instead of the $2k that Savings analytics shows.
+      if (SAVINGS_CATEGORIES.includes(cat)) {
+        sav[mi] -= amt;
+        savByCat.set(cat, (savByCat.get(cat) || 0) - amt);
+        return;
+      }
       inc[mi] += amt;
     } else {
       const cat = t.category || "";
@@ -15896,10 +15901,14 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       }
 
       if (t.type === "income") {
-        // Income only counts as Gross when its category is a job category.
-        // Savings deposits aren't revenue, and other non-job income paths
-        // (refunds, transfers) shouldn't inflate gross either.
-        if (SAVINGS_CATEGORIES.includes(cat)) return;
+        // Income tagged with a savings category is a pullback from a
+        // savings account, not revenue. Subtract it from the running
+        // savings total so deposits − pullbacks reads as the true net.
+        // Doesn't touch Gross (it never belonged there anyway).
+        if (SAVINGS_CATEGORIES.includes(cat)) {
+          savings -= amt;
+          return;
+        }
         gross += amt;
         incomeByCat.set(cat, (incomeByCat.get(cat) || 0) + amt);
       } else if (t.type === "expense") {
