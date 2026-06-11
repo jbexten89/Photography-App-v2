@@ -2397,15 +2397,19 @@ body.tx-select-active #tx-select-all-bar { display: block; }
     overflow: visible;
   }
   #tx-table thead th {
-    position: sticky;
-    top: var(--tx-sticky-header-h, 0px);
-    z-index: 20;
-    background: var(--surface-alt);
+    position: sticky !important;
+    top: var(--tx-sticky-header-h, 80px) !important;
+    z-index: 20 !important;
+    background: var(--surface-alt) !important;
     /* Sticky cells with border-collapse can lose their bottom border at
        the seam — paint it via box-shadow which sits above the collapsed
        border. */
     box-shadow: inset 0 -1px 0 var(--border);
   }
+  /* Sticky also needs to be allowed on the table itself; some browsers
+     refuse sticky <th> if the table has transform/contain set. Force
+     baseline values. */
+  #tx-table { transform: none; contain: none; }
 }
 
 .tx-select-col input[type="checkbox"] {

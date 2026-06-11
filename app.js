@@ -4876,7 +4876,11 @@ function syncTxStickyHeights() {
   const wrap = sect.querySelector(":scope > .tx-sticky-header");
   if (!wrap) return;
   const h = Math.ceil(wrap.getBoundingClientRect().height);
+  // Set the variable on BOTH #transactions (for legacy mobile rules) and
+  // documentElement (so desktop thead-sticky rules can read it regardless
+  // of where the cascade is applied).
   sect.style.setProperty("--tx-sticky-header-h", `${h}px`);
+  document.documentElement.style.setProperty("--tx-sticky-header-h", `${h}px`);
 }
 window.addEventListener("resize", syncTxStickyHeights);
 window.addEventListener("DOMContentLoaded", () => setTimeout(syncTxStickyHeights, 50));
