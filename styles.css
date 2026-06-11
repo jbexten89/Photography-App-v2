@@ -1797,10 +1797,11 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   margin-right: auto;
 }
 
-/* Locked-year indicator: small red padlock in the bottom-right corner of
+/* Locked-year indicator: small amber padlock in the bottom-right corner of
    any year tile in the year-picker sheet whose year is in
-   state.lockedYears. Padlock is the universal "locked" symbol —
-   the recon column moved off the padlock so there's no collision. */
+   state.lockedYears. Amber matches the same color used on the All
+   Transactions row badge and modal banner, so "locked" reads the same
+   color everywhere in the app. */
 .year-sheet-item.is-locked { position: relative; }
 .year-sheet-item.is-locked::after {
   content: "";
@@ -1809,7 +1810,7 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   bottom: 5px;
   width: 12px;
   height: 12px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='11' width='18' height='11' rx='2' fill='%23ef4444' stroke='%23ef4444'/><path d='M7 11V7a5 5 0 0 1 10 0v4' fill='none' stroke='%23ef4444'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b08800' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='11' width='18' height='11' rx='2' fill='%23b08800' stroke='%23b08800'/><path d='M7 11V7a5 5 0 0 1 10 0v4' fill='none' stroke='%23b08800'/></svg>");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -1826,7 +1827,7 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   bottom: 2px;
   width: 9px;
   height: 9px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='11' width='18' height='11' rx='2' fill='%23ef4444' stroke='%23ef4444'/><path d='M7 11V7a5 5 0 0 1 10 0v4' fill='none' stroke='%23ef4444'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b08800' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='11' width='18' height='11' rx='2' fill='%23b08800' stroke='%23b08800'/><path d='M7 11V7a5 5 0 0 1 10 0v4' fill='none' stroke='%23b08800'/></svg>");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
