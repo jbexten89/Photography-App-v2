@@ -2391,6 +2391,20 @@ body.tx-select-active #tx-select-all-bar { display: block; }
     background: var(--bg);
     padding-bottom: 4px;
   }
+  /* Align the Balance label + value over the Amount column so the eye
+     reads down from "BALANCE -$15,911.34" straight into the column of
+     signed amounts below. Default column widths after Amount:
+     memo 160 + recon 40 + tags 36 = 236px; Amount itself is 100px.
+     Padding the right edge by ~236px (the post-Amount block) lands the
+     Balance group flush against Amount's right edge. */
+  #transactions > .tx-sticky-header .running-balance {
+    padding: 0 236px 0 0 !important;
+    margin-top: 0;
+    justify-content: flex-end;
+  }
+  #transactions > .tx-sticky-header .running-balance .rb-item.main {
+    margin-right: 0;
+  }
   /* Make the .table-wrap itself the scroll container. thead sticks to the
      wrap's top (top: 0) — that's a fully-supported sticky pattern that
      doesn't depend on page-level scroll position or container quirks.
