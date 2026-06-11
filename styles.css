@@ -7623,12 +7623,13 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     70%  { opacity: 1; transform: scale(1); }
     100% { opacity: 0; transform: scale(0.95); }
   }
-  /* Persistent at-a-glance reconciled indicator — green left border */
+  /* Persistent at-a-glance reconciled indicator — green left border.
+     Cleared (C) intermediate state intentionally has no border so the
+     amber color isn't claimed by recon (locked-year visual uses amber
+     elsewhere, and C is mostly a transient state anyway). The
+     recon-circle in the row still shows the C state if you look at it. */
   body.tx-mobile-3line #tx-table tbody tr.tx-row[data-recon="R"] {
     box-shadow: inset 4px 0 0 #27ae60;
-  }
-  body.tx-mobile-3line #tx-table tbody tr.tx-row[data-recon="C"] {
-    box-shadow: inset 4px 0 0 #f5a623;
   }
 
   /* All Transactions: 3-line stacked layout (opt-in via Settings).
