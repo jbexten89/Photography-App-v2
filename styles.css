@@ -2381,35 +2381,34 @@ body.tx-select-active #tx-select-all-bar { display: block; }
    keeps --tx-sticky-header-h in sync with the wrapper's measured height
    so the thead's top offset always matches. */
 @media (min-width: 769px) {
+  /* The band (heading + balance + toolbar + select-all) pins to the top
+     of the viewport. Z-index above the thead so the thead never peeks
+     out from under it while scrolling. */
   #transactions > .tx-sticky-header {
     position: sticky;
     top: 0;
-    z-index: 30;
+    z-index: 40;
     background: var(--bg);
     padding-bottom: 4px;
   }
-  /* CRITICAL: .table-wrap default has overflow: auto, which creates a new
-     scroll container — position:sticky on thead inside it sticks only to
-     THAT container, not the page viewport. So the thead pinned to the
-     wrap's top, then the whole wrap scrolled off. Switch to overflow:
-     visible on desktop so sticky behaves against the actual page scroll. */
+  /* Make the .table-wrap itself the scroll container. thead sticks to the
+     wrap's top (top: 0) — that's a fully-supported sticky pattern that
+     doesn't depend on page-level scroll position or container quirks.
+     Max-height is "viewport minus the band" so the wrap fills the rest of
+     the screen and rows scroll inside it. The CSS variable comes from
+     syncTxStickyHeights() and updates when the band's height changes. */
   #transactions > .table-wrap {
-    overflow: visible;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    max-height: calc(100vh - var(--tx-sticky-header-h, 120px) - 24px);
   }
   #tx-table thead th {
     position: sticky !important;
-    top: var(--tx-sticky-header-h, 80px) !important;
+    top: 0 !important;
     z-index: 20 !important;
     background: var(--surface-alt) !important;
-    /* Sticky cells with border-collapse can lose their bottom border at
-       the seam — paint it via box-shadow which sits above the collapsed
-       border. */
     box-shadow: inset 0 -1px 0 var(--border);
   }
-  /* Sticky also needs to be allowed on the table itself; some browsers
-     refuse sticky <th> if the table has transform/contain set. Force
-     baseline values. */
-  #tx-table { transform: none; contain: none; }
 }
 
 .tx-select-col input[type="checkbox"] {
