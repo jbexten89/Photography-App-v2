@@ -2359,6 +2359,14 @@ td.amount.expense { color: var(--expense); }
 #tx-table:not(.select-mode) .tx-select-col input[type="checkbox"] {
   visibility: hidden;
 }
+/* Master Select All in the thead is redundant with the labeled
+   "Select all" pill above the table (#tx-select-all-mirror). Hide
+   the thead one so only the pill is visible — the master element
+   stays in the DOM as the source of truth for the renderer / mirror
+   dispatch / reconcile init wiring. */
+#tx-table thead .tx-select-col #tx-select-all {
+  visibility: hidden;
+}
 
 .tx-select-col input[type="checkbox"] {
   width: 16px;
