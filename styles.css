@@ -9937,17 +9937,15 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   min-width: 160px;
 }
 
-/* All Transactions inline-edit editor — readable size + theme-aware.
-   display:block + min-width:0 + !important on width so number inputs
-   (which have a user-agent default min-width of ~76px and stay
-   inline-block) actually fill the cell instead of rendering as a
-   small natural-width box. */
+/* All Transactions inline-edit editor — readable size + theme-aware. */
 .nj-inline-edit-input {
   display: block;
   width: 100% !important;
+  max-width: 100% !important;
   min-width: 0;
   box-sizing: border-box;
   padding: 5px 8px;
+  margin: 0;
   font-size: 13px;
   font-family: inherit;
   border: 1px solid var(--primary);
@@ -9956,10 +9954,25 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   color: var(--text);
   outline: 2px solid rgba(108, 122, 224, 0.25);
   outline-offset: 0;
+  /* Hide the native number-input spinner arrows. The default ones eat
+     ~17px of editable width on Chrome and are mostly noise — the user
+     can still type or arrow-key. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.nj-inline-edit-input::-webkit-outer-spin-button,
+.nj-inline-edit-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
 }
 /* Amount column is right-aligned — keep the value's digits on the right
    edge of the input so the editing experience matches the resting state. */
 #tx-table td[data-col="amount"] .nj-inline-edit-input { text-align: right; }
+/* The cell may have left/right padding that compounds with the input's
+   own padding. Zero-pad the cell while the input is in place so the
+   editor truly spans edge-to-edge of the column. */
+#tx-table td[data-col="amount"]:has(.nj-inline-edit-input) { padding: 2px 4px !important; }
 
 /* Active analytics filter summary — small label next to Filters/Presets
    showing what year(s) and other key filters are currently applied. */
