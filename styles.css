@@ -6076,40 +6076,9 @@ body.tx-hide-tags     #tx-table th[data-col="tags"],     body.tx-hide-tags     #
   user-select: none;
 }
 
-/* RECONCILIATION CIRCLE */
-.recon-circle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
-  font-size: 11px;
-  font-weight: 700;
-  color: transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-  user-select: none;
-  line-height: 1;
-}
-
-.recon-circle:hover {
-  border-color: var(--primary);
-}
-
-.recon-circle.cleared {
-  background: var(--income);
-  border-color: var(--income);
-  color: white;
-}
-
-.recon-circle.reconciled {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
+/* Recon column click target — give the whole cell a pointer cursor so
+   it's obvious it's interactive. The actual icon is .recon-lock inside. */
+.recon-cell { cursor: pointer; }
 
 td.recon-cell { text-align: center; }
 

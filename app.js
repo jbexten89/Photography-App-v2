@@ -12528,7 +12528,7 @@ function renderTransactions() {
 
     row.addEventListener("dblclick", e => {
       // Ignore double-clicks on the reconciliation circle (it has its own click)
-      if (e.target.closest(".recon-circle")) return;
+      if (e.target.closest(".recon-cell")) return;
       const id = row.dataset.id;
       const tx = state.transactions.find(t => t.id === id);
       if (tx) openTxModal(tx);
@@ -12536,7 +12536,7 @@ function renderTransactions() {
 
     row.addEventListener("mousedown", e => {
       if (e.button !== 0) return;
-      if (e.target.closest(".recon-circle")) return;
+      if (e.target.closest(".recon-cell")) return;
       didHold = false;
       row.classList.add("pressing");
       holdTimer = setTimeout(() => {
@@ -12573,7 +12573,7 @@ function renderTransactions() {
     });
   });
 
-  body.querySelectorAll(".recon-circle").forEach(c => c.addEventListener("click", e => {
+  body.querySelectorAll(".recon-cell").forEach(c => c.addEventListener("click", e => {
     const id = e.target.closest("tr").dataset.id;
     const tx = state.transactions.find(t => t.id === id);
     if (!tx) return;
@@ -15301,7 +15301,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       const row = e.target.closest("tr.tx-row");
       if (!row) { if (activeRow) closeSwipe(); return; }
       // Don't start a swipe on interactive bits inside the row
-      if (e.target.closest(".tx-select-col, .recon-circle, button, input, select, .tx-row-actions")) return;
+      if (e.target.closest(".tx-select-col, .recon-cell, button, input, select, .tx-row-actions")) return;
       if (locked && activeRow !== row) { closeSwipe(); return; }
       if (activeRow && activeRow !== row) closeSwipe();
       activeRow = row;
