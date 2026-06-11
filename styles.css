@@ -2391,14 +2391,13 @@ body.tx-select-active #tx-select-all-bar { display: block; }
     background: var(--bg);
     padding-bottom: 4px;
   }
-  /* Align the Balance label + value over the Amount column so the eye
-     reads down from "BALANCE -$15,911.34" straight into the column of
-     signed amounts below. Default column widths after Amount:
-     memo 160 + recon 40 + tags 36 = 236px; Amount itself is 100px.
-     Padding the right edge by ~236px (the post-Amount block) lands the
-     Balance group flush against Amount's right edge. */
+  /* Align the Balance over the Amount column. JS sets --tx-balance-right
+     to the actual pixel distance from the table-wrap's right edge to the
+     RIGHT edge of the Amount column — accounts for hidden columns,
+     resized columns, and Tags-toggled-off. Fallback: 80px (lands Balance
+     above the Amount area on the default column layout). */
   #transactions > .tx-sticky-header .running-balance {
-    padding: 0 236px 0 0 !important;
+    padding: 0 var(--tx-balance-right, 80px) 0 0 !important;
     margin-top: 0;
     justify-content: flex-end;
   }

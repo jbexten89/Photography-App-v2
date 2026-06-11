@@ -4881,6 +4881,18 @@ function syncTxStickyHeights() {
   // of where the cascade is applied).
   sect.style.setProperty("--tx-sticky-header-h", `${h}px`);
   document.documentElement.style.setProperty("--tx-sticky-header-h", `${h}px`);
+
+  // Position the BALANCE label/value horizontally above the Amount column.
+  // Compute the distance from the band's right edge to the Amount column's
+  // right edge, account for column resize / hidden columns. Falls through
+  // to the CSS fallback (80px) if Amount isn't visible.
+  const amountTh = document.querySelector('#tx-table thead th[data-col="amount"]');
+  if (amountTh) {
+    const bandRect = wrap.getBoundingClientRect();
+    const amtRect  = amountTh.getBoundingClientRect();
+    const rightGap = Math.max(0, bandRect.right - amtRect.right);
+    sect.style.setProperty("--tx-balance-right", `${rightGap}px`);
+  }
 }
 window.addEventListener("resize", syncTxStickyHeights);
 window.addEventListener("DOMContentLoaded", () => setTimeout(syncTxStickyHeights, 50));
@@ -12596,6 +12608,12 @@ function renderTransactions() {
     saveState();
     renderTransactions();
   }));
+
+  // Re-measure the sticky band + Amount-column position after every render
+  // so column resize / hide-show updates the Balance horizontal alignment.
+  if (typeof syncTxStickyHeights === "function") {
+    requestAnimationFrame(syncTxStickyHeights);
+  }
 }
 
 const SAVINGS_CATEGORIES = ["Wealthfront", "CiT Bank", "Huntington", "Savings"];
