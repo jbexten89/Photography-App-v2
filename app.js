@@ -1845,6 +1845,13 @@ function renderSavingsRate() {
     if (mi === undefined) return;
     const amt = t.amount || 0;
     if (t.type === "income") {
+      // Exclude income tagged with a savings category (e.g. bank interest
+      // recorded against "Savings" / "Wealthfront"). That's investment
+      // income, not photography revenue — it doesn't belong in Profit
+      // Base. Matches Year-End report's Gross Income definition so the
+      // two views report the same Profit Base and Savings Rate.
+      const cat = t.category || "";
+      if (SAVINGS_CATEGORIES.includes(cat)) return;
       inc[mi] += amt;
     } else {
       const cat = t.category || "";
