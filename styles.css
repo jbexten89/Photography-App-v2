@@ -5666,8 +5666,11 @@ select option {
   .bc-table tfoot { display: none !important; }
   .bc-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   /* Freeze the Customer column so it stays visible while the numeric columns
-     scroll under your finger. Backgrounds are opaque so scrolling cells
-     don't bleed through, and a thin right border keeps the seam crisp. */
+     scroll under your finger. CRITICAL: backgrounds must be OPAQUE — using
+     var(--bg-soft) here breaks scrolling because that variable resolves to
+     a translucent rgba(...) fallback, and other header cells bleed through
+     when they slide under during horizontal scroll. var(--surface) and
+     var(--surface-alt) are both real opaque colors and work correctly. */
   .bc-table thead th:first-child,
   .bc-table tbody td:first-child {
     position: sticky;
@@ -5675,18 +5678,16 @@ select option {
     z-index: 2;
     background: var(--surface);
     border-right: 1px solid var(--border);
-    /* Cap the customer name column so the rest has room to scroll into view.
-       Without this, a long name like "Montpelier Parks & Rec" can push the
-       numeric columns most of the way off-screen. */
     max-width: 42vw;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  /* Header cell needs slightly higher z than body cells so it stays above
-     them when both axes scroll. */
-  .bc-table thead th:first-child { z-index: 3; background: var(--bg-soft); }
-  /* Preserve hover state for the frozen cell — without an explicit override,
-     the sticky background paints over the row hover tint. */
+  .bc-table thead th:first-child {
+    z-index: 3;
+    /* Use surface-alt (opaque) for the header tint instead of the translucent
+       bg-soft fallback. */
+    background: var(--surface-alt);
+  }
   .bc-table tbody tr.bc-row:hover td:first-child {
     background: color-mix(in srgb, var(--surface) 92%, var(--accent) 8%);
   }
