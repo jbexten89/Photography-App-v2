@@ -14089,7 +14089,14 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const payeeEl = document.getElementById("tx-payee");
     if (payeeEl) payeeEl.removeAttribute("required");
     // Per spec: disable Vendor and Expense/Income on inflow.
-    if (txVendor) txVendor.disabled = inflow;
+    // Exception: when the Category (or Expense field) is a savings bucket
+    // (Wealthfront / CiT Bank / Huntington / Savings), allow Vendor on
+    // inflows too — a savings pullback's "vendor" is the source bank, and
+    // surfaces correctly in the Savings Transactions list.
+    const cat = (txCategory?.value || "").trim();
+    const ei  = (txExpInc?.value   || "").trim();
+    const isSavings = SAVINGS_CATEGORIES.includes(cat) || SAVINGS_CATEGORIES.includes(ei);
+    if (txVendor) txVendor.disabled = inflow && !isSavings;
     if (txExpInc) txExpInc.disabled = inflow;
     // Job picker only meaningful when Existing Job = Y
     if (txJobLink) txJobLink.disabled = !existing;
@@ -14112,6 +14119,10 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 
   // Wire conditional triggers
   [txOutflow, txInflow].forEach(el => el && el.addEventListener("input", applyTxConditionalUI));
+  // Category changing in/out of a SAVINGS_CATEGORIES value flips whether
+  // Vendor stays enabled on inflows — re-apply the conditional UI so the
+  // field updates in real time without waiting for the next save.
+  [txCategory, txExpInc].forEach(el => el && el.addEventListener("change", applyTxConditionalUI));
   [txExistingToggle].forEach(el => el && el.addEventListener("change", () => {
     refreshJobLinkOptions();
     applyTxConditionalUI();
