@@ -2287,10 +2287,15 @@ function renderSavings() {
           </tr>
           ${arr.map(t => {
             const signed = (t.type === "income" ? -1 : 1) * (+t.amount || 0);
+            // Fall back to vendor / customer when payee is blank — savings
+            // transactions typically have the bank name (Wealthfront, CiT
+            // Bank) in the vendor field, not payee, so the column was
+            // showing empty otherwise. Same pattern as the Helper report.
+            const party = (t.payee || "").trim() || (t.vendor || "").trim() || (t.customer || "").trim();
             return `
               <tr>
                 <td>${escapeHtml(fmtDate(t.date))}</td>
-                <td>${escapeHtml(t.payee || "")}</td>
+                <td>${escapeHtml(party)}</td>
                 <td>${escapeHtml(t.category || t.expenseIncome || "")}</td>
                 <td class="amt">${fmtMoney(signed)}</td>
               </tr>
