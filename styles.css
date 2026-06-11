@@ -2373,6 +2373,34 @@ td.amount.expense { color: var(--expense); }
 #tx-select-all-bar { display: none; }
 body.tx-select-active #tx-select-all-bar { display: block; }
 
+/* DESKTOP sticky header on Transactions — the .tx-sticky-header wrapper
+   (heading + running-balance + toolbar) pins to the top of the viewport,
+   and the table's <thead> sits flush below it. Mobile already had this
+   treatment via its own @media block; this is the desktop counterpart.
+   ensureTxStickyHeader() builds the wrapper and syncTxStickyHeights()
+   keeps --tx-sticky-header-h in sync with the wrapper's measured height
+   so the thead's top offset always matches. */
+@media (min-width: 769px) {
+  #transactions > .tx-sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--bg);
+    padding-bottom: 4px;
+  }
+  #tx-table thead th {
+    position: sticky;
+    top: var(--tx-sticky-header-h, 0px);
+    z-index: 20;
+    background: var(--surface-alt);
+  }
+  /* Sticky cells with border-collapse can lose their bottom border at the
+     seam — paint it via box-shadow which sits above the collapsed border. */
+  #tx-table thead th {
+    box-shadow: inset 0 -1px 0 var(--border);
+  }
+}
+
 .tx-select-col input[type="checkbox"] {
   width: 16px;
   height: 16px;
