@@ -6728,12 +6728,17 @@ function renderPLReport() {
   document.getElementById("pl-range").textContent = `${fmt(from)} — ${fmt(to)}`;
   document.getElementById("pl-col-header").textContent = "Total";
 
-  // Filter transactions to date range and exclude Roll Over / Correction
+  // Filter transactions to date range and exclude Roll Over / Correction,
+  // plus savings-tagged transactions (Wealthfront / CiT Bank / Savings).
+  // Savings transfers aren't operational P&L activity — they're balance-
+  // sheet movements between personal accounts.
   const txs = state.transactions.filter(t => {
     if (!t.date) return false;
     if (from && t.date < from) return false;
     if (to && t.date > to) return false;
     if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (SAVINGS_CATEGORIES.includes(t.category)) return false;
+    if (SAVINGS_CATEGORIES.includes(t.expenseIncome || "")) return false;
     return true;
   });
 
@@ -7186,7 +7191,17 @@ function renderIEReport() {
     if (to && d > to) return false;
     return true;
   };
-  const txs = state.transactions.filter(inRange).filter(t => !NON_JOB_CATEGORIES.includes(t.category));
+  // Exclude NON_JOB_CATEGORIES (Roll Over, Correction) and SAVINGS_CATEGORIES
+  // (Wealthfront, CiT Bank, Savings) — savings transfers aren't operational
+  // income/expense and shouldn't appear on either side of an IE report.
+  // Also check expenseIncome so transactions tagged via the new-spec field
+  // (rather than the legacy category) are filtered too.
+  const isSavingsTx = t => SAVINGS_CATEGORIES.includes(t.category) ||
+                            SAVINGS_CATEGORIES.includes(t.expenseIncome || "");
+  const txs = state.transactions
+    .filter(inRange)
+    .filter(t => !NON_JOB_CATEGORIES.includes(t.category))
+    .filter(t => !isSavingsTx(t));
 
   // Aggregate per category — track each transaction so the drill can show
   // per-tx detail (Date · Vendor / Memo / Expense, amount).
@@ -7842,7 +7857,12 @@ function renderJobsReport() {
   };
 
   const txs = state.transactions.filter(inRange);
-  const jobCats = state.categories.filter(c => !NON_JOB_CATEGORIES.includes(c));
+  // Filter savings categories out of the Job/Category list so a "Savings"
+  // category doesn't show up as a job line with zero job context — matches
+  // the same treatment IE / P&L / Schedule C use.
+  const jobCats = state.categories.filter(c =>
+    !NON_JOB_CATEGORIES.includes(c) && !SAVINGS_CATEGORIES.includes(c)
+  );
 
   const allRows = jobCats.map(cat => {
     const catTxs = txs.filter(t => t.category === cat);
@@ -15663,6 +15683,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       const cat = (t.category || "").trim() || "(uncategorized)";
       if (NON_JOB_CATEGORIES.includes(cat)) return;
       if (SAVINGS_CATEGORIES.includes(cat)) return;
+      // Also exclude savings tagged via the new-spec expenseIncome field —
+      // matches the same rule the Savings Rate / Year-End reports use.
+      if (SAVINGS_CATEGORIES.includes((t.expenseIncome || "").trim())) return;
       const amt = +t.amount || 0;
       if (t.type === "income") {
         grossReceipts += amt;
