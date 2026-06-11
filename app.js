@@ -2074,13 +2074,11 @@ function renderSavings() {
   const eyebrowEl = document.getElementById("sv-eyebrow");
   if (!chartEl || !totalEl) return;
 
-  // Populate the subtitle with the actual SAVINGS_CATEGORIES list so the
-  // label always matches what's being summed — was hardcoded to two of
-  // the three (Wealthfront / CiT Bank) and missed the generic "Savings"
-  // category. Title attribute keeps the full categorical list for hover.
+  // Subtitle: simple "Monthly deposits into Savings". Hover title keeps the
+  // detailed list of which categories actually get summed.
   const svSub = document.getElementById("sv-sub");
   if (svSub) {
-    svSub.textContent = `Monthly deposits into ${SAVINGS_CATEGORIES.join(" · ")}`;
+    svSub.textContent = "Monthly deposits into Savings";
     svSub.setAttribute("title", `Categories counted: ${SAVINGS_CATEGORIES.join(", ")}`);
   }
 
