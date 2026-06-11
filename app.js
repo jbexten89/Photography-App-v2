@@ -14206,8 +14206,6 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
           catSel.value = saved;
         }
         if (txExpInc) txExpInc.value = tx?.expenseIncome || "";
-        const markCb = document.getElementById("tx-nj-marked");
-        if (markCb) markCb.checked = !!(tx?.njMarked);
       }
     });
     obs.observe(txModal, { attributes: true, attributeFilter: ["class"] });
@@ -14222,7 +14220,6 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
         txCountBefore: (state.transactions || []).length,
         jobNo: isExistingJob() ? (txJobLink?.value || "") : "",
         expenseIncome: txExpInc?.value && txExpInc.value !== "__new__" ? txExpInc.value : "",
-        njMarked: !!document.getElementById("tx-nj-marked")?.checked,
       };
     }, true);
     // Bubble-phase: run AFTER the original handler — patch the saved tx (only if it actually saved)
@@ -14244,14 +14241,12 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       if (tx) {
         if (link.jobNo) tx.jobNo = link.jobNo; else delete tx.jobNo;
         if (link.expenseIncome) tx.expenseIncome = link.expenseIncome; else delete tx.expenseIncome;
-        if (link.njMarked) tx.njMarked = true; else delete tx.njMarked;
         saveState();
         renderNjAnalytics();
         // The original submit handler already called render() before our patch
         // — re-render the transactions table so the new Job No. / Expense
-        // cells (and the green badge) reflect the just-saved values.
+        // cells reflect the just-saved values.
         if (typeof renderTransactions === "function") renderTransactions();
-        stampTxNjBadges();
       }
     });
   }
@@ -14900,7 +14895,6 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     saveState();
     if (typeof renderTransactions === "function") renderTransactions();
     if (typeof renderNjAnalytics === "function") renderNjAnalytics();
-    if (typeof stampTxNjBadges === "function") stampTxNjBadges();
     njBackfillUpdateStat();
     closeBackfillModal();
     alert(`Tagged ${changes.length} transaction(s) with their suggested Job No.\n\nUndo is available on the Settings card if needed.`);
@@ -14932,7 +14926,6 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     saveState();
     if (typeof renderTransactions === "function") renderTransactions();
     if (typeof renderNjAnalytics === "function") renderNjAnalytics();
-    if (typeof stampTxNjBadges === "function") stampTxNjBadges();
     njBackfillUpdateStat();
     alert(`Reverted ${reverted} transaction(s). ${snap.changes.length - reverted ? `(${snap.changes.length - reverted} were skipped because they had been changed since.)` : ""}`);
   });
@@ -14961,9 +14954,6 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
         txExistingToggle.checked = false;
         if (typeof syncExistingPills === "function") syncExistingPills();
       }
-      // Reset Mark-as-edited
-      const mark = document.getElementById("tx-nj-marked");
-      if (mark) mark.checked = false;
       // Date back to today
       const dateEl = document.getElementById("tx-date");
       if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
@@ -15136,7 +15126,6 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       saveState();
       cell.dataset.editing = "";
       if (typeof renderTransactions === "function") renderTransactions();
-      stampTxNjBadges();
     };
     editor.addEventListener("keydown", (e) => {
       if (e.key === "Enter") { e.preventDefault(); editor.blur(); }
@@ -15401,43 +15390,8 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     }, true);
   })();
 
-  // ============================================================
-  // ALL TRANSACTIONS — "edited with new logic" indicator
-  // Watches the tx table for re-renders and stamps a green dot onto
-  // rows whose tx has either a jobNo or expenseIncome field.
-  // ============================================================
-  function stampTxNjBadges() {
-    const txMap = new Map((state.transactions || []).map(t => [t.id, t]));
-    document.querySelectorAll("#tx-table tbody tr.tx-row").forEach(row => {
-      const t = txMap.get(row.dataset.id);
-      if (!t) return;
-      const tagged = !!(t.jobNo || t.expenseIncome || t.njMarked);
-      row.classList.toggle("nj-tagged", tagged);
-      const dateCell = row.querySelector('td[data-col="date"]');
-      if (!dateCell) return;
-      let badge = dateCell.querySelector(".nj-badge");
-      if (tagged) {
-        if (!badge) {
-          badge = document.createElement("span");
-          badge.className = "nj-badge";
-          const tip = [
-            t.jobNo ? `Job ${t.jobNo}` : null,
-            t.expenseIncome ? `Entry: ${t.expenseIncome}` : null,
-          ].filter(Boolean).join(" · ");
-          badge.title = "Edited with new logic — " + tip;
-          dateCell.prepend(badge);
-        }
-      } else if (badge) {
-        badge.remove();
-      }
-    });
-  }
-  const txTbody = document.querySelector("#tx-table tbody");
-  if (txTbody) {
-    const txObs = new MutationObserver(() => stampTxNjBadges());
-    txObs.observe(txTbody, { childList: true, subtree: false });
-    stampTxNjBadges();
-  }
+  // "Edited with new logic" badge feature retired 2026-06.
+  // The green dot + njMarked flag are gone — see commit notes for context.
 
   // Wire Job Analytics filters (year / customer / category)
   ["nj-analytics-year", "nj-analytics-customer", "nj-analytics-category"].forEach(id => {
