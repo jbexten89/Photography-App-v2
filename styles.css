@@ -2367,6 +2367,11 @@ td.amount.expense { color: var(--expense); }
 #tx-table thead .tx-select-col #tx-select-all {
   visibility: hidden;
 }
+/* Select-all bar is gated on body.tx-select-active. The mobile @media
+   block also sets this rule, but without the unconditional version,
+   desktop showed the bar permanently. */
+#tx-select-all-bar { display: none; }
+body.tx-select-active #tx-select-all-bar { display: block; }
 
 .tx-select-col input[type="checkbox"] {
   width: 16px;
