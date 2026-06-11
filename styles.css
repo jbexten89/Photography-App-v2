@@ -2401,12 +2401,11 @@ body.tx-select-active #tx-select-all-bar { display: block; }
     margin-top: 0;
     justify-content: flex-end;
   }
-  /* Wrap the main Balance label + value in a card so it reads as a
-     contained statistic instead of floating text. Force visible chrome
-     with stronger contrast than the band — !important defeats any
-     specificity-equal override I may have missed. */
-  #transactions > .tx-sticky-header .running-balance .rb-item.main {
-    margin-right: 0;
+  /* Wrap BOTH stats in cards — Balance on the right and the optional
+     Selected stat on the left (visible in select mode). Same chrome,
+     same min-width so the two cards visually balance.
+     !important defeats any specificity-equal override I may have missed. */
+  #transactions > .tx-sticky-header .running-balance .rb-item {
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
     border-radius: 10px !important;
@@ -2414,9 +2413,11 @@ body.tx-select-active #tx-select-all-bar { display: block; }
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18) !important;
     min-width: 180px;
   }
-  /* Also ensure label + value sit centered within the card. */
-  #transactions > .tx-sticky-header .running-balance .rb-item.main .rb-label,
-  #transactions > .tx-sticky-header .running-balance .rb-item.main .rb-value {
+  #transactions > .tx-sticky-header .running-balance .rb-item.main {
+    margin-right: 0;
+  }
+  #transactions > .tx-sticky-header .running-balance .rb-item .rb-label,
+  #transactions > .tx-sticky-header .running-balance .rb-item .rb-value {
     text-align: center;
   }
   /* Make the .table-wrap itself the scroll container. thead sticks to the
