@@ -2402,15 +2402,22 @@ body.tx-select-active #tx-select-all-bar { display: block; }
     justify-content: flex-end;
   }
   /* Wrap the main Balance label + value in a card so it reads as a
-     contained statistic instead of floating text. Inherits the same
-     panel chrome (border, radius, soft bg) the analytics tiles use. */
+     contained statistic instead of floating text. Force visible chrome
+     with stronger contrast than the band — !important defeats any
+     specificity-equal override I may have missed. */
   #transactions > .tx-sticky-header .running-balance .rb-item.main {
     margin-right: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 16px 10px;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    padding: 10px 20px 12px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18) !important;
+    min-width: 180px;
+  }
+  /* Also ensure label + value sit centered within the card. */
+  #transactions > .tx-sticky-header .running-balance .rb-item.main .rb-label,
+  #transactions > .tx-sticky-header .running-balance .rb-item.main .rb-value {
+    text-align: center;
   }
   /* Make the .table-wrap itself the scroll container. thead sticks to the
      wrap's top (top: 0) — that's a fully-supported sticky pattern that
