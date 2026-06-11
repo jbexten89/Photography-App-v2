@@ -12571,7 +12571,7 @@ function renderTransactions() {
   }));
 }
 
-const SAVINGS_CATEGORIES = ["Wealthfront", "CiT Bank", "Savings"];
+const SAVINGS_CATEGORIES = ["Wealthfront", "CiT Bank", "Huntington", "Savings"];
 const NON_JOB_CATEGORIES = ["Roll Over", "Correction"];
 
 // Chart of accounts types (the standard accounting bucket categories)
