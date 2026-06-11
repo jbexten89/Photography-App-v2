@@ -5682,10 +5682,12 @@ select option {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* All header cells share the same opaque tint so the row reads as one
+     consistent band — was Customer = surface-alt vs the others = translucent
+     bg-soft fallback (which painted as the page bg behind them). */
+  .bc-table thead th { background: var(--surface-alt); }
   .bc-table thead th:first-child {
     z-index: 3;
-    /* Use surface-alt (opaque) for the header tint instead of the translucent
-       bg-soft fallback. */
     background: var(--surface-alt);
   }
   .bc-table tbody tr.bc-row:hover td:first-child {
