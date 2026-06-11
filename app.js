@@ -1957,11 +1957,19 @@ function renderSavingsRate() {
   const slot = plotW / groupCount;
   const barW = Math.min(slot * 0.6, 56);
 
-  // Y axis: 0 to max(50%, ceil(maxRate to next 10))
-  const maxRate = Math.max(20, ...monthlyRate);
-  const yTop = Math.ceil(maxRate / 10) * 10;
-  const tickStep = yTop <= 50 ? 10 : 20;
-  const yFor = v => padT + ((yTop - v) / yTop) * plotH;
+  // Y axis: 0 to max(50%, ceil(maxRate to next 10)). Capped at 200% so a
+  // single outlier month (e.g. big savings deposit / tiny profit base →
+  // 5000% rate) doesn't blow the axis ceiling and pack the chart with
+  // hundreds of tick labels. Bar height for any month above the cap is
+  // clamped at the cap so the bar shows but the axis stays readable.
+  const SR_MAX_AXIS = 200;
+  const finiteRates = monthlyRate.filter(r => isFinite(r));
+  const observedMax = finiteRates.length ? Math.max(...finiteRates) : 0;
+  const maxRate = Math.max(20, Math.min(SR_MAX_AXIS, observedMax));
+  const yTop = Math.ceil(maxRate / 10) * 10 || 20;
+  // Aim for roughly 5–6 ticks regardless of yTop range.
+  const tickStep = yTop <= 50 ? 10 : yTop <= 100 ? 20 : yTop <= 150 ? 25 : 50;
+  const yFor = v => padT + ((yTop - Math.min(v, yTop)) / yTop) * plotH;
 
   let grid = "", yLabels = "";
   for (let v = 0; v <= yTop + 0.001; v += tickStep) {
