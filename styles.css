@@ -2388,15 +2388,22 @@ body.tx-select-active #tx-select-all-bar { display: block; }
     background: var(--bg);
     padding-bottom: 4px;
   }
+  /* CRITICAL: .table-wrap default has overflow: auto, which creates a new
+     scroll container — position:sticky on thead inside it sticks only to
+     THAT container, not the page viewport. So the thead pinned to the
+     wrap's top, then the whole wrap scrolled off. Switch to overflow:
+     visible on desktop so sticky behaves against the actual page scroll. */
+  #transactions > .table-wrap {
+    overflow: visible;
+  }
   #tx-table thead th {
     position: sticky;
     top: var(--tx-sticky-header-h, 0px);
     z-index: 20;
     background: var(--surface-alt);
-  }
-  /* Sticky cells with border-collapse can lose their bottom border at the
-     seam — paint it via box-shadow which sits above the collapsed border. */
-  #tx-table thead th {
+    /* Sticky cells with border-collapse can lose their bottom border at
+       the seam — paint it via box-shadow which sits above the collapsed
+       border. */
     box-shadow: inset 0 -1px 0 var(--border);
   }
 }
