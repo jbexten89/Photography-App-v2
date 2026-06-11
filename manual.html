@@ -377,7 +377,7 @@
       <tr><td><strong>Net profit</strong></td><td>Income − Expenses.</td></tr>
       <tr><td><strong>Profit base (Savings Rate)</strong></td><td>Income − Job Expenses − Cost of Goods. The denominator of the Savings Rate formula.</td></tr>
       <tr><td><strong>Job Expense</strong></td><td>Expense whose category is in <code>JOB_ORDER</code> (a job-named cost).</td></tr>
-      <tr><td><strong>Cost of Goods</strong></td><td>Expense whose category is literally "Cost of Goods" or "Cost of Goods Sold".</td></tr>
+      <tr><td><strong>Cost of Goods (CoGS)</strong></td><td>Expense whose Chart Account is "CoGS" / "Cost of Goods" (case-insensitive). Also matches if the category itself is literally "Cost of Goods" or "CoGS" (legacy data). Updated 2026-06 — was previously category-only, which missed real CoGS spending classified via the COA column.</td></tr>
       <tr><td><strong>Drill-down</strong></td><td>Clicking a chart element (donut slice, year matrix cell, sankey node) to jump to the Transactions tab pre-filtered to that subset.</td></tr>
     </tbody>
   </table>
@@ -1185,7 +1185,7 @@
     <li><strong>Savings</strong> = Σ expense rows whose category OR expense-table entry is a savings category.</li>
     <li><strong>Gross Profit</strong> = Σ income rows (excluding Roll Over / Correction).</li>
     <li><strong>Job Expenses</strong> = Σ expense rows whose category is in <code>JOB_ORDER</code>.</li>
-    <li><strong>Cost of Goods</strong> = Σ expense rows whose category is literally "Cost of Goods" or "Cost of Goods Sold".</li>
+    <li><strong>Cost of Goods (CoGS)</strong> = Σ expense rows whose <strong>Chart Account</strong> matches "CoGS" / "Cost of Goods" (case-insensitive), OR whose category is literally "Cost of Goods" / "CoGS" for legacy data. CoGS takes precedence over Job Expenses — a Baseball-category expense with COA=CoGS is cost of goods, not a job expense. Updated 2026-06 so the Savings Rate view matches the Year-End report (was previously category-only, which missed CoGS classified via the COA column).</li>
   </ul>
 
   <h3>17.2 Monthly chart</h3>

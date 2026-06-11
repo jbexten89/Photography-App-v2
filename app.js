@@ -1857,14 +1857,29 @@ function renderSavingsRate() {
         sav[mi] += amt;
         const label = SAVINGS_CATEGORIES.includes(cat) ? cat : ei;
         savByCat.set(label, (savByCat.get(label) || 0) + amt);
-      } else if (JOB_ORDER.includes(cat)) {
-        jobExp[mi] += amt;
-        deductTxs.push({ ...t, _bucket: "Job Expense" });
-      } else if (cat === "Cost of Goods") {
-        cogs[mi] += amt;
-        deductTxs.push({ ...t, _bucket: "Cost of Goods" });
       } else {
-        otherExp[mi] += amt;
+        // CoGS detection looks at Chart Account first (that's where users
+        // actually classify cost of goods — "CoGS" lives in the COA, not
+        // the Category column). Falls back to the legacy category match
+        // for old data tagged "Cost of Goods" directly. Same logic the
+        // Year-End report uses, so the two views produce the same numbers.
+        // CoGS takes precedence over JobExp — a Baseball-category expense
+        // with COA=CoGS is cost of goods, not a job expense.
+        const ca = (t.chartAccount || "").trim();
+        const isCogs =
+          /^cogs$/i.test(ca) ||
+          /cost of goods/i.test(ca) ||
+          /^cogs$/i.test(cat) ||
+          /cost of goods/i.test(cat);
+        if (isCogs) {
+          cogs[mi] += amt;
+          deductTxs.push({ ...t, _bucket: "Cost of Goods" });
+        } else if (JOB_ORDER.includes(cat)) {
+          jobExp[mi] += amt;
+          deductTxs.push({ ...t, _bucket: "Job Expense" });
+        } else {
+          otherExp[mi] += amt;
+        }
       }
     }
   });
