@@ -12407,11 +12407,11 @@ function renderTransactions() {
       (isLocked ? " locked-year" : "");
     const tintColor = (t.jobNo && txJobColorMap.get(t.jobNo)) || "";
     const rowStyle = tintColor ? ` style="--row-tint: ${hexToRowTint(tintColor)}"` : "";
-    // Calendar with a small "no-entry" diagonal — semantically "this date
-     // period is locked." Visually distinct from the reconciled column's
-     // padlock so the two cues never get confused for each other.
+    // Padlock — universal "locked" icon. The recon column moved from
+     // padlock to checkmark-in-circle, so a padlock here no longer
+     // collides with the verified/reconciled meaning.
     const lockIcon = isLocked
-      ? ` <span class="tx-locked-icon" title="${escapeHtml((t.date || "").slice(0, 4))} is locked — unlock in Settings" aria-label="Year locked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="6" y1="20" x2="18" y2="14"/></svg></span>`
+      ? ` <span class="tx-locked-icon" title="${escapeHtml((t.date || "").slice(0, 4))} is locked — unlock in Settings" aria-label="Year locked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>`
       : "";
     return `
     <tr data-id="${t.id}" class="${rowCls}" data-recon="${rState}"${rowStyle}>
@@ -12433,8 +12433,10 @@ function renderTransactions() {
       <td data-col="recon" class="recon-cell" title="${rTitle}">
         <span class="recon-lock ${rClass}">
           ${rState === "R"
-            ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`
-            : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`
+            ? `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="7.5 12 11 15.5 16.5 9" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+            : rState === "C"
+              ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polyline points="7.5 12 11 15.5 16.5 9"/></svg>`
+              : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/></svg>`
           }
         </span>
       </td>

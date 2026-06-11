@@ -1797,20 +1797,24 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   margin-right: auto;
 }
 
-/* Locked-year indicator: small red dot in the bottom-right corner of any
-   year tile in the year-picker sheet whose year is in state.lockedYears. */
+/* Locked-year indicator: small red padlock in the bottom-right corner of
+   any year tile in the year-picker sheet whose year is in
+   state.lockedYears. Padlock is the universal "locked" symbol —
+   the recon column moved off the padlock so there's no collision. */
 .year-sheet-item.is-locked { position: relative; }
 .year-sheet-item.is-locked::after {
   content: "";
   position: absolute;
-  right: 6px;
-  bottom: 6px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ef4444;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+  right: 5px;
+  bottom: 5px;
+  width: 12px;
+  height: 12px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='11' width='18' height='11' rx='2' fill='%23ef4444' stroke='%23ef4444'/><path d='M7 11V7a5 5 0 0 1 10 0v4' fill='none' stroke='%23ef4444'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.4));
 }
 /* Same indicator on inline year pills (Overview row) so desktop users
    can see at a glance which years are locked. */
@@ -1818,14 +1822,16 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
 .year-pill.is-locked::after {
   content: "";
   position: absolute;
-  right: 4px;
-  bottom: 3px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ef4444;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+  right: 3px;
+  bottom: 2px;
+  width: 9px;
+  height: 9px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='11' width='18' height='11' rx='2' fill='%23ef4444' stroke='%23ef4444'/><path d='M7 11V7a5 5 0 0 1 10 0v4' fill='none' stroke='%23ef4444'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.4));
 }
 
 .year-pill {
@@ -6116,8 +6122,10 @@ td.recon-cell { text-align: center; }
 .dash-drill-row.drillable:hover { background: var(--hover); }
 .dash-drill-row.drillable.drill-active { background: var(--hover); }
 
-/* Padlock icon in the R column — matches the Tag-icon styling:
-   dim when uncleared, primary color when reconciled. */
+/* Verification icon in the R column — empty circle when uncleared,
+   outline check when cleared, filled green check when reconciled.
+   Padlock semantics were moved to "locked year" (Settings, Overview,
+   tx row badge) — recon is "verified," shown as a check. */
 .recon-lock {
   display: inline-flex;
   align-items: center;
@@ -6127,8 +6135,8 @@ td.recon-cell { text-align: center; }
   transition: color 0.15s, opacity 0.15s;
 }
 .recon-lock svg { width: 16px; height: 16px; display: block; }
-.recon-lock.cleared    { color: var(--accent); opacity: 0.85; }
-.recon-lock.reconciled { color: var(--primary); opacity: 1; }
+.recon-lock.cleared    { color: var(--accent); opacity: 0.9; }
+.recon-lock.reconciled { color: var(--income); opacity: 1; }
 
 /* Find (magnifying-glass) search — icon button expands to an input on click */
 .tx-find-wrap {
