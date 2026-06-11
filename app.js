@@ -3595,6 +3595,41 @@ function renderCashFlow() {
 const modal = document.getElementById("tx-modal");
 const txForm = document.getElementById("tx-form");
 
+// ------------------------------------------------------------
+// Locked-year banner — proactive visual cue shown inside the tx
+// modal when the date field falls in a locked year. The existing
+// isLockedDate check at save-time stays as the actual safety net;
+// this just warns the user BEFORE they try to save and disables
+// the Save button while the warning is up.
+// ------------------------------------------------------------
+function syncTxLockedBanner() {
+  const dateEl   = document.getElementById("tx-date");
+  const bannerEl = document.getElementById("tx-locked-banner");
+  const yearEl   = document.getElementById("tx-locked-banner-year");
+  const saveBtn  = document.querySelector("#tx-form button[type=\"submit\"]");
+  if (!dateEl || !bannerEl) return;
+  const dateVal = dateEl.value || "";
+  const locked = isLockedDate(dateVal);
+  if (locked) {
+    const yr = dateVal.slice(0, 4);
+    if (yearEl) yearEl.textContent = yr;
+    bannerEl.hidden = false;
+  } else {
+    bannerEl.hidden = true;
+  }
+  if (saveBtn) {
+    saveBtn.disabled = locked;
+    saveBtn.setAttribute("aria-disabled", locked ? "true" : "false");
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("tx-date")?.addEventListener("input", syncTxLockedBanner);
+  document.getElementById("tx-date")?.addEventListener("change", syncTxLockedBanner);
+});
+// Also expose for the openTxModal call site (which runs before DOMContentLoaded
+// in some test contexts).
+window.syncTxLockedBanner = syncTxLockedBanner;
+
 function openTxModal(tx) {
   populateDatalist("payee-datalist", state.payees);
   populateDatalist("category-datalist", state.categories);
@@ -3621,6 +3656,8 @@ function openTxModal(tx) {
   document.getElementById("btn-delete-tx").style.display = hasId ? "inline-block" : "none";
   document.getElementById("btn-duplicate-tx").style.display = hasId ? "inline-block" : "none";
   document.getElementById("tx-date").value = tx?.date || new Date().toISOString().slice(0, 10);
+  // Sync the locked-year banner + Save button state for the initial date.
+  if (typeof syncTxLockedBanner === "function") syncTxLockedBanner();
   document.getElementById("tx-payee").value = tx?.payee || "";
   document.getElementById("tx-vendor").value = tx?.vendor || "";
   // Set customer select; if saved value isn't in the list, add it so it stays selected.
@@ -12324,16 +12361,21 @@ function renderTransactions() {
     const expincMatchesCat = !!(t.expenseIncome && t.category &&
       t.expenseIncome.trim().toLowerCase() === t.category.trim().toLowerCase());
     const isSalesChart = !!(t.chartAccount && /(^|:)\s*sales\s*$/i.test(t.chartAccount));
+    const isLocked = isLockedDate(t.date);
     const rowCls = "tx-row" +
       (isNonJob ? " nonjob" : "") +
       (expincMatchesCat ? " expinc-cat-match" : "") +
-      (isSalesChart ? " chart-sales" : "");
+      (isSalesChart ? " chart-sales" : "") +
+      (isLocked ? " locked-year" : "");
     const tintColor = (t.jobNo && txJobColorMap.get(t.jobNo)) || "";
     const rowStyle = tintColor ? ` style="--row-tint: ${hexToRowTint(tintColor)}"` : "";
+    const lockIcon = isLocked
+      ? ` <span class="tx-locked-icon" title="${escapeHtml((t.date || "").slice(0, 4))} is locked — unlock in Settings" aria-label="Year locked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>`
+      : "";
     return `
     <tr data-id="${t.id}" class="${rowCls}" data-recon="${rState}"${rowStyle}>
       ${checkboxCell}
-      <td data-col="date">${fmtDate(t.date)}</td>
+      <td data-col="date">${fmtDate(t.date)}${lockIcon}</td>
       <td data-col="vendor">${t.vendor ? escapeHtml(t.vendor) : "&nbsp;"}</td>
       <td data-col="jobno">${escapeHtml(t.jobNo || "")}${
         t.jobNo && t.type === "income" && invoicedJobNos.has(t.jobNo)

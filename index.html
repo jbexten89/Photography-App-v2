@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=565" />
+<link rel="stylesheet" href="styles.css?v=566" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -3058,6 +3058,14 @@
   <div id="tx-modal" class="modal hidden">
     <div class="modal-content">
       <h2 id="modal-title">New Transaction</h2>
+      <!-- Locked-year warning banner — shown when tx-date falls in a locked
+           year. JS toggles its hidden attribute and disables Save while
+           visible. The existing isLockedDate check is still the safety
+           net; this is the proactive visual cue. -->
+      <div id="tx-locked-banner" class="tx-locked-banner" hidden>
+        <svg class="tx-locked-banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span><strong id="tx-locked-banner-year">Year</strong> is locked. Unlock in <strong>Settings → Locked Years</strong> to edit this transaction.</span>
+      </div>
       <form id="tx-form">
         <input type="hidden" id="tx-id" />
 
@@ -3220,6 +3228,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=325"></script>
+  <script src="app.js?v=326"></script>
 </body>
 </html>
