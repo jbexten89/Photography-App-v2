@@ -2401,8 +2401,16 @@ body.tx-select-active #tx-select-all-bar { display: block; }
     margin-top: 0;
     justify-content: flex-end;
   }
+  /* Wrap the main Balance label + value in a card so it reads as a
+     contained statistic instead of floating text. Inherits the same
+     panel chrome (border, radius, soft bg) the analytics tiles use. */
   #transactions > .tx-sticky-header .running-balance .rb-item.main {
     margin-right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px 10px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
   }
   /* Make the .table-wrap itself the scroll container. thead sticks to the
      wrap's top (top: 0) — that's a fully-supported sticky pattern that
