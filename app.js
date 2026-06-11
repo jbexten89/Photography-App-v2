@@ -664,7 +664,17 @@ function activateAnalyticsView(viewName) {
   if (typeof syncAmvpFromActiveView === "function") syncAmvpFromActiveView(viewName);
   if (typeof syncJobsModeTogglePlacement === "function") syncJobsModeTogglePlacement(viewName);
   if (typeof refreshFilterTriggers === "function") refreshFilterTriggers();
-  if (viewName === "flow"   && typeof renderTrends   === "function") renderTrends();
+  if (viewName === "flow"   && typeof renderTrends   === "function") {
+    // Reset Flow defaults every time the user opens it: All Jobs · Net ·
+    // current year. Without this, mode/year selections from a previous
+    // visit persist until manually changed.
+    if (typeof trendMode !== "undefined")       trendMode       = "year";
+    if (typeof trendAmountMode !== "undefined") trendAmountMode = "net";
+    trendSelectedJobs = null;     // null = "all jobs"
+    trendSelectedYears = null;    // null → year-mode init falls through to current year
+    trendYearsInitialized = false; // force the current-year init branch to run
+    renderTrends();
+  }
   if (viewName === "trends" && typeof renderByCategory === "function") renderByCategory();
   if (viewName === "cash-flow" && typeof renderCashFlow === "function") renderCashFlow();
   if (viewName === "breakdown" && typeof renderBreakdown === "function") renderBreakdown();
