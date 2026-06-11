@@ -178,6 +178,20 @@ document.body.classList.toggle("tx-job-color-rows", state.txJobColorRows);
 // falls in a locked year cannot be edited or deleted from the UI.
 if (!Array.isArray(state.lockedYears)) state.lockedYears = [];
 
+// 2026-06: Cleared ("C") state retired — recon is now a two-state model:
+// "" (uncleared) or "R" (reconciled). Migrate any legacy C-tagged rows to
+// uncleared so they don't render in a state that no longer has a UI path.
+(function migrateClearedToUncleared() {
+  if (!Array.isArray(state.transactions)) return;
+  let migrated = 0;
+  state.transactions.forEach(t => {
+    if (t.reconciled === "C") { t.reconciled = ""; migrated++; }
+  });
+  if (migrated > 0 && typeof saveState === "function") {
+    queueMicrotask(() => saveState());
+  }
+})();
+
 function isLockedDate(dateStr) {
   if (!dateStr) return false;
   const m = String(dateStr).match(/^(\d{4})/);
@@ -4921,9 +4935,10 @@ function openReconcile() {
   // Default statement balance to empty
   document.getElementById("reconcile-balance").value = "";
 
-  // Pre-check rows that are already marked "C"
+  // Pre-check rows already marked Reconciled. The legacy "C" middle state
+  // was retired 2026-06; existing C rows were migrated to uncleared on load.
   reconcileChecked = new Set(
-    state.transactions.filter(t => t.reconciled === "C").map(t => t.id)
+    state.transactions.filter(t => t.reconciled === "R").map(t => t.id)
   );
   reconcileLastClickedId = null;
 
@@ -12270,7 +12285,7 @@ function renderTransactions() {
         if (!txFilterCharts.has((t.chartAccount || "").trim())) return false;
       }
       if (qAll) {
-        const reconLabel = t.reconciled === "R" ? "reconciled" : t.reconciled === "C" ? "cleared" : "uncleared";
+        const reconLabel = t.reconciled === "R" ? "reconciled" : "uncleared";
         const hay = [
           t.date,
           fmtDate(t.date || ""),
@@ -12392,8 +12407,10 @@ function renderTransactions() {
 
   body.innerHTML = list.map(t => {
     const rState = t.reconciled || "";
-    const rClass = rState === "C" ? "cleared" : rState === "R" ? "reconciled" : "";
-    const rTitle = rState === "C" ? "Cleared (click to mark Reconciled)" : rState === "R" ? "Reconciled (click to clear)" : "Uncleared (click to mark Cleared)";
+    // Two-state recon: "" (uncleared) or "R" (reconciled). Legacy "C" rows
+    // were migrated to "" at startup.
+    const rClass = rState === "R" ? "reconciled" : "";
+    const rTitle = rState === "R" ? "Reconciled (click to unmark)" : "Uncleared (click to mark Reconciled)";
     const checkboxCell = `<td class="tx-select-col"><input type="checkbox" class="tx-select-box" ${txSelectedIds.has(t.id) ? "checked" : ""} /></td>`;
     const isNonJob = NON_JOB_CATEGORIES.includes(t.category);
     const expincMatchesCat = !!(t.expenseIncome && t.category &&
@@ -12434,9 +12451,7 @@ function renderTransactions() {
         <span class="recon-lock ${rClass}">
           ${rState === "R"
             ? `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="7.5 12 11 15.5 16.5 9" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-            : rState === "C"
-              ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polyline points="7.5 12 11 15.5 16.5 9"/></svg>`
-              : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/></svg>`
+            : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/></svg>`
           }
         </span>
       </td>
@@ -12566,8 +12581,8 @@ function renderTransactions() {
       blockedToast(tx.date.slice(0, 4));
       return;
     }
-    const cur = tx.reconciled || "";
-    tx.reconciled = cur === "" ? "C" : cur === "C" ? "R" : "";
+    // Two-state model: Uncleared ↔ Reconciled.
+    tx.reconciled = (tx.reconciled === "R") ? "" : "R";
     saveState();
     renderTransactions();
   }));

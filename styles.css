@@ -6136,8 +6136,8 @@ td.recon-cell { text-align: center; }
   transition: color 0.15s, opacity 0.15s;
 }
 .recon-lock svg { width: 16px; height: 16px; display: block; }
-.recon-lock.cleared    { color: var(--accent); opacity: 0.9; }
 .recon-lock.reconciled { color: var(--income); opacity: 1; }
+/* .cleared state retired 2026-06 — recon is now two-state (uncleared / reconciled). */
 
 /* Find (magnifying-glass) search — icon button expands to an input on click */
 .tx-find-wrap {
