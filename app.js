@@ -5170,6 +5170,12 @@ document.getElementById("btn-select-mode").addEventListener("click", () => {
   document.body.classList.toggle("tx-select-active", txSelectMode);
   ensureTxSelectAllBar();
   syncTxStickyHeights();
+  // Re-render so the master checkbox's onchange handler is wired against
+  // the current list. Without this, entering select mode and immediately
+  // hitting Select All does nothing — the handler was never attached.
+  if (txSelectMode && typeof renderTransactions === "function") {
+    renderTransactions();
+  }
   if (!txSelectMode) {
     // On exit, clear any checked rows visually without a full re-render.
     document.querySelectorAll("#tx-table tbody tr.is-checked").forEach(r => r.classList.remove("is-checked"));
