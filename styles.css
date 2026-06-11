@@ -3555,6 +3555,20 @@ select option {
   border-radius: 4px;
   color: var(--muted);
 }
+/* Close button — visible only on mobile (where there's no Esc key
+   and the backdrop isn't reachable behind the fullscreen modal). */
+.gsearch-close {
+  display: none;
+  background: rgba(127,127,127,0.12);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  padding: 6px;
+  line-height: 0;
+}
+.gsearch-close svg { width: 18px; height: 18px; }
+.gsearch-close:hover { background: rgba(127,127,127,0.22); }
 .gsearch-results {
   flex: 1;
   overflow-y: auto;
@@ -3662,6 +3676,10 @@ select option {
   }
   #gsearch-input { font-size: 16px; min-width: 0; } /* 16px prevents iOS zoom */
   .gsearch-foot { display: none; }
+  /* Hide the Esc hint on mobile (no keyboard) and show the tappable
+     close button instead. */
+  .gsearch-kbd { display: none; }
+  .gsearch-close { display: inline-flex; align-items: center; justify-content: center; }
 }
 .sidebar-cloud-dot {
   width: 5px;

@@ -16339,6 +16339,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     open();
   });
   backdrop.addEventListener("click", close);
+  // Tappable close button — required on mobile (no Esc key, backdrop not
+  // reachable behind the fullscreen modal). Hidden on desktop via CSS.
+  document.getElementById("gsearch-close")?.addEventListener("click", close);
 
   // Cmd+K / Ctrl+K from anywhere
   document.addEventListener("keydown", (e) => {
