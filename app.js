@@ -17099,12 +17099,14 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       contentEl.innerHTML = "";
       const tocFrag = document.createDocumentFragment();
       sectionMap = [];
-      sections.forEach((sec, i) => {
+      sections.forEach((origSec, i) => {
         // Skip the document-level TOC (it has class .toc) — our own TOC replaces it.
-        if (sec.classList && sec.classList.contains("toc")) return;
+        if (origSec.classList && origSec.classList.contains("toc")) return;
+        // Import into the current document so the node truly belongs here
+        // (avoids any weirdness from cross-document parented nodes).
+        const sec = document.importNode(origSec, true);
         const h1 = sec.querySelector("h1");
         const title = h1 ? h1.textContent.trim() : `Section ${i + 1}`;
-        // Try to split "N. Title" into number + label.
         const m = title.match(/^(\d+[A-Za-z]?)\.\s*(.+)$/);
         const num   = m ? m[1] : "";
         const label = m ? m[2] : title;
@@ -17132,21 +17134,28 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     }
   }
 
-  // TOC click → scroll to section. preventDefault so the browser doesn't
-  // also jump (default anchor behavior) — we want smooth-scroll + offset.
-  document.getElementById("help-toc")?.addEventListener("click", (e) => {
+  // TOC click → scroll to section. Delegated on document (not on #help-toc)
+  // so we don't depend on the TOC element existing at script-init time
+  // and so the handler survives any future re-render. preventDefault stops
+  // the native instant anchor jump — we want our smooth-scroll instead.
+  document.addEventListener("click", (e) => {
     const link = e.target.closest(".help-toc-entry");
     if (!link) return;
     e.preventDefault();
-    const id = link.dataset.target;
-    const sec = document.getElementById(id);
-    if (sec) {
-      sec.scrollIntoView({ behavior: "smooth", block: "start" });
-      window.scrollBy({ top: -10, behavior: "smooth" });
-      document.querySelectorAll(".help-toc-entry").forEach(el => el.classList.toggle("active", el === link));
-      // Update the URL hash so the entry is shareable / back-button friendly.
-      history.replaceState(null, "", `#${id}`);
+    const id  = link.dataset.target;
+    const sec = id ? document.getElementById(id) : null;
+    if (!sec) {
+      console.warn("Help TOC: target section not found:", id);
+      return;
     }
+    // Mark active first so the user gets immediate visual feedback.
+    document.querySelectorAll(".help-toc-entry").forEach(el => el.classList.toggle("active", el === link));
+    // Smooth-scroll into view. block:"start" puts the section heading at
+    // the top of the viewport, then a small upward nudge so it's not
+    // flush against the very top.
+    sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => window.scrollBy({ top: -16, behavior: "smooth" }), 250);
+    history.replaceState(null, "", `#${id}`);
     if (window.matchMedia("(max-width: 900px)").matches) {
       document.getElementById("help-toc")?.classList.add("collapsed");
     }
