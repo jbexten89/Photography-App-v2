@@ -14892,18 +14892,80 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     }
   }
 
+  // Sort state — defaults: Job No descending. Survives across re-renders.
+  if (typeof window.__njSort === "undefined") {
+    window.__njSort = { col: "jobno", dir: "desc" };
+  }
   function renderNjAnalytics() {
     const tbody = document.querySelector("#nj-analytics-table tbody");
     njAnalyticsPopulateFilters();
     const fYear = $("nj-analytics-year")?.value || "";
     const fCust = $("nj-analytics-customer")?.value || "";
     const fCat  = $("nj-analytics-category")?.value || "";
+    const fSearch = ($("nj-analytics-search")?.value || "").trim().toLowerCase();
     const allJobs = state.jobs || [];
-    const jobs = allJobs.slice()
+    // Pre-compute the metrics each job needs for filtering and sorting so we
+    // don't loop transactions twice.
+    const txs = state.transactions || [];
+    const jobMetrics = new Map();
+    allJobs.forEach(j => {
+      const linked = txs.filter(t => t.jobNo === j.jobNo);
+      const income  = linked.filter(t => t.type === "income").reduce((s, t) => s + (+t.amount || 0), 0);
+      const expense = linked.filter(t => t.type === "expense").reduce((s, t) => s + (+t.amount || 0), 0);
+      jobMetrics.set(j.jobNo, { income, expense, profit: income - expense, linked });
+    });
+    let jobs = allJobs.slice()
       .filter(j => !fYear || (j.date || "").startsWith(fYear))
       .filter(j => !fCust || (j.customer || "").trim() === fCust)
-      .filter(j => !fCat  || (j.category || "").trim() === fCat)
-      .sort((a, b) => (b.jobNo || "").localeCompare(a.jobNo || ""));
+      .filter(j => !fCat  || (j.category || "").trim() === fCat);
+    // Free-text search across job text fields + the job's linked transaction
+    // text (so "Diane" matches jobs that have any Diane-tagged tx).
+    if (fSearch) {
+      const tokens = fSearch.split(/\s+/).filter(Boolean);
+      jobs = jobs.filter(j => {
+        const m = jobMetrics.get(j.jobNo) || { linked: [] };
+        const hayParts = [
+          j.jobNo, j.customer, j.category, j.memo, j.date, j.hours,
+          ...m.linked.flatMap(t => [t.vendor, t.customer, t.payee, t.memo, t.category, t.expenseIncome]),
+        ];
+        const hay = hayParts.filter(Boolean).join(" ").toLowerCase();
+        return tokens.every(tok => hay.includes(tok));
+      });
+    }
+    // Apply sort
+    const sort = window.__njSort || { col: "jobno", dir: "desc" };
+    const dir = sort.dir === "asc" ? 1 : -1;
+    const statusRank = s => {
+      const v = getJobStatus({ status: s }) || s || "";
+      // Open < Shot < Edited < Ordered < Delivered < Invoiced < Paid (alpha-ish but with Paid last)
+      const order = ["", "Open", "Shot", "Edited", "Ordered", "Delivered", "Invoiced", "Paid"];
+      const idx = order.indexOf(v);
+      return idx === -1 ? 99 : idx;
+    };
+    jobs.sort((a, b) => {
+      const ma = jobMetrics.get(a.jobNo) || { income: 0, expense: 0, profit: 0 };
+      const mb = jobMetrics.get(b.jobNo) || { income: 0, expense: 0, profit: 0 };
+      let cmp = 0;
+      switch (sort.col) {
+        case "jobno":    cmp = (a.jobNo || "").localeCompare(b.jobNo || ""); break;
+        case "customer": cmp = (a.customer || "").localeCompare(b.customer || ""); break;
+        case "category": cmp = (a.category || "").localeCompare(b.category || ""); break;
+        case "hours":    cmp = (+a.hours || 0) - (+b.hours || 0); break;
+        case "income":   cmp = ma.income - mb.income; break;
+        case "expense":  cmp = ma.expense - mb.expense; break;
+        case "profit":   cmp = ma.profit - mb.profit; break;
+        case "status":   cmp = statusRank(getJobStatus(a)) - statusRank(getJobStatus(b)); break;
+        default:         cmp = (a.jobNo || "").localeCompare(b.jobNo || "");
+      }
+      return cmp === 0 ? (a.jobNo || "").localeCompare(b.jobNo || "") * -1 : cmp * dir;
+    });
+    // Refresh header sort indicators
+    document.querySelectorAll("#nj-analytics-table thead th.nj-sortable").forEach(th => {
+      const isActive = th.dataset.sort === sort.col;
+      th.classList.toggle("active", isActive);
+      th.classList.toggle("asc",  isActive && sort.dir === "asc");
+      th.classList.toggle("desc", isActive && sort.dir === "desc");
+    });
     const openEl = $("nj-open-count");
     const completeEl = $("nj-complete-count");
     if (openEl) openEl.textContent = jobs.filter(j => getJobStatus(j) !== "Paid").length;
@@ -15701,11 +15763,29 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   ["nj-analytics-year", "nj-analytics-customer", "nj-analytics-category"].forEach(id => {
     document.getElementById(id)?.addEventListener("change", renderNjAnalytics);
   });
+  // Search input — re-render on every keystroke
+  document.getElementById("nj-analytics-search")?.addEventListener("input", renderNjAnalytics);
   document.getElementById("nj-analytics-clear")?.addEventListener("click", () => {
-    ["nj-analytics-year", "nj-analytics-customer", "nj-analytics-category"].forEach(id => {
+    ["nj-analytics-year", "nj-analytics-customer", "nj-analytics-category", "nj-analytics-search"].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = "";
     });
     renderNjAnalytics();
+  });
+  // Sortable column headers — click cycles asc/desc on a column.
+  document.querySelectorAll("#nj-analytics-table thead th.nj-sortable").forEach(th => {
+    th.addEventListener("click", () => {
+      const col = th.dataset.sort;
+      if (!col) return;
+      const cur = window.__njSort || { col: "jobno", dir: "desc" };
+      if (cur.col === col) {
+        window.__njSort = { col, dir: cur.dir === "asc" ? "desc" : "asc" };
+      } else {
+        // Numeric columns default to descending (biggest first); text to ascending
+        const numeric = ["hours", "income", "expense", "profit"].includes(col);
+        window.__njSort = { col, dir: numeric ? "desc" : "asc" };
+      }
+      renderNjAnalytics();
+    });
   });
 
   // Initial render of all new-spec tables
