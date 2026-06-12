@@ -10947,6 +10947,16 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
    `display: inline-flex` rule above wins over the user-agent [hidden] rule. */
 .tx-filter-chart-btn[hidden] { display: none !important; }
 .tx-filter-chart-btn:hover { background: var(--hover); }
+
+/* Make the top-level Filters button on the Transactions toolbar match the
+   adjacent native <select> dropdowns ("All Years", "All Types") in height,
+   padding, and font-size. Scoped so it doesn't change the nested buttons
+   inside the Filters popover. */
+#transactions .toolbar #tx-filter-combined-btn {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 14px;
+}
 .tx-filter-chart-panel {
   position: absolute;
   top: calc(100% + 4px);
