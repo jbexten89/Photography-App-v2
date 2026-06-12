@@ -6336,7 +6336,7 @@ td.recon-cell { text-align: center; }
 #btn-tx-find,
 #btn-tx-find-close { display: none !important; }
 .tx-find-input {
-  width: 280px;
+  width: 340px;
   height: 36px;
   padding: 6px 10px;
   border: 1px solid var(--border);
