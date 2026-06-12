@@ -11319,7 +11319,7 @@ body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highl
 }
 #nj-analytics-table thead th.nj-sortable.asc::after  { content: " \25B2"; opacity: 1; }
 #nj-analytics-table thead th.nj-sortable.desc::after { content: " \25BC"; opacity: 1; }
-.nj-analytics-search-label { display: flex; flex-direction: column; gap: 3px; min-width: 220px; }
+.nj-analytics-search-label { display: flex; flex-direction: column; gap: 3px; min-width: 340px; flex: 0 0 340px; }
 .nj-analytics-search-label input[type="search"] {
   height: 36px;
   padding: 6px 10px;
