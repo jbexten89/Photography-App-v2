@@ -397,7 +397,15 @@ h2 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; }
   flex-direction: column;
   gap: 14px;
   margin-bottom: 18px;
-  position: relative; /* anchor for the absolute Filters panel */
+  /* Sticky so the view pills + filter row stay pinned while the
+     scrollable charts/tables move beneath. Sticky is positioned
+     relatively when not stuck, so the absolute Filters panel still
+     anchors correctly. */
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--bg);
+  padding-top: 8px;
 }
 .analytics-heading h1.analytics-title {
   margin: 0;
