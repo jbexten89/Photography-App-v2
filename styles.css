@@ -10604,41 +10604,20 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 .snapshot-row-actions .btn.danger:hover { background: rgba(192, 57, 43, 0.12); }
 
 /* ===== Help / in-app manual =====
-   Desktop layout: #help becomes a viewport-height flex column. The
-   toolbar (search + Contents + Print) sits pinned at the top, then a
-   two-column grid below holds the TOC and content panes — each of
-   which scrolls INTERNALLY. Page-level scroll is disabled inside the
-   Help tab so the toolbar stays put without needing position:sticky. */
-@media (min-width: 901px) {
-  #help.tab-panel.active {
-    display: flex !important;
-    flex-direction: column;
-    /* Viewport minus the main element's 24px padding on top and bottom. */
-    height: calc(100vh - 48px);
-    min-height: 0;
-  }
-  #help .help-layout {
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-  #help .help-toc {
-    height: 100%;
-    max-height: none;
-    position: static;
-    overflow-y: auto;
-  }
-  #help .help-content {
-    height: 100%;
-    overflow-y: auto;
-  }
-}
+   Desktop: toolbar pinned to the top of the viewport (position: sticky).
+   TOC pinned right below it. Page scrolls normally — the content pane
+   is what moves. Mobile keeps the existing stacked, non-sticky layout. */
 #help .help-toolbar {
   display: flex;
   gap: 8px;
   align-items: center;
   margin-bottom: 12px;
   flex-wrap: wrap;
-  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--bg);
+  padding: 6px 0;
 }
 #help-search {
   flex: 1 1 200px;
@@ -10669,10 +10648,14 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 4px;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
+  /* Pinned below the sticky toolbar. Toolbar measures ~58px (padding +
+     input + gap), plus a small breathing gap = ~70px from the viewport
+     top. max-height ensures the TOC pane scrolls internally if the
+     section list is taller than the remaining viewport. */
   position: sticky;
-  top: 12px;
+  top: 70px;
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
   font-size: 13px;
 }
 /* Two-column grid so the number column stays fixed and the label can
