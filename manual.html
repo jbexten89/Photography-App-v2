@@ -132,7 +132,7 @@
     across devices. No build step, no framework, no installation — open the
     URL and start working.
   </p>
-  <div class="version">Manual rev 2026-06 · App v2</div>
+  <div class="version">Manual rev 2026-06b · App v2</div>
 </div>
 
 <!-- ============== TOC ============== -->
@@ -351,7 +351,7 @@
       </tr>
       <tr>
         <td><code>SAVINGS_CATEGORIES</code></td>
-        <td>Wealthfront, CiT Bank (and any other categories you create that the Savings/Savings Rate views treat as deposits)</td>
+        <td>Wealthfront, CiT Bank, Huntington, Savings — any transaction (income OR expense) tagged with one of these as Category or Expense field is treated as a savings flow. Deposits add to net savings; income-side "pullbacks" subtract.</td>
         <td>Categories representing money you set aside. Excluded from job profit calculations.</td>
       </tr>
       <tr>
@@ -606,9 +606,11 @@
   </ul>
   <p>
     Each cell is editable inline by clicking it; changes persist on blur.
-    The Reconciled column shows a small lock icon — click to cycle through
-    Uncleared → Cleared (gray, partial outline) → Reconciled (filled
-    primary).
+    The Reconciled column shows a circle icon — click to toggle between
+    Uncleared (empty gray outline) and Reconciled (filled green circle
+    with white checkmark). The intermediate "Cleared" state was retired
+    in 2026-06; the model is now two-state. Existing C-tagged
+    transactions were migrated to Uncleared on load.
   </p>
   <p>
     The Job No. column shows a small blue invoice icon next to the job
@@ -632,7 +634,7 @@
     <li><strong>Outflow / Inflow</strong> — mutually exclusive; typing in one clears the other. <code>$0.00</code> is allowed.</li>
     <li><strong>Category</strong> — selectable list refreshes based on the chosen customer (cascade narrowing).</li>
     <li><strong>Payee</strong> — typed value, with autocomplete from <code>state.payees</code> (auto-grown on save).</li>
-    <li><strong>Vendor</strong> — disabled when Inflow has a value.</li>
+    <li><strong>Vendor</strong> — disabled when Inflow has a value, <em>except</em> when the Category (or Expense field) is in <code>SAVINGS_CATEGORIES</code>. Savings pullbacks (income-side savings transfers) can record the source bank in Vendor; the Savings Transactions list reads it back via the Payee column's vendor fallback.</li>
     <li><strong>Expense/Income</strong> — pulls the Expense Table; picking an entry auto-sets Chart of Accounts to that entry's COA. Existing Job + Inflow forces COA = "Sales".</li>
     <li><strong>Chart of Accounts</strong> — select dropdown from <code>chartAccounts</code>.</li>
     <li><strong>Memo / Tags</strong> — free text.</li>
@@ -696,10 +698,11 @@
   </ul>
   <h4>At-a-glance status indicator</h4>
   <p>
-    Every reconciled row gets a thin <strong>green left border</strong>;
-    rows in the intermediate Cleared state get an <strong>amber left
-    border</strong>. Visible whether you swiped to reconcile or used the
-    dot in the recon column.
+    Every reconciled row gets a thin <strong>green left border</strong>.
+    The recon column itself shows a filled green circle with a white
+    checkmark for reconciled rows, or an empty gray outline for
+    uncleared rows. Locked years get an <strong>amber padlock</strong>
+    badge in the date column instead.
   </p>
   <p>
     Direction-locks on the first 10px of horizontal motion, so the two
@@ -1244,7 +1247,7 @@
     <li><strong>Year</strong>: "Savings — YYYY" (same one-year rule as other views).</li>
     <li><strong>Total</strong>: sum of all monthly deposits, green if positive, red if net withdrawal.</li>
     <li><strong>YoY chip</strong>: ▲ or ▼ with % change vs prior year (hidden if prior year was 0).</li>
-    <li><strong>Subtitle</strong>: "Monthly deposits into Wealthfront / CiT Bank".</li>
+    <li><strong>Subtitle</strong>: "Monthly deposits into Savings". Hover for the full list of categories counted (Wealthfront · CiT Bank · Huntington · Savings).</li>
     <li><strong>Goal bar</strong>: progress toward <code>state.savingsGoal</code>. Caption shows "$X of $goal · $Y to go" or "Goal met · $X over". Hidden if no goal set.</li>
   </ul>
 
@@ -1697,6 +1700,43 @@
   <p>
     Opens this document (<code>manual.html</code>) in a new tab.
   </p>
+
+  <h3>24.X Snapshot History <span class="muted" style="font-size:10pt; font-weight:400;">(new · 2026-06)</span></h3>
+  <p>
+    Cloud-stored copies of your entire data state, restorable at any
+    time. Designed as a safety net for "I imported wrong" / "I deleted
+    the wrong year" / "something looks off after that bulk edit"
+    scenarios.
+  </p>
+  <p>How snapshots get taken:</p>
+  <ul>
+    <li><strong>Auto</strong> — fired after each successful cloud sync push, throttled to one per hour. Tagged with source = <code>auto</code>.</li>
+    <li><strong>Manual</strong> — the "Snapshot Now" button in this panel. Ignores the throttle. Tagged <code>manual</code>.</li>
+    <li><strong>Pre-Restore</strong> — automatically taken right before any restore replaces current state. Always gives you one snapshot back to where you were. Tagged <code>pre-restore</code>.</li>
+  </ul>
+  <p>
+    Retention: up to 30 snapshots per user; the client prunes anything
+    older after each insert. Storage cost ≈ 21MB at the cap.
+  </p>
+  <p>Restore flow:</p>
+  <ol>
+    <li>Click <strong>Restore</strong> on any snapshot row.</li>
+    <li>Confirm — the app auto-takes a Pre-Restore snapshot of current state first.</li>
+    <li>The target snapshot's state replaces current state and persists to local + cloud.</li>
+    <li>The app re-renders the dashboard and transactions list so the restored data is immediately visible.</li>
+  </ol>
+  <p>
+    The panel auto-loads the list when the Settings tab opens. Each row
+    shows a color-coded source pill (blue auto / green manual / amber
+    pre-restore), the relative time ("Today 9:04 PM" or full date), and
+    Restore / Delete buttons. Full timestamp is on hover.
+  </p>
+  <div class="tip">
+    <strong>Storage:</strong> snapshots live in the Supabase table
+    <code>app_state_snapshots_v2</code>. The schema is in
+    <code>supabase-setup.sql</code> at the project root — needs to be
+    run once via the Supabase SQL Editor before the feature works.
+  </div>
 </section>
 
 <!-- ============== 25. LOCKED YEARS ============== -->
@@ -1803,7 +1843,7 @@
   <h3>27.2 Swipe gestures</h3>
   <ul>
     <li><strong>Swipe left</strong> on a transaction row (mobile, 3-line layout) → reveals Edit / Delete buttons.</li>
-    <li><strong>Swipe right</strong> on a transaction row → toggle Reconciled. Progressive green tint as you drag; release past the 80px threshold to commit; ✓ pulse confirms. Reconciled rows keep a green left-border; Cleared rows an amber left-border. (New · 2026-06 — full details in §7.9.)</li>
+    <li><strong>Swipe right</strong> on a transaction row → toggle Reconciled. Progressive green tint as you drag; release past the 80px threshold to commit; ✓ pulse confirms. Reconciled rows keep a green left-border. The recon column itself shows a green check-circle when reconciled, empty outline when not. Two-state model (Cleared retired 2026-06). Full details in §7.9.</li>
     <li><strong>Swipe left</strong> on a mileage trip row → reveals Edit / Delete.</li>
     <li><strong>Swipe left</strong> on a job row (mobile, 3-line layout) → reveals Edit / Delete.</li>
     <li><strong>Pinch</strong> two fingers on the Breakdown Sankey → zoom 0.5×–4× anchored to pinch midpoint.</li>
