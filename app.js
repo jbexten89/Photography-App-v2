@@ -7071,6 +7071,8 @@ function showReport(which) {
   if (scEl) scEl.hidden = which !== "sc";
   const yeEl = document.getElementById("ye-report-container");
   if (yeEl) yeEl.hidden = which !== "ye";
+  const ltEl = document.getElementById("lt-report-container");
+  if (ltEl) ltEl.hidden = which !== "lt";
 
   document.querySelectorAll(".report-picker-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.report === which);
@@ -7093,6 +7095,10 @@ function showReport(which) {
   if (which === "ye") {
     if (typeof populateYearEndYearPicker === "function") populateYearEndYearPicker();
     if (typeof renderYearEndReport === "function") renderYearEndReport();
+    return;
+  }
+  if (which === "lt") {
+    if (typeof renderLifetimeReport === "function") renderLifetimeReport();
     return;
   }
 
@@ -8237,6 +8243,7 @@ document.getElementById("rmvp-print-btn")?.addEventListener("click", () => {
     "hgb-report-container",
     "sc-report-container",
     "ye-report-container",
+    "lt-report-container",
   ];
   for (const id of containers) {
     const el = document.getElementById(id);
@@ -16219,6 +16226,318 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   // Expose
   window.populateYearEndYearPicker = populateYearEndYearPicker;
   window.renderYearEndReport = renderYearEndReport;
+
+  // ============================================================
+  // Lifetime Summary report
+  //   - Two pages, landscape orientation.
+  //   - Tile row + mini-stats + Net-by-Year bars + Year-by-Year table.
+  //   - Lifetime breakdowns: Top customers, Income by Category, CoGS by
+  //     Category, Other Expenses by Category.
+  //   - Same CoGS detection logic as Year-End (chartAccount-first).
+  // ============================================================
+  function renderLifetimeReport() {
+    const txs   = state.transactions || [];
+    const jobs  = state.jobs         || [];
+    const trips = state.trips        || [];
+
+    // Job customer lookup for customer aggregation via jobNo
+    const jobCustomerOf = new Map(jobs.map(j => [j.jobNo, (j.customer || "").trim()]));
+
+    // Per-year aggregates
+    const yearly = new Map(); // year -> { gross, jobExp, cogs, other, savIn, savOut, jobs:Set }
+    const ensureYear = y => {
+      if (!yearly.has(y)) yearly.set(y, {
+        gross: 0, jobExp: 0, cogs: 0, other: 0,
+        savIn: 0, savOut: 0, jobs: new Set(),
+      });
+      return yearly.get(y);
+    };
+    // Lifetime breakdowns
+    const incomeByCat   = new Map();           // { gross, jobs:Set }
+    const cogsByCat     = new Map();           // { count, sum }
+    const otherByCat    = new Map();           // sum
+    const customerAgg   = new Map();           // { gross, costs, jobs:Set }
+
+    let totalGross=0, totalJobExp=0, totalCogs=0, totalOther=0, totalSavIn=0, totalSavOut=0;
+
+    // Jobs → year + customer index
+    jobs.forEach(j => {
+      const y    = (j.date || "").slice(0, 4);
+      const cust = (j.customer || "").trim();
+      const cat  = (j.category || "Uncategorized").trim();
+      if (/^\d{4}$/.test(y)) ensureYear(y).jobs.add(j.jobNo);
+      if (cust) {
+        if (!customerAgg.has(cust)) customerAgg.set(cust, { gross: 0, costs: 0, jobs: new Set() });
+        customerAgg.get(cust).jobs.add(j.jobNo);
+      }
+      if (cat) {
+        if (!incomeByCat.has(cat)) incomeByCat.set(cat, { gross: 0, jobs: new Set() });
+        incomeByCat.get(cat).jobs.add(j.jobNo);
+      }
+    });
+
+    txs.forEach(t => {
+      const cat = (t.category || "Uncategorized").trim();
+      const amt = +t.amount || 0;
+      const y   = (t.date || "").slice(0, 4);
+      if (!/^\d{4}$/.test(y)) return;
+      if (NON_JOB_CATEGORIES.includes(cat)) return;
+      const yAgg = ensureYear(y);
+
+      const ei  = (t.expenseIncome || "").trim();
+      const isSavings = SAVINGS_CATEGORIES.includes(cat) || SAVINGS_CATEGORIES.includes(ei);
+
+      if (t.type === "income") {
+        if (isSavings) {
+          yAgg.savIn += amt;
+          totalSavIn += amt;
+          return;
+        }
+        yAgg.gross += amt;
+        totalGross += amt;
+        // Income category breakdown
+        if (!incomeByCat.has(cat)) incomeByCat.set(cat, { gross: 0, jobs: new Set() });
+        incomeByCat.get(cat).gross += amt;
+        // Customer attribution
+        const directCust = (t.customer || "").trim();
+        const viaJobCust = t.jobNo ? (jobCustomerOf.get(t.jobNo) || "") : "";
+        const custKey = directCust || viaJobCust;
+        if (custKey) {
+          if (!customerAgg.has(custKey)) customerAgg.set(custKey, { gross: 0, costs: 0, jobs: new Set() });
+          customerAgg.get(custKey).gross += amt;
+        }
+      } else {
+        if (isSavings) {
+          yAgg.savOut += amt;
+          totalSavOut += amt;
+          return;
+        }
+        // CoGS detection: Chart Account first, category fallback
+        const ca = (t.chartAccount || "").trim();
+        const isCogs =
+          /^cogs$/i.test(ca) || /cost of goods/i.test(ca) ||
+          /^cogs$/i.test(cat) || /cost of goods/i.test(cat);
+        if (isCogs) {
+          yAgg.cogs += amt;
+          totalCogs += amt;
+          const c = cogsByCat.get(cat) || { count: 0, sum: 0 };
+          c.count++; c.sum += amt;
+          cogsByCat.set(cat, c);
+        } else if (JOB_ORDER.includes(cat)) {
+          yAgg.jobExp += amt;
+          totalJobExp += amt;
+          // Job-tagged expense → contributes to that customer's direct costs
+          if (t.jobNo && jobCustomerOf.has(t.jobNo)) {
+            const custKey = jobCustomerOf.get(t.jobNo);
+            if (custKey) {
+              if (!customerAgg.has(custKey)) customerAgg.set(custKey, { gross: 0, costs: 0, jobs: new Set() });
+              customerAgg.get(custKey).costs += amt;
+            }
+          }
+        } else {
+          yAgg.other += amt;
+          totalOther += amt;
+          otherByCat.set(cat, (otherByCat.get(cat) || 0) + amt);
+        }
+      }
+    });
+
+    const totalExp     = totalJobExp + totalCogs + totalOther;
+    const totalNet     = totalGross - totalExp;
+    const totalSavings = totalSavOut - totalSavIn;
+    const profitBase   = totalGross - totalJobExp - totalCogs;
+    const lifetimeSRate= profitBase > 0 ? (totalSavings / profitBase) * 100 : 0;
+
+    const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+
+    // ---- Header / Range ----
+    const sortedYears = [...yearly.keys()].sort();
+    const rangeEl = document.getElementById("lt-report-range");
+    if (rangeEl) {
+      rangeEl.textContent = sortedYears.length
+        ? `Calendar Years ${sortedYears[0]}–${sortedYears[sortedYears.length - 1]}`
+        : "No data yet";
+    }
+
+    // ---- Tile row ----
+    setText("lt-tile-gross",   fmtMoney(totalGross));
+    setText("lt-tile-jobexp",  fmtMoney(totalJobExp));
+    setText("lt-tile-cogs",    fmtMoney(totalCogs));
+    setText("lt-tile-totexp",  fmtMoney(totalExp));
+    const netEl = document.getElementById("lt-tile-net");
+    if (netEl) {
+      netEl.textContent = fmtMoney(totalNet);
+      netEl.style.color = totalNet >= 0 ? "var(--income)" : "var(--expense)";
+    }
+    setText("lt-tile-savings", fmtMoney(totalSavings));
+    setText("lt-tile-srate",   profitBase > 0 ? `${lifetimeSRate.toFixed(1)}%` : "—");
+
+    // ---- Mini-stats ----
+    const totalMiles = trips.reduce((s, tr) => s + (+tr.miles || 0), 0);
+    const lifetimeJobsCount = [...yearly.values()].reduce((s, y) => s + y.jobs.size, 0);
+    setText("lt-stat-years", String(sortedYears.length));
+    setText("lt-stat-jobs",  String(lifetimeJobsCount));
+    setText("lt-stat-txs",   String(txs.length));
+    setText("lt-stat-miles", totalMiles.toFixed(0));
+
+    // ---- Net Profit by Year bars ----
+    const barsEl = document.getElementById("lt-net-bars");
+    if (barsEl) {
+      const yearsDesc = sortedYears.slice().reverse(); // newest first
+      if (!yearsDesc.length) {
+        barsEl.innerHTML = `<div class="muted" style="grid-column:1/-1;text-align:center;padding:12px">No data yet.</div>`;
+      } else {
+        const netPerYear = yearsDesc.map(y => {
+          const a = yearly.get(y);
+          return { y, net: a.gross - a.jobExp - a.cogs - a.other };
+        });
+        const maxAbs = Math.max(1, ...netPerYear.map(d => Math.abs(d.net)));
+        barsEl.innerHTML = netPerYear.map(d => {
+          const pct = (Math.abs(d.net) / maxAbs) * 100;
+          const sign = d.net >= 0 ? "pos" : "neg";
+          return `
+            <div class="lt-bar-year">${escapeHtml(d.y)}</div>
+            <div class="lt-bar-track"><div class="lt-bar-fill ${sign}" style="width:${pct.toFixed(1)}%"></div></div>
+            <div class="lt-bar-amt ${sign}">${fmtMoney(d.net)}</div>
+          `;
+        }).join("");
+      }
+    }
+
+    // ---- Year-by-year table ----
+    const yearBody = document.getElementById("lt-yearly-body");
+    if (yearBody) {
+      const yearsDesc = sortedYears.slice().reverse();
+      yearBody.innerHTML = yearsDesc.map(y => {
+        const a    = yearly.get(y);
+        const net  = a.gross - a.jobExp - a.cogs - a.other;
+        const sav  = a.savOut - a.savIn;
+        const base = a.gross - a.jobExp - a.cogs;
+        const sr   = base > 0 ? (sav / base) * 100 : null;
+        return `
+          <tr>
+            <td><strong>${escapeHtml(y)}</strong></td>
+            <td class="num">${a.jobs.size}</td>
+            <td class="num income">${fmtMoney(a.gross)}</td>
+            <td class="num expense">${fmtMoney(a.jobExp)}</td>
+            <td class="num expense">${fmtMoney(a.cogs)}</td>
+            <td class="num expense">${fmtMoney(a.other)}</td>
+            <td class="num ${net >= 0 ? "income" : "expense"}"><strong>${fmtMoney(net)}</strong></td>
+            <td class="num">${fmtMoney(sav)}</td>
+            <td class="num">${sr == null ? "—" : sr.toFixed(1) + "%"}</td>
+          </tr>`;
+      }).join("");
+    }
+    setText("lt-yearly-jobs",   String(lifetimeJobsCount));
+    setText("lt-yearly-gross",  fmtMoney(totalGross));
+    setText("lt-yearly-jobexp", fmtMoney(totalJobExp));
+    setText("lt-yearly-cogs",   fmtMoney(totalCogs));
+    setText("lt-yearly-other",  fmtMoney(totalOther));
+    setText("lt-yearly-net",    fmtMoney(totalNet));
+    setText("lt-yearly-savings", fmtMoney(totalSavings));
+    setText("lt-yearly-srate",  profitBase > 0 ? `${lifetimeSRate.toFixed(1)}%` : "—");
+
+    // ---- Top 10 customers ----
+    const custRows = [...customerAgg.entries()]
+      .map(([name, v]) => ({
+        name, gross: v.gross, costs: v.costs,
+        net: v.gross - v.costs, jobs: v.jobs.size,
+      }))
+      .filter(r => r.gross !== 0 || r.costs !== 0 || r.jobs > 0)
+      .sort((a, b) => b.net - a.net)
+      .slice(0, 10);
+    const custBody = document.getElementById("lt-customers-body");
+    if (custBody) {
+      custBody.innerHTML = custRows.length
+        ? custRows.map(r => `
+            <tr>
+              <td>${escapeHtml(r.name)}</td>
+              <td class="num">${r.jobs}</td>
+              <td class="num income">${fmtMoney(r.gross)}</td>
+              <td class="num expense">${fmtMoney(r.costs)}</td>
+              <td class="num ${r.net >= 0 ? "income" : "expense"}"><strong>${fmtMoney(r.net)}</strong></td>
+            </tr>`).join("")
+        : `<tr><td colspan="5" class="muted" style="text-align:center;padding:8px">No customers yet.</td></tr>`;
+    }
+
+    // ---- Income by Job Category ----
+    const incomeRows = [...incomeByCat.entries()]
+      .map(([cat, v]) => ({ cat, gross: v.gross, jobs: v.jobs.size }))
+      .filter(r => r.gross > 0 || r.jobs > 0)
+      .sort((a, b) => b.gross - a.gross);
+    const incBody = document.getElementById("lt-income-cat-body");
+    if (incBody) {
+      incBody.innerHTML = incomeRows.length
+        ? incomeRows.map(r => {
+            const pct = totalGross > 0 ? (r.gross / totalGross) * 100 : 0;
+            return `
+              <tr>
+                <td>${escapeHtml(r.cat)}</td>
+                <td class="num">${r.jobs}</td>
+                <td class="num income">${fmtMoney(r.gross)}</td>
+                <td class="num">${pct.toFixed(1)}%</td>
+              </tr>`;
+          }).join("")
+        : `<tr><td colspan="4" class="muted" style="text-align:center;padding:8px">No income categories yet.</td></tr>`;
+    }
+
+    // ---- CoGS by category ----
+    const cogsRows = [...cogsByCat.entries()].sort((a, b) => b[1].sum - a[1].sum);
+    const cogsBody = document.getElementById("lt-cogs-cat-body");
+    if (cogsBody) {
+      cogsBody.innerHTML = cogsRows.length
+        ? cogsRows.map(([cat, v]) => {
+            const pct = totalCogs > 0 ? (v.sum / totalCogs) * 100 : 0;
+            return `
+              <tr>
+                <td>${escapeHtml(cat)}</td>
+                <td class="num">${v.count}</td>
+                <td class="num expense">${fmtMoney(v.sum)}</td>
+                <td class="num">${pct.toFixed(1)}%</td>
+              </tr>`;
+          }).join("")
+        : `<tr><td colspan="4" class="muted" style="text-align:center;padding:8px">No CoGS yet.</td></tr>`;
+    }
+
+    // ---- Other Expenses by category ----
+    const otherRows = [...otherByCat.entries()].sort((a, b) => b[1] - a[1]);
+    const otherBody = document.getElementById("lt-other-cat-body");
+    if (otherBody) {
+      otherBody.innerHTML = otherRows.length
+        ? otherRows.map(([cat, sum]) => {
+            const pct = totalOther > 0 ? (sum / totalOther) * 100 : 0;
+            return `
+              <tr>
+                <td>${escapeHtml(cat)}</td>
+                <td class="num expense">${fmtMoney(sum)}</td>
+                <td class="num">${pct.toFixed(1)}%</td>
+              </tr>`;
+          }).join("")
+        : `<tr><td colspan="3" class="muted" style="text-align:center;padding:8px">No other expenses yet.</td></tr>`;
+    }
+
+    // ---- Generated stamp ----
+    const stampEl = document.getElementById("lt-report-genstamp");
+    if (stampEl) {
+      const now = new Date();
+      stampEl.textContent = `Generated ${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})}`;
+    }
+  }
+
+  // Wire print — toggles body.printing-lt so the @page landscape rule applies
+  // only when THIS report is being printed (other reports stay portrait).
+  document.getElementById("btn-lt-report-print")?.addEventListener("click", () => {
+    document.body.classList.add("printing-lt");
+    const cleanup = () => {
+      document.body.classList.remove("printing-lt");
+      window.removeEventListener("afterprint", cleanup);
+    };
+    window.addEventListener("afterprint", cleanup);
+    window.print();
+  });
+
+  // Expose
+  window.renderLifetimeReport = renderLifetimeReport;
 
   // Expose for debugging
   window.__nj = { state, renderNjJobsTable, renderNjCcTable, renderNjExTable, renderNjAnalytics, lowestAvailableJobNo };

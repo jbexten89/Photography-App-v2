@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=587" />
+<link rel="stylesheet" href="styles.css?v=588" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1297,6 +1297,7 @@
         <button type="button" class="report-picker-btn" data-report="pl">Profit &amp; Loss</button>
         <button type="button" class="report-picker-btn" data-report="sc">Schedule C</button>
         <button type="button" class="report-picker-btn" data-report="ye">Year-End Summary</button>
+        <button type="button" class="report-picker-btn" data-report="lt">Lifetime Summary</button>
       </div>
       <!-- Mobile pull-down (richer than native <select>, same look as Analytics amvp) -->
       <div class="rmvp-row no-print">
@@ -1318,6 +1319,7 @@
             <button type="button" class="amvp-item"        data-report="pl"      role="option"><span>Profit &amp; Loss</span></button>
             <button type="button" class="amvp-item"        data-report="sc"      role="option"><span>Schedule C</span></button>
             <button type="button" class="amvp-item"        data-report="ye"      role="option"><span>Year-End Summary</span></button>
+            <button type="button" class="amvp-item"        data-report="lt"      role="option"><span>Lifetime Summary</span></button>
           </div>
         </div>
         <button type="button" id="rmvp-print-btn" class="btn">Print / PDF</button>
@@ -2185,6 +2187,141 @@
             <div>www.jbextenphotography.com</div>
           </div>
           <div class="muted ye-footer-note" id="ye-report-genstamp"></div>
+        </div>
+      </div>
+
+      <!-- LIFETIME SUMMARY REPORT (landscape, 2 pages) -->
+      <div id="lt-report-container" hidden>
+        <div class="toolbar no-print">
+          <span style="flex:1"></span>
+          <button id="btn-lt-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
+        </div>
+        <div class="invoice-sheet lt-report-sheet" id="lt-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Lifetime Summary</div>
+              <div class="tax-report-range" id="lt-report-range">—</div>
+              <div class="muted" style="font-size:11px;margin-top:4px">Lifetime retrospective — every year of bookkeeping at a glance.</div>
+            </div>
+          </div>
+
+          <!-- PAGE 1: At a glance -->
+          <div class="lt-tile-row">
+            <div class="lt-tile"><div class="lt-tile-label">Gross Income</div><div class="lt-tile-value income" id="lt-tile-gross">$0.00</div></div>
+            <div class="lt-tile"><div class="lt-tile-label">Job Expenses</div><div class="lt-tile-value expense" id="lt-tile-jobexp">$0.00</div></div>
+            <div class="lt-tile"><div class="lt-tile-label">CoGS</div><div class="lt-tile-value expense" id="lt-tile-cogs">$0.00</div></div>
+            <div class="lt-tile"><div class="lt-tile-label">Total Expenses</div><div class="lt-tile-value expense" id="lt-tile-totexp">$0.00</div></div>
+            <div class="lt-tile primary"><div class="lt-tile-label">Net Profit</div><div class="lt-tile-value" id="lt-tile-net">$0.00</div></div>
+            <div class="lt-tile"><div class="lt-tile-label">Total Savings</div><div class="lt-tile-value income" id="lt-tile-savings">$0.00</div></div>
+            <div class="lt-tile"><div class="lt-tile-label">Lifetime Savings Rate</div><div class="lt-tile-value" id="lt-tile-srate">0.0%</div></div>
+          </div>
+
+          <div class="lt-mini-stats">
+            <span><strong id="lt-stat-years">0</strong> years in business</span>
+            <span class="lt-stat-sep">·</span>
+            <span><strong id="lt-stat-jobs">0</strong> jobs logged</span>
+            <span class="lt-stat-sep">·</span>
+            <span><strong id="lt-stat-txs">0</strong> transactions</span>
+            <span class="lt-stat-sep">·</span>
+            <span><strong id="lt-stat-miles">0</strong> miles driven</span>
+          </div>
+
+          <!-- Net Profit by Year horizontal bars -->
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Net Profit by Year</h3>
+            <div class="lt-bars" id="lt-net-bars"></div>
+          </div>
+
+          <!-- Year-by-year table -->
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Year-by-Year</h3>
+            <table class="tax-report-table lt-yearly-table">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th class="num">Jobs</th>
+                  <th class="num">Gross</th>
+                  <th class="num">Job Exp</th>
+                  <th class="num">CoGS</th>
+                  <th class="num">Other Exp</th>
+                  <th class="num">Net</th>
+                  <th class="num">Savings</th>
+                  <th class="num">Sav Rate</th>
+                </tr>
+              </thead>
+              <tbody id="lt-yearly-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td class="num" id="lt-yearly-jobs"><strong>0</strong></td>
+                  <td class="num" id="lt-yearly-gross"><strong>$0.00</strong></td>
+                  <td class="num" id="lt-yearly-jobexp"><strong>$0.00</strong></td>
+                  <td class="num" id="lt-yearly-cogs"><strong>$0.00</strong></td>
+                  <td class="num" id="lt-yearly-other"><strong>$0.00</strong></td>
+                  <td class="num" id="lt-yearly-net"><strong>$0.00</strong></td>
+                  <td class="num" id="lt-yearly-savings"><strong>$0.00</strong></td>
+                  <td class="num" id="lt-yearly-srate"><strong>—</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Page break before lifetime breakdowns -->
+          <div class="lt-page-break"></div>
+
+          <!-- PAGE 2: Lifetime breakdowns -->
+          <h2 class="lt-page-heading">Lifetime Breakdowns</h2>
+          <div class="lt-grid-2">
+            <div class="tax-report-section">
+              <h3 class="tax-report-section-title">Top 10 Customers by Lifetime Net</h3>
+              <table class="tax-report-table">
+                <thead><tr><th>Customer</th><th class="num">Jobs</th><th class="num">Gross</th><th class="num">Direct Costs</th><th class="num">Net</th></tr></thead>
+                <tbody id="lt-customers-body"></tbody>
+              </table>
+            </div>
+
+            <div class="tax-report-section">
+              <h3 class="tax-report-section-title">Income by Job Category</h3>
+              <table class="tax-report-table">
+                <thead><tr><th>Category</th><th class="num">Jobs</th><th class="num">Gross</th><th class="num">% of Lifetime</th></tr></thead>
+                <tbody id="lt-income-cat-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="lt-grid-2">
+            <div class="tax-report-section">
+              <h3 class="tax-report-section-title">CoGS by Category</h3>
+              <table class="tax-report-table">
+                <thead><tr><th>Category</th><th class="num">Transactions</th><th class="num">Total</th><th class="num">% of CoGS</th></tr></thead>
+                <tbody id="lt-cogs-cat-body"></tbody>
+              </table>
+            </div>
+
+            <div class="tax-report-section">
+              <h3 class="tax-report-section-title">Other Expenses by Category</h3>
+              <table class="tax-report-table">
+                <thead><tr><th>Category</th><th class="num">Total</th><th class="num">% of Other</th></tr></thead>
+                <tbody id="lt-other-cat-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
+          <div class="muted ye-footer-note" id="lt-report-genstamp"></div>
         </div>
       </div>
     </section>
@@ -3221,6 +3358,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=344"></script>
+  <script src="app.js?v=345"></script>
 </body>
 </html>

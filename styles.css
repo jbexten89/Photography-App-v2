@@ -5361,6 +5361,132 @@ select option {
 #mileage-report-sheet.hide-expense .tax-report-detail th:last-child,
 #mileage-report-sheet.hide-expense .tax-report-detail td:last-child { display: none; }
 
+/* ============================================================
+   LIFETIME SUMMARY REPORT (landscape, 2 pages)
+   ============================================================ */
+.lt-report-sheet .lt-tile-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin: 16px 0 12px;
+}
+.lt-report-sheet .lt-tile {
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff;
+}
+.lt-report-sheet .lt-tile.primary {
+  background: rgba(44, 110, 203, 0.06);
+  border-color: rgba(44, 110, 203, 0.4);
+}
+.lt-report-sheet .lt-tile-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  font-weight: 700;
+  margin-bottom: 4px;
+  line-height: 1.25;
+  min-height: calc(9px * 1.25 * 2);
+  display: block;
+}
+.lt-report-sheet .lt-tile-value {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #1f2937;
+  line-height: 1.1;
+}
+.lt-report-sheet .lt-tile-value.income  { color: var(--income); }
+.lt-report-sheet .lt-tile-value.expense { color: var(--expense); }
+.lt-report-sheet .lt-tile.primary .lt-tile-value { color: var(--primary); }
+
+.lt-report-sheet .lt-mini-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: #6b7280;
+  margin: 0 0 16px;
+}
+.lt-report-sheet .lt-mini-stats strong { color: #1f2937; font-weight: 700; }
+.lt-report-sheet .lt-mini-stats .lt-stat-sep { color: #d1d5db; }
+
+/* Net Profit by Year horizontal bars */
+.lt-report-sheet .lt-bars {
+  display: grid;
+  grid-template-columns: 64px 1fr 96px;
+  gap: 6px 10px;
+  font-size: 11px;
+  align-items: center;
+}
+.lt-report-sheet .lt-bar-year   { font-weight: 700; font-variant-numeric: tabular-nums; }
+.lt-report-sheet .lt-bar-track  { position: relative; height: 14px; background: #f3f4f6; border-radius: 3px; overflow: hidden; }
+.lt-report-sheet .lt-bar-fill   { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
+.lt-report-sheet .lt-bar-fill.pos { background: var(--income); }
+.lt-report-sheet .lt-bar-fill.neg { background: var(--expense); }
+.lt-report-sheet .lt-bar-amt    { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.lt-report-sheet .lt-bar-amt.pos { color: var(--income); }
+.lt-report-sheet .lt-bar-amt.neg { color: var(--expense); }
+
+/* Year-by-year table */
+.lt-report-sheet .lt-yearly-table { font-size: 10.5px; }
+.lt-report-sheet .lt-yearly-table th,
+.lt-report-sheet .lt-yearly-table td { padding: 3px 8px; }
+
+.lt-report-sheet .lt-page-break {
+  page-break-before: always;
+  height: 0;
+  margin: 16px 0 0;
+}
+.lt-report-sheet .lt-page-heading {
+  font-size: 16px;
+  margin: 16px 0 8px;
+  color: var(--primary);
+}
+.lt-report-sheet .lt-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 4px;
+}
+.lt-report-sheet .lt-grid-2 .tax-report-section { margin-bottom: 8px; }
+.lt-report-sheet .tax-report-table { font-size: 11px; }
+.lt-report-sheet .tax-report-table th,
+.lt-report-sheet .tax-report-table td { padding: 4px 8px; }
+.lt-report-sheet .tax-report-table th.num,
+.lt-report-sheet .tax-report-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.lt-report-sheet .tax-report-table td.income  { color: var(--income); }
+.lt-report-sheet .tax-report-table td.expense { color: var(--expense); }
+
+/* Inverted-mode parity with Year-End */
+body.reports-inverted .invoice-sheet .lt-tile,
+body.reports-inverted .invoice-sheet .lt-tile.primary {
+  background: #e0dbd4 !important;
+  border-color: #4a4a4a !important;
+}
+body.reports-inverted .invoice-sheet .lt-tile.primary {
+  border-color: rgba(211, 145, 52, 0.55) !important;
+}
+body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
+
+/* Print rules — LANDSCAPE for the lifetime report only */
+@media print {
+  body.printing-lt @page { size: letter landscape; }
+  .lt-report-sheet .lt-tile-value { font-size: 13px; }
+  .lt-report-sheet .lt-tile-label { font-size: 8px; }
+  .lt-report-sheet .lt-yearly-table { font-size: 9.5px; }
+}
+@media (max-width: 768px) {
+  .lt-report-sheet .lt-tile-row { grid-template-columns: repeat(2, 1fr); }
+  .lt-report-sheet .lt-grid-2 { grid-template-columns: 1fr; gap: 12px; }
+  .lt-report-sheet .lt-bars { grid-template-columns: 48px 1fr 72px; font-size: 10px; }
+  .lt-report-sheet .lt-yearly-table { font-size: 9px; }
+  .lt-report-sheet .lt-yearly-table th,
+  .lt-report-sheet .lt-yearly-table td { padding: 3px 4px; }
+}
+
 /* Inline checkbox-pill used in the Mileage Report toolbar */
 .check-pill {
   display: inline-flex;
