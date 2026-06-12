@@ -10603,13 +10603,42 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 }
 .snapshot-row-actions .btn.danger:hover { background: rgba(192, 57, 43, 0.12); }
 
-/* ===== Help / in-app manual ===== */
+/* ===== Help / in-app manual =====
+   Desktop layout: #help becomes a viewport-height flex column. The
+   toolbar (search + Contents + Print) sits pinned at the top, then a
+   two-column grid below holds the TOC and content panes — each of
+   which scrolls INTERNALLY. Page-level scroll is disabled inside the
+   Help tab so the toolbar stays put without needing position:sticky. */
+@media (min-width: 901px) {
+  #help.tab-panel.active {
+    display: flex !important;
+    flex-direction: column;
+    /* Viewport minus the main element's 24px padding on top and bottom. */
+    height: calc(100vh - 48px);
+    min-height: 0;
+  }
+  #help .help-layout {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  #help .help-toc {
+    height: 100%;
+    max-height: none;
+    position: static;
+    overflow-y: auto;
+  }
+  #help .help-content {
+    height: 100%;
+    overflow-y: auto;
+  }
+}
 #help .help-toolbar {
   display: flex;
   gap: 8px;
   align-items: center;
   margin-bottom: 12px;
   flex-wrap: wrap;
+  flex: 0 0 auto;
 }
 #help-search {
   flex: 1 1 200px;
