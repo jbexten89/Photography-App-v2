@@ -17061,3 +17061,111 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   // Expose
   window.openGlobalSearch = open;
 })();
+
+// ============================================================
+// HELP TAB — in-app manual
+// Fetches manual.html on first activation, parses it, extracts the
+// section content, builds a TOC, and renders it themed to match
+// the app. Single source of truth: manual.html. Print version is
+// still available via the "Print version" link in the toolbar.
+// ============================================================
+(function setupHelpTab() {
+  const tabBtns = document.querySelectorAll('.tab-btn[data-tab="help"]');
+  if (!tabBtns.length) return;
+  let loaded = false;
+  let loading = false;
+  let sectionMap = []; // { id, title, num, sectionEl }
+
+  async function loadManual() {
+    if (loaded || loading) return;
+    loading = true;
+    const tocEl     = document.getElementById("help-toc");
+    const contentEl = document.getElementById("help-content");
+    if (!tocEl || !contentEl) { loading = false; return; }
+    try {
+      const res = await fetch("manual.html?v=" + Date.now(), { cache: "no-cache" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const html = await res.text();
+      // Parse the manual's full document and pull out body sections.
+      const parser = new DOMParser();
+      const doc    = parser.parseFromString(html, "text/html");
+      // The manual's body contains: print-banner, title-page, .toc, then
+      // <section> blocks (one per numbered chapter). We want just the
+      // sections. Title page + manual TOC + print banner are hidden via CSS.
+      const sections = Array.from(doc.body.querySelectorAll("section"));
+      if (!sections.length) throw new Error("No sections found in manual.");
+
+      // Build content and TOC
+      contentEl.innerHTML = "";
+      const tocFrag = document.createDocumentFragment();
+      sectionMap = [];
+      sections.forEach((sec, i) => {
+        // Skip the document-level TOC (it has class .toc) — our own TOC replaces it.
+        if (sec.classList && sec.classList.contains("toc")) return;
+        const h1 = sec.querySelector("h1");
+        const title = h1 ? h1.textContent.trim() : `Section ${i + 1}`;
+        // Try to split "N. Title" into number + label.
+        const m = title.match(/^(\d+[A-Za-z]?)\.\s*(.+)$/);
+        const num   = m ? m[1] : "";
+        const label = m ? m[2] : title;
+        const id = "help-sec-" + (num || i);
+        sec.id = id;
+        contentEl.appendChild(sec);
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "help-toc-entry";
+        btn.dataset.target = id;
+        btn.innerHTML = `<span class="help-toc-num">${escapeHtml(num)}</span>${escapeHtml(label)}`;
+        tocFrag.appendChild(btn);
+        sectionMap.push({ id, title: label, num, sectionEl: sec, tocBtn: btn });
+      });
+      tocEl.innerHTML = "";
+      tocEl.appendChild(tocFrag);
+      loaded = true;
+    } catch (e) {
+      console.warn("Help manual load failed:", e);
+      if (contentEl) contentEl.innerHTML = `<p class="muted" style="padding:20px">Couldn't load the manual (<code>${escapeHtml(String(e.message || e))}</code>). The standalone version is available <a href="manual.html" target="_blank">here</a>.</p>`;
+      if (tocEl)     tocEl.innerHTML = "";
+    } finally {
+      loading = false;
+    }
+  }
+
+  // TOC click → scroll to section
+  document.getElementById("help-toc")?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".help-toc-entry");
+    if (!btn) return;
+    const id = btn.dataset.target;
+    const sec = document.getElementById(id);
+    if (sec) {
+      sec.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollBy({ top: -10, behavior: "smooth" });
+      // Mark active
+      document.querySelectorAll(".help-toc-entry").forEach(el => el.classList.toggle("active", el === btn));
+    }
+    // Mobile: collapse TOC after picking
+    if (window.matchMedia("(max-width: 900px)").matches) {
+      document.getElementById("help-toc")?.classList.add("collapsed");
+    }
+  });
+
+  // Search filter — narrows TOC by title match
+  document.getElementById("help-search")?.addEventListener("input", (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    sectionMap.forEach(s => {
+      const hit = !q || s.title.toLowerCase().includes(q) || (s.num + "").startsWith(q);
+      s.tocBtn.classList.toggle("hidden", !hit);
+    });
+  });
+
+  // Contents toggle (mobile)
+  document.getElementById("help-toc-toggle")?.addEventListener("click", () => {
+    document.getElementById("help-toc")?.classList.toggle("collapsed");
+  });
+
+  // Activate when the Help tab is opened
+  tabBtns.forEach(btn => btn.addEventListener("click", () => {
+    loadManual();
+  }));
+})();

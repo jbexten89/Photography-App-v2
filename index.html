@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=592" />
+<link rel="stylesheet" href="styles.css?v=593" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -117,6 +117,7 @@
       <button class="tab-btn" data-tab="invoices"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span class="tab-label">Invoices</span></button>
       <button class="tab-btn" data-tab="mileage"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg></span><span class="tab-label">Mileage</span></button>
       <button class="tab-btn" data-tab="reports"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13v5"/><path d="M12 11v7"/><path d="M16 15v3"/></svg></span><span class="tab-label">Reports</span></button>
+      <button class="tab-btn" data-tab="help"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><span class="tab-label">Help</span></button>
     </nav>
     <div class="right-flyout-bottom">
       <button id="btn-theme-flyout" class="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
@@ -170,6 +171,7 @@
       <button class="tab-btn" data-tab="invoices"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span class="tab-label">Invoices</span></button>
       <button class="tab-btn" data-tab="mileage"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg></span><span class="tab-label">Mileage</span></button>
       <button class="tab-btn" data-tab="reports"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13v5"/><path d="M12 11v7"/><path d="M16 15v3"/></svg></span><span class="tab-label">Reports</span></button>
+      <button class="tab-btn" data-tab="help"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><span class="tab-label">Help</span></button>
     </nav>
     <div class="sidebar-bottom">
       <button id="btn-theme" class="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
@@ -2635,6 +2637,33 @@
       </div>
     </div>
 
+    <!-- HELP / IN-APP MANUAL -->
+    <section id="help" class="tab-panel">
+      <div class="page-heading-mobile">
+        <h1 class="page-title-mobile">Help</h1>
+        <p class="page-subtitle-mobile muted">The full user manual, in-app and themed to match.</p>
+      </div>
+      <div class="help-toolbar">
+        <input type="search" id="help-search" placeholder="Filter sections…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+        <button type="button" id="help-toc-toggle" class="btn" aria-label="Toggle table of contents">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Contents
+        </button>
+        <a href="manual.html" target="_blank" rel="noopener" class="btn" id="help-open-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>
+          Print version
+        </a>
+      </div>
+      <div class="help-layout">
+        <aside class="help-toc" id="help-toc">
+          <div class="help-toc-loading muted">Loading contents…</div>
+        </aside>
+        <div class="help-content" id="help-content">
+          <div class="help-content-loading muted">Loading manual…</div>
+        </div>
+      </div>
+    </section>
+
     <!-- SETTINGS -->
     <section id="settings" class="tab-panel">
       <div class="page-heading-mobile">
@@ -3368,6 +3397,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=347"></script>
+  <script src="app.js?v=348"></script>
 </body>
 </html>

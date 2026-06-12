@@ -10603,6 +10603,190 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 }
 .snapshot-row-actions .btn.danger:hover { background: rgba(192, 57, 43, 0.12); }
 
+/* ===== Help / in-app manual ===== */
+#help .help-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+#help-search {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+}
+#help .help-toolbar .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 7px 12px;
+}
+#help .help-toolbar .btn svg { width: 14px; height: 14px; }
+.help-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.help-toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 4px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  position: sticky;
+  top: 12px;
+  font-size: 13px;
+}
+.help-toc-entry {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+  line-height: 1.35;
+}
+.help-toc-entry:hover { background: rgba(127,127,127,0.08); }
+.help-toc-entry.active {
+  background: rgba(59, 158, 255, 0.14);
+  color: var(--accent);
+  font-weight: 600;
+}
+.help-toc-entry.hidden { display: none; }
+.help-toc-num {
+  display: inline-block;
+  width: 24px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.help-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 28px;
+  min-height: 200px;
+  max-width: none;
+  line-height: 1.55;
+  font-size: 14px;
+}
+/* Reset paragraph margins and re-theme everything from manual.html so it
+   inherits the app's color tokens, not the manual's hardcoded #1f2937 etc. */
+.help-content h1 {
+  color: var(--primary);
+  font-size: 22px;
+  margin: 24px 0 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+.help-content h1:first-child { margin-top: 0; }
+.help-content h2 { color: var(--primary); font-size: 18px; margin: 22px 0 8px; }
+.help-content h3 { color: var(--text); font-size: 15.5px; margin: 18px 0 6px; font-weight: 700; }
+.help-content h4 {
+  color: var(--accent);
+  font-size: 12px;
+  margin: 16px 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.help-content p { margin: 6px 0 12px; }
+.help-content ul, .help-content ol { margin: 6px 0 14px; padding-left: 24px; }
+.help-content li { margin-bottom: 4px; }
+.help-content strong { color: var(--text); }
+.help-content em { color: var(--text); }
+.help-content code {
+  font-family: "SF Mono", Consolas, Monaco, monospace;
+  font-size: 0.9em;
+  background: rgba(127,127,127,0.14);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text);
+}
+.help-content pre {
+  font-family: "SF Mono", Consolas, Monaco, monospace;
+  font-size: 12.5px;
+  background: rgba(127,127,127,0.10);
+  padding: 10px 14px;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 8px 0 14px;
+  border-left: 3px solid var(--accent);
+  color: var(--text);
+}
+.help-content .tip {
+  background: rgba(59, 158, 255, 0.08);
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  margin: 12px 0 16px;
+  font-size: 13.5px;
+  border-radius: 0 5px 5px 0;
+}
+.help-content .tip strong { color: var(--accent); }
+.help-content .formula {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  margin: 8px 0 14px;
+  border-radius: 4px;
+  font-family: "SF Mono", Consolas, Monaco, monospace;
+  font-size: 12.5px;
+  overflow-x: auto;
+  color: var(--text);
+}
+.help-content .formula strong { color: var(--accent); font-family: inherit; }
+.help-content .muted { color: var(--muted); }
+.help-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 18px;
+  font-size: 12.5px;
+}
+.help-content th, .help-content td {
+  border: 1px solid var(--border);
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.help-content th { background: rgba(127,127,127,0.08); font-weight: 600; color: var(--text); }
+/* Hide the manual's print-banner and title page when shown in-app */
+.help-content .print-banner,
+.help-content .title-page,
+.help-content > .toc { display: none !important; }
+.help-content section {
+  scroll-margin-top: 12px;
+  page-break-before: auto;
+}
+
+@media (max-width: 900px) {
+  .help-layout { grid-template-columns: 1fr; }
+  .help-toc {
+    position: static;
+    max-height: 300px;
+  }
+  .help-toc.collapsed { display: none; }
+  .help-content { padding: 14px 16px; }
+  .help-content h1 { font-size: 19px; }
+  .help-content h2 { font-size: 16px; }
+}
+@media (min-width: 901px) {
+  /* "Contents" toggle button is only useful when TOC is below the content on mobile */
+  #help-toc-toggle { display: none; }
+}
+
 /* Mark-as-Paid date picker modal */
 .paid-date-modal-content { max-width: 380px; }
 .paid-date-modal-content label {
