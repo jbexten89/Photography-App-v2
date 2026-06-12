@@ -10954,8 +10954,10 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
    inside the Filters popover. */
 #transactions .toolbar #tx-filter-combined-btn {
   height: 34px;
+  width: 120px;
   padding: 0 12px;
   font-size: 14px;
+  justify-content: space-between;
 }
 .tx-filter-chart-panel {
   position: absolute;
