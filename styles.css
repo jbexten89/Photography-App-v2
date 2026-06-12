@@ -6335,8 +6335,11 @@ td.recon-cell { text-align: center; }
 }
 #btn-tx-find,
 #btn-tx-find-close { display: none !important; }
+#transactions .toolbar .tx-find-wrap { flex: 0 0 auto; }
+#transactions .toolbar #tx-search-all,
 .tx-find-input {
-  width: 380px;
+  width: 380px !important;
+  min-width: 380px;
   height: 36px;
   padding: 6px 10px;
   border: 1px solid var(--border);
