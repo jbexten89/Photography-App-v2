@@ -6324,36 +6324,31 @@ td.recon-cell { text-align: center; }
 .recon-lock.reconciled { color: var(--income); opacity: 1; }
 /* .cleared state retired 2026-06 — recon is now two-state (uncleared / reconciled). */
 
-/* Find (magnifying-glass) search — icon button expands to an input on click */
+/* Transactions search — permanently visible, styled to match the Jobs page
+   Search input (height: 36px, var(--border), var(--surface)). The old
+   magnifying-glass toggle + close button are hidden at all viewports. */
 .tx-find-wrap {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   position: relative;
 }
-#btn-tx-find svg,
-#btn-tx-find-close svg { width: 16px; height: 16px; display: block; }
+#btn-tx-find,
+#btn-tx-find-close { display: none !important; }
 .tx-find-input {
-  width: 0;
-  padding: 6px 0;
+  width: 220px;
+  height: 36px;
+  padding: 6px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--bg);
+  background: var(--surface, var(--bg));
   color: var(--text);
   font: inherit;
-  opacity: 0;
-  transition: width 0.2s ease, padding 0.2s ease, opacity 0.15s ease;
-  pointer-events: none;
-}
-.tx-find-wrap.open .tx-find-input,
-.tx-find-input:focus,
-.tx-find-input:not(:placeholder-shown) {
-  width: 200px;
-  padding: 6px 10px;
+  font-size: 14px;
+  box-sizing: border-box;
   opacity: 1;
   pointer-events: auto;
 }
-#btn-tx-find-close { display: none; }
 
 /* When JS relocates Gross/Net into the Analytics toolbar-row (any breakpoint),
    margin-left:auto pins it to the right edge alongside Filters / Presets. */

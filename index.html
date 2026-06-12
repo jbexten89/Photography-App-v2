@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=601" />
+<link rel="stylesheet" href="styles.css?v=602" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -380,7 +380,7 @@
           <button type="button" id="btn-tx-find" class="icon-btn" aria-label="Find" title="Find">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </button>
-          <input type="search" id="tx-search-all" class="tx-find-input" placeholder="" aria-label="Find..." />
+          <input type="search" id="tx-search-all" class="tx-find-input" placeholder="Vendor, customer, category, memo…" aria-label="Search transactions" autocomplete="off" />
           <button type="button" id="btn-tx-find-close" class="icon-btn" aria-label="Close search" title="Close search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -3400,6 +3400,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=353"></script>
+  <script src="app.js?v=354"></script>
 </body>
 </html>
