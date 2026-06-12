@@ -5203,6 +5203,8 @@ select option {
 
 .tax-report-sheet .invoice-title,
 .pl-sheet .invoice-title { text-align: right; }
+.ye-report-sheet .invoice-title,
+.lt-report-sheet .invoice-title { text-align: right; }
 .pl-sheet .tax-report-range { text-align: right; }
 
 .tax-report-range {
