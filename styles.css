@@ -10646,8 +10646,15 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   top: 12px;
   font-size: 13px;
 }
+/* Two-column grid so the number column stays fixed and the label can
+   wrap freely — long titles like "Analytics — By Customer (Customer
+   Profitability)" sit cleanly under the first-line indent instead of
+   overflowing the panel. */
 .help-toc-entry {
-  display: block;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 4px;
+  align-items: start;
   padding: 6px 10px;
   border-radius: 4px;
   color: var(--text);
@@ -10658,9 +10665,14 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   text-align: left;
   width: 100%;
   font: inherit;
+  font-size: 13px;
   line-height: 1.35;
 }
-.help-toc-entry:hover { background: rgba(127,127,127,0.08); }
+.help-toc-entry:hover {
+  background: rgba(127,127,127,0.08);
+  color: var(--text);
+  text-decoration: none;
+}
 .help-toc-entry.active {
   background: rgba(59, 158, 255, 0.14);
   color: var(--accent);
@@ -10668,10 +10680,15 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 }
 .help-toc-entry.hidden { display: none; }
 .help-toc-num {
-  display: inline-block;
-  width: 24px;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  padding-top: 1px;
+}
+.help-toc-label {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .help-content {

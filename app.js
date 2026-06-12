@@ -17112,13 +17112,13 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
         sec.id = id;
         contentEl.appendChild(sec);
 
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "help-toc-entry";
-        btn.dataset.target = id;
-        btn.innerHTML = `<span class="help-toc-num">${escapeHtml(num)}</span>${escapeHtml(label)}`;
-        tocFrag.appendChild(btn);
-        sectionMap.push({ id, title: label, num, sectionEl: sec, tocBtn: btn });
+        const link = document.createElement("a");
+        link.href = `#${id}`;
+        link.className = "help-toc-entry";
+        link.dataset.target = id;
+        link.innerHTML = `<span class="help-toc-num">${escapeHtml(num)}</span><span class="help-toc-label">${escapeHtml(label)}</span>`;
+        tocFrag.appendChild(link);
+        sectionMap.push({ id, title: label, num, sectionEl: sec, tocBtn: link });
       });
       tocEl.innerHTML = "";
       tocEl.appendChild(tocFrag);
@@ -17132,19 +17132,21 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     }
   }
 
-  // TOC click → scroll to section
+  // TOC click → scroll to section. preventDefault so the browser doesn't
+  // also jump (default anchor behavior) — we want smooth-scroll + offset.
   document.getElementById("help-toc")?.addEventListener("click", (e) => {
-    const btn = e.target.closest(".help-toc-entry");
-    if (!btn) return;
-    const id = btn.dataset.target;
+    const link = e.target.closest(".help-toc-entry");
+    if (!link) return;
+    e.preventDefault();
+    const id = link.dataset.target;
     const sec = document.getElementById(id);
     if (sec) {
       sec.scrollIntoView({ behavior: "smooth", block: "start" });
       window.scrollBy({ top: -10, behavior: "smooth" });
-      // Mark active
-      document.querySelectorAll(".help-toc-entry").forEach(el => el.classList.toggle("active", el === btn));
+      document.querySelectorAll(".help-toc-entry").forEach(el => el.classList.toggle("active", el === link));
+      // Update the URL hash so the entry is shareable / back-button friendly.
+      history.replaceState(null, "", `#${id}`);
     }
-    // Mobile: collapse TOC after picking
     if (window.matchMedia("(max-width: 900px)").matches) {
       document.getElementById("help-toc")?.classList.add("collapsed");
     }
