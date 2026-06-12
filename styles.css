@@ -10537,16 +10537,26 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   font-size: 12px;
   color: var(--muted);
 }
+/* Snapshot row: meta on top (source pill + time), actions on the second
+   row. This compact two-row layout fits comfortably inside the narrow
+   Settings column on desktop AND on phone widths without needing a
+   horizontal scrollbar. */
 .snapshot-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface);
   font-size: 13px;
+}
+.snapshot-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 .snapshot-row-source {
   font-size: 10px;
@@ -10557,6 +10567,7 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   background: rgba(127,127,127,0.18);
   color: var(--muted);
   font-weight: 700;
+  flex: 0 0 auto;
 }
 .snapshot-row-source.auto { background: rgba(59, 158, 255, 0.15); color: var(--accent); }
 .snapshot-row-source.manual { background: rgba(39, 174, 96, 0.16); color: var(--income); }
@@ -10564,18 +10575,25 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 .snapshot-row-when {
   font-variant-numeric: tabular-nums;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.snapshot-row-when small { display: block; color: var(--muted); font-size: 11px; margin-top: 1px; }
-.snapshot-row .btn {
-  padding: 4px 10px;
+.snapshot-row-actions {
+  display: flex;
+  gap: 8px;
+}
+.snapshot-row-actions .btn {
+  flex: 1 1 0;
+  padding: 6px 10px;
   font-size: 12px;
 }
-.snapshot-row .btn.danger {
+.snapshot-row-actions .btn.danger {
   border-color: var(--expense);
   color: var(--expense);
   background: transparent;
 }
-.snapshot-row .btn.danger:hover { background: rgba(192, 57, 43, 0.12); }
+.snapshot-row-actions .btn.danger:hover { background: rgba(192, 57, 43, 0.12); }
 
 /* Mark-as-Paid date picker modal */
 .paid-date-modal-content { max-width: 380px; }

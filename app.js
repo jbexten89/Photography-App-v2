@@ -5643,10 +5643,14 @@ function renderLockedYearsList() {
       const div = document.createElement("div");
       div.className = "snapshot-row";
       div.innerHTML = `
-        <span class="snapshot-row-source ${escapeHtml(r.source || "auto")}">${escapeHtml(r.source || "auto")}</span>
-        <span class="snapshot-row-when">${escapeHtml(when.main)}<small>${escapeHtml(when.full)}</small></span>
-        <button type="button" class="btn snapshot-row-restore" data-id="${escapeHtml(r.snapshot_id)}">Restore</button>
-        <button type="button" class="btn danger snapshot-row-delete" data-id="${escapeHtml(r.snapshot_id)}">Delete</button>
+        <div class="snapshot-row-meta">
+          <span class="snapshot-row-source ${escapeHtml(r.source || "auto")}">${escapeHtml(r.source || "auto")}</span>
+          <span class="snapshot-row-when" title="${escapeHtml(when.full)}">${escapeHtml(when.main)}</span>
+        </div>
+        <div class="snapshot-row-actions">
+          <button type="button" class="btn snapshot-row-restore" data-id="${escapeHtml(r.snapshot_id)}">Restore</button>
+          <button type="button" class="btn danger snapshot-row-delete" data-id="${escapeHtml(r.snapshot_id)}">Delete</button>
+        </div>
       `;
       listEl.appendChild(div);
     });
