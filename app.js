@@ -12002,21 +12002,24 @@ function renderDashboard() {
   txs.forEach(t => {
     // Roll Over / Correction-style categories are carry-forward entries, not real income/expense
     if (NON_JOB_CATEGORIES.includes(t.category)) return;
-    const isSavings = SAVINGS_CATEGORIES.includes(t.category);
+    // Detect savings via Category OR Expense field — matches Year-End report,
+    // Savings Rate view, etc. Savings flows are tracked separately and never
+    // count toward Total Income / Total Expenses.
+    const isSavings = SAVINGS_CATEGORIES.includes(t.category) ||
+                      SAVINGS_CATEGORIES.includes((t.expenseIncome || "").trim());
     if (t.type === "income") {
-      inc += t.amount;
       if (isSavings) savIn += t.amount;
+      else           inc   += t.amount;
     } else {
-      exp += t.amount;
       if (isSavings) savOut += t.amount;
+      else           exp    += t.amount;
     }
   });
 
   const savingsNet = savOut - savIn;
-  const expNonSavings = exp - savOut + savIn; // strip savings flows out of expenses display
 
   document.getElementById("sum-income").textContent = fmtMoney(inc);
-  document.getElementById("sum-expense").textContent = fmtMoney(expNonSavings);
+  document.getElementById("sum-expense").textContent = fmtMoney(exp);
   document.getElementById("sum-savings").textContent = fmtMoney(savingsNet);
 
   // Savings goal progress — vertical thermometer-style bar (read-only on dashboard)
