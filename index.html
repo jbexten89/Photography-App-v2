@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=600" />
+<link rel="stylesheet" href="styles.css?v=601" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -3092,9 +3092,6 @@
 
       <h2 class="nj-analytics-heading" style="margin-top:24px">Job Analytics</h2>
       <div class="nj-analytics-filters">
-        <label class="nj-analytics-search-label">Search
-          <input type="search" id="nj-analytics-search" placeholder="Job No, customer, category, memo…" autocomplete="off" />
-        </label>
         <label>Year
           <select id="nj-analytics-year"><option value="">All</option></select>
         </label>
@@ -3103,6 +3100,9 @@
         </label>
         <label>Category
           <select id="nj-analytics-category"><option value="">All</option></select>
+        </label>
+        <label class="nj-analytics-search-label">Search
+          <input type="search" id="nj-analytics-search" placeholder="Job No, customer, category, memo…" autocomplete="off" />
         </label>
         <span style="flex:1"></span>
         <button type="button" id="nj-analytics-clear" class="btn">Clear filters</button>
@@ -3400,6 +3400,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=352"></script>
+  <script src="app.js?v=353"></script>
 </body>
 </html>
