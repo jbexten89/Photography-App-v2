@@ -10697,9 +10697,22 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
   border-radius: 8px;
   padding: 20px 28px;
   min-height: 200px;
+  /* min-width: 0 lets the grid column shrink to fit the viewport instead
+     of widening with intrinsic content. Without it, a wide table inside
+     forces the whole page to scroll horizontally — which pulls the
+     sticky TOC off-screen as the user scrolls right. */
+  min-width: 0;
   max-width: none;
+  overflow-x: auto;
   line-height: 1.55;
   font-size: 14px;
+}
+/* Wrap long cell content so tables don't push the content pane wider
+   than its grid column. */
+.help-content table { table-layout: auto; word-break: normal; }
+.help-content td, .help-content th {
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 /* Reset paragraph margins and re-theme everything from manual.html so it
    inherits the app's color tokens, not the manual's hardcoded #1f2937 etc. */
