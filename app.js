@@ -14898,19 +14898,61 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const fYear = $("nj-analytics-year")?.value || "";
     const fCust = $("nj-analytics-customer")?.value || "";
     const fCat  = $("nj-analytics-category")?.value || "";
+    const fSearch = ($("nj-analytics-search")?.value || "").trim().toLowerCase();
     const allJobs = state.jobs || [];
-    const jobs = allJobs.slice()
+    const txsAll = state.transactions || [];
+    function njMetricsFor(j) {
+      const linked = txsAll.filter(t => t.jobNo === j.jobNo);
+      const income = linked.filter(t => t.type === "income").reduce((s, t) => s + (+t.amount || 0), 0);
+      const expense = linked.filter(t => t.type === "expense").reduce((s, t) => s + (+t.amount || 0), 0);
+      return { income, expense, profit: income - expense, linked };
+    }
+    let jobs = allJobs.slice()
       .filter(j => !fYear || (j.date || "").startsWith(fYear))
       .filter(j => !fCust || (j.customer || "").trim() === fCust)
-      .filter(j => !fCat  || (j.category || "").trim() === fCat)
-      .sort((a, b) => (b.jobNo || "").localeCompare(a.jobNo || ""));
+      .filter(j => !fCat  || (j.category || "").trim() === fCat);
+    if (fSearch) {
+      const tokens = fSearch.split(/\s+/).filter(Boolean);
+      jobs = jobs.filter(j => {
+        const m = njMetricsFor(j);
+        const parts = [j.jobNo, j.customer, j.category, j.memo, j.date, j.hours]
+          .concat(m.linked.flatMap(t => [t.vendor, t.customer, t.payee, t.memo, t.category, t.expenseIncome]));
+        const hay = parts.filter(Boolean).join(" ").toLowerCase();
+        return tokens.every(tok => hay.includes(tok));
+      });
+    }
+    const sortState = (window.__njSort && window.__njSort.col)
+      ? window.__njSort
+      : { col: "jobno", dir: "desc" };
+    const sortDir = sortState.dir === "asc" ? 1 : -1;
+    jobs.sort((a, b) => {
+      let cmp = 0;
+      switch (sortState.col) {
+        case "customer": cmp = (a.customer || "").localeCompare(b.customer || ""); break;
+        case "category": cmp = (a.category || "").localeCompare(b.category || ""); break;
+        case "hours":    cmp = (+a.hours || 0) - (+b.hours || 0); break;
+        case "income":   cmp = njMetricsFor(a).income  - njMetricsFor(b).income;  break;
+        case "expense":  cmp = njMetricsFor(a).expense - njMetricsFor(b).expense; break;
+        case "profit":   cmp = njMetricsFor(a).profit  - njMetricsFor(b).profit;  break;
+        case "status":   cmp = (getJobStatus(a) || "").localeCompare(getJobStatus(b) || ""); break;
+        case "jobno":
+        default:         cmp = (a.jobNo || "").localeCompare(b.jobNo || "");
+      }
+      if (cmp === 0) cmp = (a.jobNo || "").localeCompare(b.jobNo || "") * -1;
+      return cmp * sortDir;
+    });
+    // Refresh header sort indicators
+    document.querySelectorAll("#nj-analytics-table thead th.nj-sortable").forEach(th => {
+      th.classList.remove("asc", "desc");
+      if (th.dataset.sort === sortState.col) th.classList.add(sortState.dir);
+    });
     const openEl = $("nj-open-count");
     const completeEl = $("nj-complete-count");
     if (openEl) openEl.textContent = jobs.filter(j => getJobStatus(j) !== "Paid").length;
     if (completeEl) completeEl.textContent = jobs.filter(j => getJobStatus(j) === "Paid").length;
     if (!tbody) return;
     if (jobs.length === 0) {
-      const empty = (fYear || fCust || fCat)
+      const empty = (fYear || fCust || fCat || fSearch)
         ? "No jobs match the current filters."
         : "No jobs yet — add one above.";
       tbody.innerHTML = `<tr><td colspan="10" class="muted" style="text-align:center;padding:14px">${empty}</td></tr>`;
@@ -15701,10 +15743,28 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   ["nj-analytics-year", "nj-analytics-customer", "nj-analytics-category"].forEach(id => {
     document.getElementById(id)?.addEventListener("change", renderNjAnalytics);
   });
+  // Search box — re-render on every keystroke
+  document.getElementById("nj-analytics-search")?.addEventListener("input", renderNjAnalytics);
   document.getElementById("nj-analytics-clear")?.addEventListener("click", () => {
-    ["nj-analytics-year", "nj-analytics-customer", "nj-analytics-category"].forEach(id => {
+    ["nj-analytics-year", "nj-analytics-customer", "nj-analytics-category", "nj-analytics-search"].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = "";
     });
+    renderNjAnalytics();
+  });
+  // Sortable columns — delegate click to the table head so it works even if
+  // headers get re-rendered. Numeric columns default to descending.
+  document.querySelector("#nj-analytics-table thead")?.addEventListener("click", (e) => {
+    const th = e.target.closest("th.nj-sortable");
+    if (!th) return;
+    const col = th.dataset.sort;
+    if (!col) return;
+    const cur = window.__njSort || { col: "jobno", dir: "desc" };
+    if (cur.col === col) {
+      window.__njSort = { col, dir: cur.dir === "asc" ? "desc" : "asc" };
+    } else {
+      const numericCols = ["hours", "income", "expense", "profit"];
+      window.__njSort = { col, dir: numericCols.indexOf(col) >= 0 ? "desc" : "asc" };
+    }
     renderNjAnalytics();
   });
 

@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=598" />
+<link rel="stylesheet" href="styles.css?v=600" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -3092,6 +3092,9 @@
 
       <h2 class="nj-analytics-heading" style="margin-top:24px">Job Analytics</h2>
       <div class="nj-analytics-filters">
+        <label class="nj-analytics-search-label">Search
+          <input type="search" id="nj-analytics-search" placeholder="Job No, customer, category, memo…" autocomplete="off" />
+        </label>
         <label>Year
           <select id="nj-analytics-year"><option value="">All</option></select>
         </label>
@@ -3119,14 +3122,14 @@
           </colgroup>
           <thead>
             <tr>
-              <th>Job No.</th>
-              <th>Customer</th>
-              <th>Category</th>
-              <th style="text-align:right">Hours</th>
-              <th style="text-align:right">Income</th>
-              <th style="text-align:right">Expenses</th>
-              <th style="text-align:right">Profit</th>
-              <th style="text-align:center">Status</th>
+              <th class="nj-sortable" data-sort="jobno">Job No.</th>
+              <th class="nj-sortable" data-sort="customer">Customer</th>
+              <th class="nj-sortable" data-sort="category">Category</th>
+              <th class="nj-sortable" data-sort="hours" style="text-align:right">Hours</th>
+              <th class="nj-sortable" data-sort="income" style="text-align:right">Income</th>
+              <th class="nj-sortable" data-sort="expense" style="text-align:right">Expenses</th>
+              <th class="nj-sortable" data-sort="profit" style="text-align:right">Profit</th>
+              <th class="nj-sortable" data-sort="status" style="text-align:center">Status</th>
               <th></th>
             </tr>
           </thead>
@@ -3397,6 +3400,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=350"></script>
+  <script src="app.js?v=352"></script>
 </body>
 </html>

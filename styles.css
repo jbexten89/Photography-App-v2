@@ -11298,3 +11298,32 @@ body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highl
 
 #newjob .form-actions { margin-top: 16px; }
 .nj-analytics h3 { margin-bottom: 8px; }
+
+/* Jobs page: sortable column headers + search box */
+#nj-analytics-table thead th.nj-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+#nj-analytics-table thead th.nj-sortable::after {
+  content: " \2195";
+  color: var(--muted, #888);
+  opacity: 0.4;
+  font-size: 0.85em;
+}
+#nj-analytics-table thead th.nj-sortable.asc::after  { content: " \25B2"; opacity: 1; }
+#nj-analytics-table thead th.nj-sortable.desc::after { content: " \25BC"; opacity: 1; }
+.nj-analytics-search-label { display: flex; flex-direction: column; gap: 3px; min-width: 220px; }
+.nj-analytics-search-label input[type="search"] {
+  height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--border, rgba(0,0,0,0.15));
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  color: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+@media (max-width: 768px) {
+  #newjob .nj-analytics-filters label.nj-analytics-search-label { flex: 1 0 100%; order: 0; min-width: 0; }
+  #newjob .nj-analytics-filters input#nj-analytics-search { width: 100%; height: 40px; font-size: 16px; }
+}
