@@ -7642,16 +7642,6 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .nj-analytics-filters label:has(#nj-analytics-category) { flex: 0 0 calc(66.667% - 4px); order: 3; }
   #newjob #nj-analytics-clear { flex: 0 0 calc(33.333% - 4px); height: 40px; min-height: 40px; align-self: end; order: 4; }
   #newjob .nj-analytics-filters > span[style*="flex:1"] { display: none; }
-  /* Search box: full-width row above the existing filters on mobile. */
-  #newjob .nj-analytics-filters label:has(#nj-analytics-search) { flex: 1 0 100%; order: 0; }
-  #newjob .nj-analytics-filters input#nj-analytics-search {
-    width: 100%;
-    height: 40px;
-    min-height: 40px;
-    padding: 6px 10px;
-    font-size: 16px;
-    box-sizing: border-box;
-  }
 
   /* Add-Job modal: stack each field on its own row (5 rows + actions) */
   #nj-add-modal .modal-content #nj-form {
@@ -11308,35 +11298,3 @@ body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highl
 
 #newjob .form-actions { margin-top: 16px; }
 .nj-analytics h3 { margin-bottom: 8px; }
-
-/* Jobs analytics: sortable column headers + search box */
-#nj-analytics-table thead th.nj-sortable {
-  cursor: pointer;
-  user-select: none;
-  position: relative;
-  white-space: nowrap;
-}
-#nj-analytics-table thead th.nj-sortable:hover { background: var(--row-hover, rgba(0,0,0,0.04)); }
-#nj-analytics-table thead th.nj-sortable .nj-sort-ind {
-  display: inline-block;
-  width: 0.9em;
-  margin-left: 4px;
-  color: var(--muted, #888);
-  font-size: 0.85em;
-  opacity: 0.5;
-}
-#nj-analytics-table thead th.nj-sortable.active .nj-sort-ind { opacity: 1; color: var(--primary, currentColor); }
-#nj-analytics-table thead th.nj-sortable.asc  .nj-sort-ind::before { content: "▲"; }
-#nj-analytics-table thead th.nj-sortable.desc .nj-sort-ind::before { content: "▼"; }
-#nj-analytics-table thead th.nj-sortable:not(.asc):not(.desc) .nj-sort-ind::before { content: "↕"; }
-.nj-analytics-search-label { display: flex; flex-direction: column; gap: 3px; min-width: 200px; }
-.nj-analytics-search-label input[type="search"] {
-  height: 36px;
-  padding: 6px 10px;
-  border: 1px solid var(--border, rgba(0,0,0,0.15));
-  border-radius: 6px;
-  background: var(--surface, #fff);
-  color: inherit;
-  font-size: 14px;
-  box-sizing: border-box;
-}

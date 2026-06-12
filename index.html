@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=599" />
+<link rel="stylesheet" href="styles.css?v=598" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -3101,9 +3101,6 @@
         <label>Category
           <select id="nj-analytics-category"><option value="">All</option></select>
         </label>
-        <label class="nj-analytics-search-label">Search
-          <input type="search" id="nj-analytics-search" placeholder="Job No, customer, category, memo…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
-        </label>
         <span style="flex:1"></span>
         <button type="button" id="nj-analytics-clear" class="btn">Clear filters</button>
       </div>
@@ -3122,14 +3119,14 @@
           </colgroup>
           <thead>
             <tr>
-              <th class="nj-sortable" data-sort="jobno">Job No.<span class="nj-sort-ind"></span></th>
-              <th class="nj-sortable" data-sort="customer">Customer<span class="nj-sort-ind"></span></th>
-              <th class="nj-sortable" data-sort="category">Category<span class="nj-sort-ind"></span></th>
-              <th class="nj-sortable num" data-sort="hours">Hours<span class="nj-sort-ind"></span></th>
-              <th class="nj-sortable num" data-sort="income">Income<span class="nj-sort-ind"></span></th>
-              <th class="nj-sortable num" data-sort="expense">Expenses<span class="nj-sort-ind"></span></th>
-              <th class="nj-sortable num" data-sort="profit">Profit<span class="nj-sort-ind"></span></th>
-              <th class="nj-sortable" style="text-align:center" data-sort="status">Status<span class="nj-sort-ind"></span></th>
+              <th>Job No.</th>
+              <th>Customer</th>
+              <th>Category</th>
+              <th style="text-align:right">Hours</th>
+              <th style="text-align:right">Income</th>
+              <th style="text-align:right">Expenses</th>
+              <th style="text-align:right">Profit</th>
+              <th style="text-align:center">Status</th>
               <th></th>
             </tr>
           </thead>
@@ -3400,6 +3397,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=351"></script>
+  <script src="app.js?v=350"></script>
 </body>
 </html>
