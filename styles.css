@@ -5836,8 +5836,16 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   border-radius: 8px;
   background: var(--bg-soft);
 }
-#bc-chart { width: 100%; height: auto; display: block; }
+/* Cap the chart's rendered height so it doesn't dominate the view on
+   wide monitors. The SVG uses preserveAspectRatio (default), so
+   constraining max-height shrinks the whole drawing proportionally —
+   bars stay readable but stop being the focal point. Table beneath
+   carries the same data more comprehensively anyway. */
+#bc-chart { width: 100%; height: auto; max-height: 280px; display: block; margin: 0 auto; }
 #bc-chart rect.bc-bar:hover { opacity: 0.85; }
+@media (max-width: 768px) {
+  #bc-chart { max-height: none; } /* mobile uses its own viewBox sizing */
+}
 
 .bc-table-wrap { overflow-x: auto; }
 .bc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
