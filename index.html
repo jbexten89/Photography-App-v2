@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=589" />
+<link rel="stylesheet" href="styles.css?v=590" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2828,6 +2828,16 @@
             <div class="locked-years-list" id="locked-years-list"></div>
           </div>
           <div class="settings-field">
+            <span>Snapshot History</span>
+            <p class="muted" style="margin:4px 0 6px;font-size:12px">Cloud-stored copies of your entire data state. Created automatically (max once per hour) and on demand. Up to <strong>30</strong> kept; oldest pruned. Restore any snapshot if a change ever turns out wrong — a "Pre-Restore" snapshot of current state is taken automatically before the restore, so you can always come back.</p>
+            <div class="snapshot-actions">
+              <button type="button" id="btn-snapshot-now" class="btn">Snapshot Now</button>
+              <button type="button" id="btn-snapshot-refresh" class="btn">Refresh List</button>
+              <span id="snapshot-status" class="muted" style="font-size:12px"></span>
+            </div>
+            <div id="snapshot-list" class="snapshot-list" style="margin-top:10px"></div>
+          </div>
+          <div class="settings-field">
             <span>Mobile Layout</span>
             <p class="muted" style="margin:4px 0 6px;font-size:12px">Switch from the side-scrolling table to a 3-line stacked card per transaction (mobile only).</p>
             <label class="check-pill"><input type="checkbox" id="setting-tx-mobile-3line" /> 3 lines per row on mobile</label>
@@ -3358,6 +3368,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=345"></script>
+  <script src="app.js?v=346"></script>
 </body>
 </html>

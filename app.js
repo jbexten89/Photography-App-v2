@@ -434,8 +434,135 @@ async function cloudSyncPush() {
 function cloudSyncSchedulePush() {
   if (!supa || !supaUser) return;
   clearTimeout(cloudSyncTimer);
-  cloudSyncTimer = setTimeout(cloudSyncPush, 2000);
+  cloudSyncTimer = setTimeout(async () => {
+    await cloudSyncPush();
+    // After a successful push, fire a throttled auto-snapshot.
+    cloudSnapshotMaybe();
+  }, 2000);
 }
+
+// ============================================================
+// CLOUD SNAPSHOT HISTORY
+// Keeps up to 30 versions of the user's state in the
+// app_state_snapshots_v2 table. Restored from Settings → Snapshot
+// History. Snapshots are throttled to one per hour for "auto" source
+// (debounced cloud-push trigger); manual + pre-restore snapshots
+// ignore the throttle.
+// ============================================================
+const SNAPSHOT_MAX_PER_USER = 30;
+const SNAPSHOT_AUTO_THROTTLE_MS = 60 * 60 * 1000; // 1 hour
+let snapshotLastAutoAt = 0;
+
+async function cloudSnapshotMaybe() {
+  if (!supa || !supaUser) return;
+  const now = Date.now();
+  if (now - snapshotLastAutoAt < SNAPSHOT_AUTO_THROTTLE_MS) return;
+  snapshotLastAutoAt = now;
+  return cloudSnapshotNow("auto");
+}
+
+async function cloudSnapshotNow(source = "manual") {
+  if (!supa || !supaUser) return { ok: false, reason: "Not signed in to cloud sync." };
+  // Don't snapshot an empty state — guards against accidental wipe.
+  if (!Array.isArray(state.transactions) || state.transactions.length === 0) {
+    return { ok: false, reason: "Local state is empty — refusing to snapshot." };
+  }
+  try {
+    const { error } = await supa.from("app_state_snapshots_v2").insert({
+      user_id: supaUser.id,
+      state: state,
+      source: source,
+    });
+    if (error) {
+      console.warn("cloudSnapshotNow insert failed:", error);
+      return { ok: false, reason: error.message || "Snapshot insert failed." };
+    }
+    // Prune any beyond SNAPSHOT_MAX_PER_USER. Cheap: select ids ordered
+    // newest-first, slice past the max, delete those rows.
+    try {
+      const { data: rows } = await supa.from("app_state_snapshots_v2")
+        .select("snapshot_id, created_at")
+        .eq("user_id", supaUser.id)
+        .order("created_at", { ascending: false });
+      if (rows && rows.length > SNAPSHOT_MAX_PER_USER) {
+        const stale = rows.slice(SNAPSHOT_MAX_PER_USER).map(r => r.snapshot_id);
+        await supa.from("app_state_snapshots_v2").delete().in("snapshot_id", stale);
+      }
+    } catch (e) {
+      console.warn("Snapshot prune failed (non-fatal):", e);
+    }
+    return { ok: true };
+  } catch (e) {
+    console.warn("cloudSnapshotNow exception:", e);
+    return { ok: false, reason: String(e?.message || e) };
+  }
+}
+
+async function cloudSnapshotList() {
+  if (!supa || !supaUser) return [];
+  try {
+    const { data, error } = await supa.from("app_state_snapshots_v2")
+      .select("snapshot_id, source, created_at")
+      .eq("user_id", supaUser.id)
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.warn("cloudSnapshotList failed:", error);
+      return [];
+    }
+    return data || [];
+  } catch (e) {
+    console.warn("cloudSnapshotList exception:", e);
+    return [];
+  }
+}
+
+async function cloudSnapshotRestore(snapshotId) {
+  if (!supa || !supaUser) return { ok: false, reason: "Not signed in." };
+  if (!snapshotId) return { ok: false, reason: "Missing snapshot id." };
+  try {
+    // Safety net: snapshot CURRENT state as "pre-restore" before replacing.
+    await cloudSnapshotNow("pre-restore");
+    const { data, error } = await supa.from("app_state_snapshots_v2")
+      .select("state")
+      .eq("user_id", supaUser.id)
+      .eq("snapshot_id", snapshotId)
+      .maybeSingle();
+    if (error) return { ok: false, reason: error.message || "Fetch failed." };
+    if (!data || !data.state) return { ok: false, reason: "Snapshot not found or empty." };
+    // Replace local state and save.
+    state = data.state;
+    if (!Array.isArray(state.transactions)) state.transactions = [];
+    if (!Array.isArray(state.lockedYears))  state.lockedYears  = [];
+    saveState();
+    // Re-render the app surfaces so the user sees the restored data.
+    if (typeof renderTransactions === "function") renderTransactions();
+    if (typeof renderDashboard === "function")    renderDashboard();
+    return { ok: true };
+  } catch (e) {
+    console.warn("cloudSnapshotRestore exception:", e);
+    return { ok: false, reason: String(e?.message || e) };
+  }
+}
+
+async function cloudSnapshotDelete(snapshotId) {
+  if (!supa || !supaUser) return { ok: false };
+  try {
+    const { error } = await supa.from("app_state_snapshots_v2")
+      .delete()
+      .eq("user_id", supaUser.id)
+      .eq("snapshot_id", snapshotId);
+    if (error) return { ok: false, reason: error.message };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, reason: String(e?.message || e) };
+  }
+}
+
+// Expose for UI handlers in Settings.
+window.cloudSnapshotNow     = cloudSnapshotNow;
+window.cloudSnapshotList    = cloudSnapshotList;
+window.cloudSnapshotRestore = cloudSnapshotRestore;
+window.cloudSnapshotDelete  = cloudSnapshotDelete;
 
 // Wire auth buttons + force push/pull controls
 document.addEventListener("DOMContentLoaded", () => {
@@ -5469,6 +5596,113 @@ function renderLockedYearsList() {
     state.lockedYears = Array.from(set).sort();
     saveState();
     if (window.toast) toast(cb.checked ? `Year ${y} locked` : `Year ${y} unlocked`, { kind: "success" });
+  });
+})();
+
+// ============================================================
+// SETTINGS: Snapshot history panel
+// ============================================================
+(function wireSnapshotPanel() {
+  const listEl    = document.getElementById("snapshot-list");
+  const statusEl  = document.getElementById("snapshot-status");
+  const btnNow    = document.getElementById("btn-snapshot-now");
+  const btnRefresh = document.getElementById("btn-snapshot-refresh");
+  if (!listEl) return;
+
+  function setStatus(msg, kind) {
+    if (!statusEl) return;
+    statusEl.textContent = msg || "";
+    statusEl.style.color = kind === "error" ? "var(--expense)"
+                         : kind === "success" ? "var(--income)"
+                         : "var(--muted)";
+  }
+
+  function formatSnapshotWhen(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+    const wasYesterday = d.toDateString() === yesterday.toDateString();
+    const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const date = d.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
+    const main = sameDay ? `Today ${time}` : wasYesterday ? `Yesterday ${time}` : `${date} ${time}`;
+    return { main, full: d.toLocaleString() };
+  }
+
+  async function refreshList() {
+    setStatus("Loading…");
+    const rows = await cloudSnapshotList();
+    listEl.innerHTML = "";
+    if (!rows.length) {
+      setStatus("");
+      return;
+    }
+    rows.forEach(r => {
+      const when = formatSnapshotWhen(r.created_at);
+      const div = document.createElement("div");
+      div.className = "snapshot-row";
+      div.innerHTML = `
+        <span class="snapshot-row-source ${escapeHtml(r.source || "auto")}">${escapeHtml(r.source || "auto")}</span>
+        <span class="snapshot-row-when">${escapeHtml(when.main)}<small>${escapeHtml(when.full)}</small></span>
+        <button type="button" class="btn snapshot-row-restore" data-id="${escapeHtml(r.snapshot_id)}">Restore</button>
+        <button type="button" class="btn danger snapshot-row-delete" data-id="${escapeHtml(r.snapshot_id)}">Delete</button>
+      `;
+      listEl.appendChild(div);
+    });
+    setStatus(`${rows.length} snapshot${rows.length === 1 ? "" : "s"} stored.`);
+  }
+
+  btnNow?.addEventListener("click", async () => {
+    setStatus("Saving snapshot…");
+    const res = await cloudSnapshotNow("manual");
+    if (res.ok) {
+      setStatus("Snapshot saved.", "success");
+      refreshList();
+    } else {
+      setStatus(res.reason || "Snapshot failed.", "error");
+    }
+  });
+
+  btnRefresh?.addEventListener("click", refreshList);
+
+  listEl.addEventListener("click", async (e) => {
+    const restoreBtn = e.target.closest(".snapshot-row-restore");
+    const deleteBtn  = e.target.closest(".snapshot-row-delete");
+    if (restoreBtn) {
+      const id = restoreBtn.dataset.id;
+      if (!id) return;
+      if (!confirm("Restore this snapshot? Your current data will be REPLACED. A 'Pre-Restore' snapshot of current state will be saved first so you can come back.")) return;
+      setStatus("Restoring…");
+      restoreBtn.disabled = true;
+      const res = await cloudSnapshotRestore(id);
+      restoreBtn.disabled = false;
+      if (res.ok) {
+        setStatus("Restored. Pre-Restore snapshot saved.", "success");
+        if (window.toast) toast("Snapshot restored — pre-restore copy saved.", { kind: "success", ttl: 4000 });
+        refreshList();
+      } else {
+        setStatus(res.reason || "Restore failed.", "error");
+      }
+    } else if (deleteBtn) {
+      const id = deleteBtn.dataset.id;
+      if (!id) return;
+      if (!confirm("Delete this snapshot? Cannot be undone.")) return;
+      deleteBtn.disabled = true;
+      const res = await cloudSnapshotDelete(id);
+      deleteBtn.disabled = false;
+      if (res.ok) {
+        refreshList();
+      } else {
+        setStatus(res.reason || "Delete failed.", "error");
+      }
+    }
+  });
+
+  // Auto-load when Settings tab becomes active so the user sees the
+  // current list without clicking Refresh.
+  document.querySelectorAll('.tab-btn[data-tab="settings"]').forEach(btn => {
+    btn.addEventListener("click", () => setTimeout(refreshList, 100));
   });
 })();
 
