@@ -6336,7 +6336,7 @@ td.recon-cell { text-align: center; }
 #btn-tx-find,
 #btn-tx-find-close { display: none !important; }
 .tx-find-input {
-  width: 340px;
+  width: 380px;
   height: 36px;
   padding: 6px 10px;
   border: 1px solid var(--border);
@@ -11319,7 +11319,7 @@ body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highl
 }
 #nj-analytics-table thead th.nj-sortable.asc::after  { content: " \25B2"; opacity: 1; }
 #nj-analytics-table thead th.nj-sortable.desc::after { content: " \25BC"; opacity: 1; }
-.nj-analytics-search-label { display: flex; flex-direction: column; gap: 3px; min-width: 340px; flex: 0 0 340px; }
+.nj-analytics-search-label { display: flex; flex-direction: column; gap: 3px; min-width: 380px; flex: 0 0 380px; }
 .nj-analytics-search-label input[type="search"] {
   height: 36px;
   padding: 6px 10px;
