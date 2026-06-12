@@ -12449,11 +12449,18 @@ function renderTransactions() {
       t.expenseIncome.trim().toLowerCase() === t.category.trim().toLowerCase());
     const isSalesChart = !!(t.chartAccount && /(^|:)\s*sales\s*$/i.test(t.chartAccount));
     const isLocked = isLockedDate(t.date);
+    // Savings rows (deposits OR pullbacks) — mobile 3-line layout hides
+    // the Vendor cell on income rows by default (income usually shows
+    // Customer); savings is the exception, so the row gets its own class
+    // and CSS reveals Vendor again.
+    const isSavingsRow = SAVINGS_CATEGORIES.includes((t.category || "").trim()) ||
+                         SAVINGS_CATEGORIES.includes((t.expenseIncome || "").trim());
     const rowCls = "tx-row" +
       (isNonJob ? " nonjob" : "") +
       (expincMatchesCat ? " expinc-cat-match" : "") +
       (isSalesChart ? " chart-sales" : "") +
-      (isLocked ? " locked-year" : "");
+      (isLocked ? " locked-year" : "") +
+      (isSavingsRow ? " tx-savings" : "");
     const tintColor = (t.jobNo && txJobColorMap.get(t.jobNo)) || "";
     const rowStyle = tintColor ? ` style="--row-tint: ${hexToRowTint(tintColor)}"` : "";
     // Padlock — universal "locked" icon. The recon column moved from
