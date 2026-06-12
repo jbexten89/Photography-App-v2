@@ -10604,20 +10604,50 @@ tr.nj-row-edit:hover, tr.nj-row-clickable:hover { background: rgba(127,127,127,0
 .snapshot-row-actions .btn.danger:hover { background: rgba(192, 57, 43, 0.12); }
 
 /* ===== Help / in-app manual =====
-   Desktop: toolbar pinned to the top of the viewport (position: sticky).
-   TOC pinned right below it. Page scrolls normally — the content pane
-   is what moves. Mobile keeps the existing stacked, non-sticky layout. */
+   Desktop: the Help tab becomes a fixed-height container that fills the
+   viewport. Toolbar at top + TOC + content panes — only the content
+   pane scrolls. Page-level scroll is disabled inside Help so nothing
+   moves relative to anything else.
+
+   We use display: flex on the section and overflow: hidden so the
+   section cannot grow taller than the viewport. The right pane has
+   overflow-y: auto for the actual manual scroll. */
+@media (min-width: 901px) {
+  /* Section's natural top inside main is 24px (main's padding). Subtract
+     that from 100vh to fill exactly to the bottom of the viewport. */
+  body:has(#help.tab-panel.active) main { overflow: hidden; }
+  #help.tab-panel.active {
+    display: flex !important;
+    flex-direction: column;
+    height: calc(100vh - 48px);
+    min-height: 0;
+    overflow: hidden;
+  }
+  #help.tab-panel.active .help-layout {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+  }
+  #help.tab-panel.active .help-toc {
+    height: 100%;
+    max-height: none;
+    position: static;
+    top: auto;
+    overflow-y: auto;
+  }
+  #help.tab-panel.active .help-content {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+}
 #help .help-toolbar {
   display: flex;
   gap: 8px;
   align-items: center;
   margin-bottom: 12px;
   flex-wrap: wrap;
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  background: var(--bg);
-  padding: 6px 0;
+  flex: 0 0 auto;
 }
 #help-search {
   flex: 1 1 200px;
