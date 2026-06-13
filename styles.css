@@ -7227,6 +7227,10 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
        and this reclaims viewport space (matches the New Job pattern). */
     display: none !important;
   }
+  /* Hide the page-heading-mobile title on Calendar, Invoices, and Mileage too. */
+  #schedule > .page-heading-mobile,
+  #invoices > .page-heading-mobile,
+  #mileage > .page-heading-mobile { display: none !important; }
   .running-balance {
     padding: 1px 4px 12px !important;
     margin: 0 0 4px;
