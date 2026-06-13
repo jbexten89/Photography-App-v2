@@ -7661,6 +7661,21 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .nj-analytics-filters label:has(#nj-analytics-category) { flex: 0 0 calc(66.667% - 4px); order: 3; }
   #newjob #nj-analytics-clear { flex: 0 0 calc(33.333% - 4px); height: 40px; min-height: 40px; align-self: end; order: 5; }
   #newjob .nj-analytics-filters > span[style*="flex:1"] { display: none; }
+  /* Hide the YEAR / CUSTOMER / CATEGORY label text on mobile — the "All Years"
+     / "All Customers" / "All Categories" default option inside each select
+     now serves as the description. Trick: font-size: 0 on the label collapses
+     the text node, then we restore font-size on the <select> child. */
+  #newjob .nj-analytics-filters label:has(#nj-analytics-year),
+  #newjob .nj-analytics-filters label:has(#nj-analytics-customer),
+  #newjob .nj-analytics-filters label:has(#nj-analytics-category) {
+    font-size: 0;
+    gap: 0;
+  }
+  #newjob .nj-analytics-filters label:has(#nj-analytics-year) select,
+  #newjob .nj-analytics-filters label:has(#nj-analytics-customer) select,
+  #newjob .nj-analytics-filters label:has(#nj-analytics-category) select {
+    font-size: 16px;
+  }
 
   /* Add-Job modal: stack each field on its own row (5 rows + actions) */
   #nj-add-modal .modal-content #nj-form {

@@ -14871,7 +14871,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       const cur = yearSel.value;
       const years = [...new Set(allJobs.map(j => (j.date || "").slice(0, 4)).filter(y => /^\d{4}$/.test(y)))]
         .sort((a, b) => b.localeCompare(a));
-      yearSel.innerHTML = `<option value="">All</option>` + years.map(y => `<option value="${y}">${y}</option>`).join("");
+      yearSel.innerHTML = `<option value="">All Years</option>` + years.map(y => `<option value="${y}">${y}</option>`).join("");
       if (years.includes(cur)) yearSel.value = cur;
     }
     const custSel = $("nj-analytics-customer");
@@ -14879,7 +14879,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       const cur = custSel.value;
       const customers = [...new Set(allJobs.map(j => (j.customer || "").trim()).filter(Boolean))]
         .sort((a, b) => a.localeCompare(b));
-      custSel.innerHTML = `<option value="">All</option>` + customers.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+      custSel.innerHTML = `<option value="">All Customers</option>` + customers.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
       if (customers.includes(cur)) custSel.value = cur;
     }
     const catSel = $("nj-analytics-category");
@@ -14887,7 +14887,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       const cur = catSel.value;
       const cats = [...new Set(allJobs.map(j => (j.category || "").trim()).filter(Boolean))]
         .sort((a, b) => a.localeCompare(b));
-      catSel.innerHTML = `<option value="">All</option>` + cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+      catSel.innerHTML = `<option value="">All Categories</option>` + cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
       if (cats.includes(cur)) catSel.value = cur;
     }
   }
