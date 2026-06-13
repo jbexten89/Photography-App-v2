@@ -8459,64 +8459,41 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 .nj-add-trigger-row { display: flex; justify-content: flex-end; margin: 8px 0 16px; }
 
 @media (max-width: 768px) {
-  /* Mobile-only fixed-viewport layout for the Analytics page so the view
-     pills + filter toolbar stay pinned and only the chart area scrolls.
-     Mirrors the New Job and Transactions patterns. */
-  #jobs.tab-panel.active {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 56px);
-    overflow: hidden;
-  }
-  #jobs > .analytics-header {
-    flex: 0 0 auto;
+  /* Match Transactions: a single sticky band wrapping heading + trigger row +
+     filters. Body scrolls (no viewport-fixed flex); the band pins at top:0
+     with the page heading INSIDE so the title also pins (same as Transactions
+     where page-heading-mobile is inside .tx-sticky-header). */
+  #newjob > .nj-sticky-band {
+    position: sticky;
+    top: 0;
+    z-index: 50;
     background: var(--bg);
-    margin-bottom: 6px;
-    padding-bottom: 6px;
     border-bottom: 1px solid var(--border);
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    overflow: visible;
+    display: flow-root;  /* contain children's margins inside the band */
   }
-  #jobs > .analytics-views {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    overflow-x: hidden;
-    min-height: 0;
-  }
-  /* Page heading slides off — hide it on mobile so the pills + filter row
-     have the viewport to themselves. */
-  #jobs .analytics-heading-mobile { display: none !important; }
+  #newjob > .nj-sticky-band .page-heading-mobile { padding: 6px 0 4px; margin: 0; }
+  #newjob > .nj-sticky-band .nj-add-trigger-row { margin: 6px 0 6px; }
+  #newjob > .nj-sticky-band .nj-analytics-heading { margin-top: 6px !important; margin-bottom: 6px; }
 }
 
 @media (max-width: 768px) {
-  /* Mobile-only fixed-viewport layout for the New Job page so the top
-     section (button + filters) stays pinned and ONLY the jobs table scrolls.
-     This avoids position:sticky entirely — which was unreliable here — by
-     making #newjob a viewport-height flex column with the table-wrap as the
-     scrollable child. The band sits at top naturally and never moves. */
-  #newjob.tab-panel.active {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 56px);
-    overflow: hidden;
-  }
-  #newjob .nj-sticky-band {
-    flex: 0 0 auto;
+  /* Analytics: same pattern. The existing <header class="analytics-header">
+     already contains the heading + pills + filter toolbar — make it sticky
+     mirroring the Transactions band. */
+  #jobs > .analytics-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
     background: var(--bg);
-    padding-bottom: 6px;
-    margin-bottom: 6px;
     border-bottom: 1px solid var(--border);
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    overflow: visible;
+    display: flow-root;
   }
-  #newjob .nj-sticky-band .nj-add-trigger-row { margin: 6px 0 6px; }
-  #newjob .nj-sticky-band .nj-analytics-heading { margin-top: 6px !important; margin-bottom: 6px; }
-  #newjob > .table-wrap {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    overflow-x: auto;
-    min-height: 0;
-    margin-bottom: 0;
-  }
-  /* Page heading slides off — hide it on mobile so it doesn't eat the
-     viewport. The trigger row + filters already tell the user where they are. */
-  #newjob > .page-heading-mobile { display: none !important; }
 }
 
 /* All Transactions: hide Clear filters on desktop (it lives in row 3 mobile only) */

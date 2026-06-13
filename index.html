@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=624" />
+<link rel="stylesheet" href="styles.css?v=625" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -3047,12 +3047,11 @@
 
     <!-- ===== NEW JOB page ===== -->
     <section id="newjob" class="tab-panel">
+      <div class="nj-sticky-band">
       <div class="page-heading-mobile">
         <h1 class="page-title-mobile">New Job</h1>
         <p class="page-subtitle-mobile muted">Log jobs (YY001 numbering) and track profit by Job No.</p>
       </div>
-
-      <div class="nj-sticky-band">
       <div class="nj-add-trigger-row">
         <button type="button" id="nj-open-add-modal" class="btn primary">+ New Job</button>
       </div>
