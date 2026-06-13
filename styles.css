@@ -5639,16 +5639,14 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
      right edge lines up with the All Years select's right edge. */
   #transactions .toolbar #btn-new-tx            {
     order: -22;
-    flex: 0 0 calc(33.333% - 6px);
+    flex: 0 0 auto;
     margin-left: auto;
     margin-right: 6px;
-    min-width: 0;
     height: auto;
-    min-height: 44px;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    min-height: 40px;
+    padding: 8px 14px;
     line-height: 1.2;
-    white-space: normal;
+    white-space: nowrap;
   }
   #transactions .toolbar .tx-toolbar-row-break {
     display: block;
