@@ -8459,29 +8459,35 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 .nj-add-trigger-row { display: flex; justify-content: flex-end; margin: 8px 0 16px; }
 
 @media (max-width: 768px) {
-  /* Pin the New Job page top section (button row + Job Analytics heading +
-     filter row) to the top of the viewport while the jobs table scrolls.
-     top is offset by 56px (mobile header bar height) + safe-area-inset-top
-     so the band sits BELOW the fixed mobile header instead of behind it. */
+  /* Mobile-only fixed-viewport layout for the New Job page so the top
+     section (button + filters) stays pinned and ONLY the jobs table scrolls.
+     This avoids position:sticky entirely — which was unreliable here — by
+     making #newjob a viewport-height flex column with the table-wrap as the
+     scrollable child. The band sits at top naturally and never moves. */
+  #newjob.tab-panel.active {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
   #newjob .nj-sticky-band {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    /* Solid background so the jobs table can't be seen through the band as
-       it scrolls. Pulling the band 4px up + adding 4px padding-top hides the
-       4px main-padding-top sliver where the table would otherwise peek. */
+    flex: 0 0 auto;
     background: var(--bg);
-    margin-top: -4px;
-    padding-top: 4px;
     padding-bottom: 6px;
     margin-bottom: 6px;
     border-bottom: 1px solid var(--border);
-    /* Contain children's margins so they don't collapse out of the band. */
-    display: flow-root;
   }
-  /* Tighten internal spacing so the band doesn't take half the screen. */
   #newjob .nj-sticky-band .nj-add-trigger-row { margin: 6px 0 6px; }
   #newjob .nj-sticky-band .nj-analytics-heading { margin-top: 6px !important; margin-bottom: 6px; }
+  #newjob > .table-wrap {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: auto;
+    min-height: 0;
+    margin-bottom: 0;
+  }
+  /* Page heading still scrolls — keep it small so it doesn't eat the viewport. */
+  #newjob > .page-heading-mobile { flex: 0 0 auto; padding: 4px 0 6px; }
 }
 
 /* All Transactions: hide Clear filters on desktop (it lives in row 3 mobile only) */
