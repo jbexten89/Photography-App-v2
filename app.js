@@ -12607,7 +12607,7 @@ function renderTransactions() {
           linkedJob ? linkedJob.customer : "",
           linkedJob ? linkedJob.category : "",
           linkedJob ? linkedJob.memo : ""
-        ].map(x => (x || "").toLowerCase()).join(" ");
+        ].map(x => String(x == null ? "" : x).toLowerCase()).join(" ");
         if (!fuzzyMatch(qAll, hay)) return false;
       }
       if (hideReconciled && t.reconciled === "R") return false;
@@ -14950,7 +14950,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
             t.account, t.chartAccount, t.date, fmtDate(t.date || ""),
             String(t.amount), t.type
           ]));
-        const hay = parts.filter(Boolean).join(" ").toLowerCase();
+        const hay = parts.map(x => String(x == null ? "" : x)).filter(Boolean).join(" ").toLowerCase();
         return fuzzyMatch(fSearch, hay);
       });
     }

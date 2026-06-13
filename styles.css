@@ -11397,10 +11397,17 @@ body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highl
 .nj-analytics-search-label { display: flex; flex-direction: column; gap: 3px; min-width: 280px; flex: 0 0 280px; }
 .nj-analytics-search-label input[type="search"] {
   height: 36px;
-  padding: 6px 10px;
+  /* padding split so the icon's padding-left: 34px (set in the earlier
+     icon-rule above) survives — using `padding:` shorthand here would
+     reset it back to 10px and crop the magnifying glass off. */
+  padding-top: 6px;
+  padding-right: 10px;
+  padding-bottom: 6px;
   border: 1px solid var(--border, rgba(0,0,0,0.15));
   border-radius: 6px;
-  background: var(--surface, #fff);
+  /* background-color (not the `background:` shorthand) so the icon's
+     background-image set above isn't wiped out. */
+  background-color: var(--surface, #fff);
   color: inherit;
   font-size: 14px;
   box-sizing: border-box;
