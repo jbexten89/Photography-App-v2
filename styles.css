@@ -8458,6 +8458,24 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 /* New Job: trigger row spacing for + Add Job button (desktop + mobile) */
 .nj-add-trigger-row { display: flex; justify-content: flex-end; margin: 8px 0 16px; }
 
+@media (max-width: 768px) {
+  /* Pin the New Job page top section (button row + Job Analytics heading +
+     filter row) to the top of the viewport while the jobs table scrolls.
+     Mirrors the Transactions page mobile sticky band. */
+  #newjob .nj-sticky-band {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  /* Tighten internal spacing so the band doesn't take half the screen. */
+  #newjob .nj-sticky-band .nj-add-trigger-row { margin: 6px 0 6px; }
+  #newjob .nj-sticky-band .nj-analytics-heading { margin-top: 6px !important; margin-bottom: 6px; }
+}
+
 /* All Transactions: hide Clear filters on desktop (it lives in row 3 mobile only) */
 @media (min-width: 769px) { #transactions #btn-tx-clear-filters { display: none; } }
 
