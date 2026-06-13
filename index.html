@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=629" />
+<link rel="stylesheet" href="styles.css?v=630" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1067,6 +1067,7 @@
     <section id="invoices" class="tab-panel">
       <!-- LIST VIEW -->
       <div id="invoices-list-view">
+        <div class="inv-sticky-band">
         <div class="page-heading-mobile">
           <h1 class="page-title-mobile">Invoices</h1>
           <p class="page-subtitle-mobile muted">Create and track customer invoices</p>
@@ -1094,6 +1095,7 @@
           <span style="flex:1"></span>
           <button id="btn-new-invoice" class="btn primary">+ New Invoice</button>
         </div>
+        </div><!-- /.inv-sticky-band -->
         <!-- Un-Invoiced jobs (income transactions not linked to any invoice) -->
         <div id="uninvoiced-jobs-card" class="uninvoiced-card" hidden>
           <div class="uninvoiced-head">

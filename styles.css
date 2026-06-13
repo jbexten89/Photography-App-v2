@@ -7233,6 +7233,19 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #schedule .page-heading-mobile,
   #invoices .page-heading-mobile,
   #mileage .page-heading-mobile { display: none !important; }
+
+  /* Invoices: sticky band wrapping the summary + toolbar so they pin while
+     the invoice table scrolls. Mirrors the Transactions / New Job pattern. */
+  #invoices .inv-sticky-band {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    display: flow-root;
+  }
   .running-balance {
     padding: 1px 4px 12px !important;
     margin: 0 0 4px;
