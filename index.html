@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=630" />
+<link rel="stylesheet" href="styles.css?v=631" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -1096,6 +1096,7 @@
           <button id="btn-new-invoice" class="btn primary">+ New Invoice</button>
         </div>
         </div><!-- /.inv-sticky-band -->
+        <div class="inv-scroll">
         <!-- Un-Invoiced jobs (income transactions not linked to any invoice) -->
         <div id="uninvoiced-jobs-card" class="uninvoiced-card" hidden>
           <div class="uninvoiced-head">
@@ -1144,6 +1145,7 @@
             <tbody></tbody>
           </table>
         </div>
+        </div><!-- /.inv-scroll -->
       </div>
 
       <!-- EDITOR VIEW -->
@@ -2440,6 +2442,7 @@
         <button id="sched-new-event" class="btn primary" type="button">+ New Event</button>
       </div>
 
+      <div class="sched-scroll">
       <h2 id="sched-list-heading">Scheduled Jobs</h2>
       <div class="table-wrap">
         <table id="schedule-list-table" class="fixed-cols">
@@ -2464,6 +2467,7 @@
       </div>
 
       <div class="schedule-year-grid" id="schedule-calendar"></div>
+      </div><!-- /.sched-scroll -->
     </section>
 
     <!-- BACKFILL JOB NO. MODAL (new-spec) -->

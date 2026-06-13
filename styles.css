@@ -7234,18 +7234,35 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #invoices .page-heading-mobile,
   #mileage .page-heading-mobile { display: none !important; }
 
-  /* Invoices: sticky band wrapping the summary + toolbar so they pin while
-     the invoice table scrolls. Mirrors the Transactions / New Job pattern. */
-  #invoices .inv-sticky-band {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 6px;
-    padding-bottom: 8px;
-    display: flow-root;
+  /* Fixed-viewport layout on Transactions, Calendar, and Invoices so the
+     sticky band stays literally fixed (mirrors the New Job page approach
+     instead of using position:sticky). */
+
+  /* Transactions */
+  #transactions.tab-panel.active {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow: hidden;
   }
+  #transactions > .tx-sticky-header { flex: 0 0 auto; position: static !important; }
+  #transactions > .table-wrap { flex: 1 1 auto; overflow-y: auto; overflow-x: auto; min-height: 0; margin-bottom: 0; }
+
+  /* Calendar (#schedule) */
+  #schedule.tab-panel.active {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+  #schedule > .schedule-toolbar { flex: 0 0 auto; }
+  #schedule > .sched-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+
+  /* Invoices — list view */
+  #invoices.tab-panel.active { display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; }
+  #invoices > #invoices-list-view { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  #invoices-list-view > .inv-sticky-band { flex: 0 0 auto; position: static !important; }
+  #invoices-list-view > .inv-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
   .running-balance {
     padding: 1px 4px 12px !important;
     margin: 0 0 4px;
