@@ -8465,12 +8465,19 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
      so the band sits BELOW the fixed mobile header instead of behind it. */
   #newjob .nj-sticky-band {
     position: sticky;
-    top: calc(56px + env(safe-area-inset-top, 0px));
+    top: 0;
     z-index: 50;
+    /* Solid background so the jobs table can't be seen through the band as
+       it scrolls. Pulling the band 4px up + adding 4px padding-top hides the
+       4px main-padding-top sliver where the table would otherwise peek. */
     background: var(--bg);
+    margin-top: -4px;
+    padding-top: 4px;
     padding-bottom: 6px;
     margin-bottom: 6px;
     border-bottom: 1px solid var(--border);
+    /* Contain children's margins so they don't collapse out of the band. */
+    display: flow-root;
   }
   /* Tighten internal spacing so the band doesn't take half the screen. */
   #newjob .nj-sticky-band .nj-add-trigger-row { margin: 6px 0 6px; }
