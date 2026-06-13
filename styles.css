@@ -8461,10 +8461,11 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 @media (max-width: 768px) {
   /* Pin the New Job page top section (button row + Job Analytics heading +
      filter row) to the top of the viewport while the jobs table scrolls.
-     Mirrors the Transactions page mobile sticky band. */
+     top is offset by 56px (mobile header bar height) + safe-area-inset-top
+     so the band sits BELOW the fixed mobile header instead of behind it. */
   #newjob .nj-sticky-band {
     position: sticky;
-    top: 0;
+    top: calc(56px + env(safe-area-inset-top, 0px));
     z-index: 50;
     background: var(--bg);
     padding-bottom: 6px;
