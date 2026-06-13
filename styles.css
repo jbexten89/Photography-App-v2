@@ -8481,6 +8481,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     overflow-x: hidden;
     min-height: 0;
   }
+  /* Page heading slides off — hide it on mobile so the pills + filter row
+     have the viewport to themselves. */
+  #jobs .analytics-heading-mobile { display: none !important; }
 }
 
 @media (max-width: 768px) {
@@ -8511,8 +8514,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     min-height: 0;
     margin-bottom: 0;
   }
-  /* Page heading still scrolls — keep it small so it doesn't eat the viewport. */
-  #newjob > .page-heading-mobile { flex: 0 0 auto; padding: 4px 0 6px; }
+  /* Page heading slides off — hide it on mobile so it doesn't eat the
+     viewport. The trigger row + filters already tell the user where they are. */
+  #newjob > .page-heading-mobile { display: none !important; }
 }
 
 /* All Transactions: hide Clear filters on desktop (it lives in row 3 mobile only) */
