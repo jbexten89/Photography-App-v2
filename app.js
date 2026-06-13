@@ -15745,6 +15745,28 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   });
   // Search box — re-render on every keystroke
   document.getElementById("nj-analytics-search")?.addEventListener("input", renderNjAnalytics);
+  // On mobile, dock the search label into the "+ New Job" trigger row so it
+  // shares a row with the button (mirrors the Transactions page). On desktop,
+  // keep it in its original spot inside .nj-analytics-filters.
+  function placeNjSearch() {
+    const search    = document.querySelector(".nj-analytics-search-label");
+    const triggerRow = document.querySelector(".nj-add-trigger-row");
+    const filters   = document.querySelector(".nj-analytics-filters");
+    const button    = document.getElementById("nj-open-add-modal");
+    const clearBtn  = document.getElementById("nj-analytics-clear");
+    if (!search || !triggerRow || !filters || !button) return;
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (isMobile) {
+      if (search.parentElement !== triggerRow) triggerRow.insertBefore(search, button);
+    } else {
+      if (search.parentElement !== filters) {
+        if (clearBtn) filters.insertBefore(search, clearBtn);
+        else filters.appendChild(search);
+      }
+    }
+  }
+  placeNjSearch();
+  window.addEventListener("resize", placeNjSearch);
   document.getElementById("nj-analytics-clear")?.addEventListener("click", () => {
     ["nj-analytics-year", "nj-analytics-customer", "nj-analytics-category", "nj-analytics-search"].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = "";

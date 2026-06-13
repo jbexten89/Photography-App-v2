@@ -7661,6 +7661,31 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob .nj-analytics-filters label:has(#nj-analytics-category) { flex: 0 0 calc(66.667% - 4px); order: 3; }
   #newjob #nj-analytics-clear { flex: 0 0 calc(33.333% - 4px); height: 40px; min-height: 40px; align-self: end; order: 5; }
   #newjob .nj-analytics-filters > span[style*="flex:1"] { display: none; }
+  /* Mobile only — when JS docks the search label into the New Job trigger row,
+     lay them out as a flex row: search fills left, button stays at its existing
+     size on the right. */
+  .nj-add-trigger-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+  .nj-add-trigger-row .nj-analytics-search-label {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    flex-direction: column;
+    display: flex;
+    gap: 0;
+    font-size: 0;
+  }
+  .nj-add-trigger-row .nj-analytics-search-label input {
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
   /* Hide the YEAR / CUSTOMER / CATEGORY label text on mobile — the "All Years"
      / "All Customers" / "All Categories" default option inside each select
      now serves as the description. Trick: font-size: 0 on the label collapses
