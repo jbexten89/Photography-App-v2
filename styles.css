@@ -4039,7 +4039,8 @@ select option {
 #tx-form label,
 #sched-form label,
 #trip-form label,
-#nj-edit-form label {
+#nj-edit-form label,
+#nj-form label {
   display: block;
   font-size: 12px;
   font-weight: 600;
