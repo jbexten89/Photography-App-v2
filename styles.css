@@ -7242,7 +7242,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #transactions.tab-panel.active {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 56px);
+    height: calc(100vh - 56px - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     overflow: hidden;
   }
   #transactions > .tx-sticky-header { flex: 0 0 auto; position: static !important; }
@@ -7252,14 +7252,14 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #schedule.tab-panel.active {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 56px);
+    height: calc(100vh - 56px - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     overflow: hidden;
   }
   #schedule > .schedule-toolbar { flex: 0 0 auto; }
   #schedule > .sched-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 
   /* Invoices — list view */
-  #invoices.tab-panel.active { display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; }
+  #invoices.tab-panel.active { display: flex; flex-direction: column; height: calc(100vh - 56px - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow: hidden; }
   #invoices > #invoices-list-view { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
   #invoices-list-view > .inv-sticky-band { flex: 0 0 auto; position: static !important; }
   #invoices-list-view > .inv-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
@@ -8507,7 +8507,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #jobs.tab-panel.active {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 56px);
+    height: calc(100vh - 56px - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     overflow: hidden;
   }
   #jobs > .analytics-header {
@@ -8537,7 +8537,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #newjob.tab-panel.active {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 56px);
+    height: calc(100vh - 56px - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     overflow: hidden;
   }
   #newjob .nj-sticky-band {
