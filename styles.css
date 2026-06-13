@@ -5659,10 +5659,17 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
     padding: 0;
   }
 
+  /* Row 1 (continued) — Search shares the same row as New Transaction.
+     Order -23 puts it BEFORE the New Tx button (which is -22) and before
+     the row-break (-21), so it doesn't wrap to a new row. flex: 1 1 0 with
+     min-width: 0 lets it absorb whatever width is left after the button,
+     which keeps the button at its natural 1/3 size and prevents wrapping. */
+  #transactions .toolbar .tx-find-wrap          { order: -23; flex: 1 1 0; min-width: 0; margin: 0; }
+  #transactions .toolbar #tx-search-all         { width: 100%; min-width: 0; max-width: none; box-sizing: border-box; }
+
   /* Row 2 */
-  #transactions .toolbar .tx-find-wrap          { order: -19; flex: 0 0 calc(33.333% - 6px); min-width: 0; margin: 0; }
-  #transactions .toolbar #btn-tx-clear-filters  { order: -18; flex: 0 0 calc(33.333% - 6px); min-width: 0; height: 40px; min-height: 40px; }
-  #transactions .toolbar #tx-filter-year        { order: -17; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
+  #transactions .toolbar #btn-tx-clear-filters  { order: -18; flex: 0 0 calc(50% - 4px); min-width: 0; height: 40px; min-height: 40px; }
+  #transactions .toolbar #tx-filter-year        { order: -17; flex: 0 0 calc(50% - 4px); min-width: 0; }
 
   /* Row 3 — More · Filters · All Types (each 1/3) */
   #transactions .toolbar .tx-more-wrap          { order: -16; flex: 0 0 calc(33.333% - 6px); min-width: 0; }
@@ -6343,13 +6350,7 @@ td.recon-cell { text-align: center; }
 }
 #btn-tx-find,
 #btn-tx-find-close { display: none !important; }
-#transactions .toolbar .tx-find-wrap { flex: 0 0 auto; }
-#transactions .toolbar #tx-search-all,
 .tx-find-input {
-  width: 280px !important;
-  min-width: 280px;
-  height: 36px;
-  padding: 6px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface, var(--bg));
@@ -6359,6 +6360,17 @@ td.recon-cell { text-align: center; }
   box-sizing: border-box;
   opacity: 1;
   pointer-events: auto;
+}
+/* Desktop sizing — scoped so it doesn't fight the mobile layout below. */
+@media (min-width: 769px) {
+  #transactions .toolbar .tx-find-wrap { flex: 0 0 auto; }
+  #transactions .toolbar #tx-search-all,
+  .tx-find-input {
+    width: 280px !important;
+    min-width: 280px;
+    height: 36px;
+    padding: 6px 10px;
+  }
 }
 
 /* When JS relocates Gross/Net into the Analytics toolbar-row (any breakpoint),
