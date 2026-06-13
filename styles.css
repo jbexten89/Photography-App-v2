@@ -8459,6 +8459,31 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
 .nj-add-trigger-row { display: flex; justify-content: flex-end; margin: 8px 0 16px; }
 
 @media (max-width: 768px) {
+  /* Mobile-only fixed-viewport layout for the Analytics page so the view
+     pills + filter toolbar stay pinned and only the chart area scrolls.
+     Mirrors the New Job and Transactions patterns. */
+  #jobs.tab-panel.active {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+  #jobs > .analytics-header {
+    flex: 0 0 auto;
+    background: var(--bg);
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  #jobs > .analytics-views {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 768px) {
   /* Mobile-only fixed-viewport layout for the New Job page so the top
      section (button + filters) stays pinned and ONLY the jobs table scrolls.
      This avoids position:sticky entirely — which was unreliable here — by
