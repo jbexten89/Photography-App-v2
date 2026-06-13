@@ -7223,9 +7223,9 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     align-items: center !important;
   }
   #transactions > .tx-sticky-header .page-heading-mobile {
-    position: static;
-    margin: 0;
-    padding: 6px 0 4px;
+    /* Hidden on mobile — the toolbar already tells the user where they are
+       and this reclaims viewport space (matches the New Job pattern). */
+    display: none !important;
   }
   .running-balance {
     padding: 1px 4px 12px !important;
