@@ -6359,6 +6359,19 @@ td.recon-cell { text-align: center; }
   box-sizing: border-box;
   opacity: 1;
   pointer-events: auto;
+  /* Magnifying-glass icon inside the input on the left. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 16px 16px;
+  padding-left: 34px;
+}
+.nj-analytics-search-label input[type="search"] {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 16px 16px;
+  padding-left: 34px;
 }
 /* Desktop sizing — scoped so it doesn't fight the mobile layout below. */
 @media (min-width: 769px) {

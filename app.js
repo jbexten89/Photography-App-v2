@@ -12518,6 +12518,27 @@ function wireDashboardDrillThrough() {
   });
 }
 
+// fuzzyMatch: every token in `query` must subsequence-match `hay` (lowercased).
+// "mtnplr sftbl" → matches "Montpelier Softball"; "softball" → still matches
+// (substring is just a tighter subsequence). Each space-separated token is
+// matched independently so word order doesn't matter.
+function fuzzyMatch(query, hay) {
+  const q = (query || "").toLowerCase().trim();
+  if (!q) return true;
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const h = (hay || "").toLowerCase();
+  for (const tok of tokens) {
+    let hi = 0, ok = true;
+    for (const ch of tok) {
+      const idx = h.indexOf(ch, hi);
+      if (idx < 0) { ok = false; break; }
+      hi = idx + 1;
+    }
+    if (!ok) return false;
+  }
+  return true;
+}
+
 function renderTransactions() {
   const qAll = (document.getElementById("tx-search-all")?.value || "").toLowerCase().trim();
   const fYear = document.getElementById("tx-filter-year").value;
@@ -12566,6 +12587,11 @@ function renderTransactions() {
       }
       if (qAll) {
         const reconLabel = t.reconciled === "R" ? "reconciled" : "uncleared";
+        // Search EVERYTHING — every textual field on the transaction, plus the
+        // linked job's customer/category if jobNo is set, so a customer name
+        // matches transactions tied to that customer's jobs even when the
+        // customer field on the row is blank.
+        const linkedJob = t.jobNo ? (state.jobs || []).find(j => j.jobNo === t.jobNo) : null;
         const hay = [
           t.date,
           fmtDate(t.date || ""),
@@ -12577,9 +12603,12 @@ function renderTransactions() {
           String(t.amount),
           t.type,
           reconLabel,
-          t.hours != null ? String(t.hours) : ""
+          t.hours != null ? String(t.hours) : "",
+          linkedJob ? linkedJob.customer : "",
+          linkedJob ? linkedJob.category : "",
+          linkedJob ? linkedJob.memo : ""
         ].map(x => (x || "").toLowerCase()).join(" ");
-        if (!hay.includes(qAll)) return false;
+        if (!fuzzyMatch(qAll, hay)) return false;
       }
       if (hideReconciled && t.reconciled === "R") return false;
       return true;
@@ -14912,13 +14941,17 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       .filter(j => !fCust || (j.customer || "").trim() === fCust)
       .filter(j => !fCat  || (j.category || "").trim() === fCat);
     if (fSearch) {
-      const tokens = fSearch.split(/\s+/).filter(Boolean);
       jobs = jobs.filter(j => {
         const m = njMetricsFor(j);
-        const parts = [j.jobNo, j.customer, j.category, j.memo, j.date, j.hours]
-          .concat(m.linked.flatMap(t => [t.vendor, t.customer, t.payee, t.memo, t.category, t.expenseIncome]));
+        // Search EVERYTHING on the job + every linked transaction.
+        const parts = [j.jobNo, j.customer, j.category, j.memo, j.date, j.hours, j.status]
+          .concat(m.linked.flatMap(t => [
+            t.vendor, t.customer, t.payee, t.memo, t.category, t.expenseIncome,
+            t.account, t.chartAccount, t.date, fmtDate(t.date || ""),
+            String(t.amount), t.type
+          ]));
         const hay = parts.filter(Boolean).join(" ").toLowerCase();
-        return tokens.every(tok => hay.includes(tok));
+        return fuzzyMatch(fSearch, hay);
       });
     }
     const sortState = (window.__njSort && window.__njSort.col)
