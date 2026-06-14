@@ -9188,8 +9188,8 @@ function renderInvoicesList() {
           inv.paidDate || "",
           totalStr,
           lineHay,
-        ].map(x => (x || "").toString().toLowerCase()).join(" ");
-        if (!hay.includes(qAll)) return false;
+        ].map(x => String(x == null ? "" : x)).join(" ").toLowerCase();
+        if (!fuzzyMatch(qAll, hay)) return false;
       }
       return true;
     })
