@@ -7263,6 +7263,12 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #invoices > #invoices-list-view { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
   #invoices-list-view > .inv-sticky-band { flex: 0 0 auto; position: static !important; }
   #invoices-list-view > .inv-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+
+  /* Mileage — list view (same pattern as Invoices) */
+  #mileage.tab-panel.active { display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; }
+  #mileage > #mileage-list-view { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  #mileage-list-view > .mileage-sticky-band { flex: 0 0 auto; background: var(--bg); padding-bottom: 6px; margin-bottom: 6px; border-bottom: 1px solid var(--border); }
+  #mileage-list-view > .mileage-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
   .running-balance {
     padding: 1px 4px 12px !important;
     margin: 0 0 4px;

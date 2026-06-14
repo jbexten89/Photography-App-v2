@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=633" />
+<link rel="stylesheet" href="styles.css?v=634" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2335,6 +2335,7 @@
     <!-- MILEAGE -->
     <section id="mileage" class="tab-panel">
       <div id="mileage-list-view">
+        <div class="mileage-sticky-band">
         <div class="page-heading-mobile">
           <h1 class="page-title-mobile">Mileage</h1>
           <p class="page-subtitle-mobile muted">Log trips and calculate vehicle reimbursement</p>
@@ -2356,6 +2357,7 @@
           <span style="flex:1"></span>
           <button type="button" id="mileage-open-add-modal" class="btn primary">+ New Trip</button>
         </div>
+        </div><!-- /.mileage-sticky-band -->
 
         <!-- Add Trip modal -->
         <div id="mileage-add-modal" class="modal hidden">
@@ -2383,6 +2385,7 @@
           </div>
         </div>
 
+        <div class="mileage-scroll">
         <h2 id="mileage-summary-heading" style="margin-top:24px">Summary by Vehicle</h2>
         <div class="table-wrap">
           <table id="mileage-summary-table" class="fixed-cols">
@@ -2426,6 +2429,7 @@
             <tbody></tbody>
           </table>
         </div>
+        </div><!-- /.mileage-scroll -->
       </div>
 
     </section>
