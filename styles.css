@@ -7257,9 +7257,13 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #schedule .schedule-summary .inv-sum-label { font-size: 10px; }
   #schedule .schedule-summary .inv-sum-value { font-size: 20px; }
 
-  /* Invoices — list view */
-  #invoices.tab-panel.active { display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; }
-  #invoices > #invoices-list-view { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  /* Invoices — list view only (edit view scrolls normally with body). */
+  #invoices-list-view:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
   #invoices-list-view > .inv-sticky-band { flex: 0 0 auto; position: static !important; }
   #invoices-list-view > .inv-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 
