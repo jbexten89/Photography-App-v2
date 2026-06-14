@@ -7345,12 +7345,13 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   /* Table scrolls horizontally — preserve the default behavior */
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-  /* All-Transactions table flows with the page on mobile — no internal
-     sub-scroller. Only the running-balance bar above stays sticky. */
+  /* All-Transactions table on mobile — the section is now a fixed-viewport
+     flex column (see #transactions.tab-panel.active rule above), so the
+     table-wrap is the scrollable flex:1 child. */
   #transactions .table-wrap {
     position: static;
     max-height: none;
-    overflow-y: visible;
+    overflow-y: auto;
   }
   /* Headers scroll naturally with the content (no sticky thead). */
   #tx-table thead th { top: auto; z-index: auto; background: var(--surface-alt); }
