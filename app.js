@@ -852,18 +852,17 @@ window.addEventListener("resize", () => syncJobsModeTogglePlacement());
 // Also run once at startup so the initial render reflects the right home.
 setTimeout(() => syncJobsModeTogglePlacement(), 0);
 
-// On mobile, relocate the + New Invoice button into the invoice-summary grid
-// so it sits on the right side of the same row as Outstanding Balance.
+// The + New Invoice button used to be relocated into the invoice-summary grid
+// on mobile (occupying the empty [2,2] cell when summary was 2x2). Now that
+// the summary is 3-wide on mobile (matching Calendar), there's no slot for
+// the button — it stays in the toolbar, which is itself pinned.
 const _newInvoiceBtn = document.getElementById("btn-new-invoice");
 const _newInvoiceOrigParent = _newInvoiceBtn?.parentNode || null;
 const _newInvoiceOrigNext   = _newInvoiceBtn?.nextSibling || null;
 function syncNewInvoiceButtonPlacement() {
   if (!_newInvoiceBtn || !_newInvoiceOrigParent) return;
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
-  const summary = document.querySelector("#invoices-list-view .invoice-summary");
-  if (isMobile && summary) {
-    if (_newInvoiceBtn.parentNode !== summary) summary.appendChild(_newInvoiceBtn);
-  } else {
+  // Always keep the button in its original toolbar slot.
+  {
     if (_newInvoiceBtn.parentNode !== _newInvoiceOrigParent) {
       _newInvoiceOrigParent.insertBefore(_newInvoiceBtn, _newInvoiceOrigNext);
     }

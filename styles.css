@@ -6922,22 +6922,13 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   .flow-bar { border-radius: 0 3px 3px 0; }
 
   /* --- Invoices --- */
-  /* Mobile invoice summary:
-       Row 1: Total Invoiced  · Total Paid
-       Row 2: Outstanding Balance · + New Invoice (relocated by JS) */
-  .invoice-summary { grid-template-columns: 1fr 1fr; }
-  .invoice-summary > #btn-new-invoice {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    align-self: stretch;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-  }
+  /* Mobile invoice summary: 3 tiles in one row (matches Calendar). The
+     + New Invoice button stays in the toolbar — see
+     syncNewInvoiceButtonPlacement() in app.js. */
+  #invoices-list-view .invoice-summary { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  #invoices-list-view .invoice-summary .inv-sum-item { padding: 8px 10px; }
+  #invoices-list-view .invoice-summary .inv-sum-label { font-size: 10px; }
+  #invoices-list-view .invoice-summary .inv-sum-value { font-size: 16px; }
 
   /* Un Invoiced + Invoices tables: let data breathe and slide horizontally. */
   .uninvoiced-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
