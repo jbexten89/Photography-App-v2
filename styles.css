@@ -8754,7 +8754,7 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #invoices-list-view .toolbar #inv-filter-year  { order: 2; flex: 0 0 calc(50% - 4px); min-width: 0; }
   #invoices-list-view .toolbar #inv-filter-billto {
     order: 3;
-    flex: 1 1 100%;
+    flex: 0 0 calc(50% - 4px);
     min-width: 0;
     /* Replace the "Search invoices..." placeholder with a magnifying-glass
        icon and left-justify the cursor. */
@@ -8767,7 +8767,8 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   }
   #invoices-list-view .toolbar #inv-filter-billto::placeholder { color: transparent; }
   #invoices-list-view .toolbar > span[style*="flex"] { display: none; }
-  #invoices-list-view .toolbar #btn-new-invoice  { order: 4; flex: 1 1 100%; }
+  /* Row 2: Search + New Invoice each 1/2 width. */
+  #invoices-list-view .toolbar #btn-new-invoice  { order: 4; flex: 0 0 calc(50% - 4px); min-width: 0; }
 
   /* Report toolbars — date inputs take appropriate width */
   .date-range {
