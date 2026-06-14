@@ -25,7 +25,7 @@
      briefly shows the page at full opacity before styles.css applies
      opacity:0, producing a noticeable flash before the fade-in. -->
 <style>body { opacity: 0; }</style>
-<link rel="stylesheet" href="styles.css?v=634" />
+<link rel="stylesheet" href="styles.css?v=635" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- d3 + d3-sankey for the Breakdown view -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -2440,6 +2440,20 @@
         <h1 class="page-title-mobile">Calendar</h1>
         <p class="page-subtitle-mobile muted">Plan upcoming jobs and shoot dates</p>
       </div>
+      <div class="invoice-summary schedule-summary">
+        <div class="inv-sum-item">
+          <span class="inv-sum-label">Upcoming (next 30 days)</span>
+          <span class="inv-sum-value" id="sched-sum-upcoming">0</span>
+        </div>
+        <div class="inv-sum-item">
+          <span class="inv-sum-label">This Year</span>
+          <span class="inv-sum-value" id="sched-sum-year">0</span>
+        </div>
+        <div class="inv-sum-item">
+          <span class="inv-sum-label">Past 30 days</span>
+          <span class="inv-sum-value" id="sched-sum-past">0</span>
+        </div>
+      </div>
       <div class="schedule-toolbar">
         <select id="sched-year-select" class="btn year-select"></select>
         <span style="flex:1"></span>
@@ -3412,6 +3426,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=358"></script>
+  <script src="app.js?v=359"></script>
 </body>
 </html>

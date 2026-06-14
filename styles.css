@@ -7255,8 +7255,15 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
     height: calc(100vh - 56px);
     overflow: hidden;
   }
+  #schedule > .schedule-summary { flex: 0 0 auto; margin-bottom: 8px; }
   #schedule > .schedule-toolbar { flex: 0 0 auto; }
   #schedule > .sched-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+  /* Compact summary tiles on mobile: 3 columns instead of auto-fit minmax,
+     and smaller padding/font so all three fit comfortably in the band. */
+  #schedule .schedule-summary { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  #schedule .schedule-summary .inv-sum-item { padding: 8px 10px; }
+  #schedule .schedule-summary .inv-sum-label { font-size: 10px; }
+  #schedule .schedule-summary .inv-sum-value { font-size: 20px; }
 
   /* Invoices — list view */
   #invoices.tab-panel.active { display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; }

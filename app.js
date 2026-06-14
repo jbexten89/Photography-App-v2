@@ -6720,6 +6720,33 @@ function renderSchedule() {
   });
 
   renderScheduleList();
+  renderScheduleSummary();
+}
+
+function renderScheduleSummary() {
+  const upEl  = document.getElementById("sched-sum-upcoming");
+  const yrEl  = document.getElementById("sched-sum-year");
+  const pstEl = document.getElementById("sched-sum-past");
+  if (!upEl && !yrEl && !pstEl) return;
+  const events = state.scheduledJobs || [];
+  const now = new Date();
+  const todayIso = now.toISOString().slice(0, 10);
+  const in30 = new Date(now); in30.setDate(in30.getDate() + 30);
+  const in30Iso = in30.toISOString().slice(0, 10);
+  const past30 = new Date(now); past30.setDate(past30.getDate() - 30);
+  const past30Iso = past30.toISOString().slice(0, 10);
+  const yearStr = String(now.getFullYear());
+  let upcoming = 0, thisYear = 0, past = 0;
+  events.forEach(e => {
+    const d = e.date || "";
+    if (!d) return;
+    if (d >= todayIso && d <= in30Iso) upcoming++;
+    if (d.startsWith(yearStr)) thisYear++;
+    if (d < todayIso && d >= past30Iso) past++;
+  });
+  if (upEl)  upEl.textContent  = String(upcoming);
+  if (yrEl)  yrEl.textContent  = String(thisYear);
+  if (pstEl) pstEl.textContent = String(past);
 }
 
 function renderMiniMonth(year, month, eventsByDate, todayIso) {
