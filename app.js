@@ -9171,11 +9171,20 @@ function renderInvoicesList() {
       }
       // Free-text search runs against every visible/searchable field on the invoice.
       if (qAll) {
-        const lineHay = (inv.lineItems || []).map(l =>
-          [l.item, l.description, l.qty, l.price].filter(Boolean).join(" ")
-        ).join(" ");
+        const lineHay = (inv.lineItems || []).map(l => {
+          const priceN = Number(l.price);
+          const priceVariants = isNaN(priceN) ? "" :
+            [String(priceN), priceN.toFixed(2), fmtMoney(priceN)].join(" ");
+          return [l.item, l.description, l.qty, l.price, priceVariants]
+            .filter(Boolean).join(" ");
+        }).join(" ");
+        // Build several money representations so the user can search by any of:
+        // "125", "125.00", "$125.00", "$1,250.00", etc.
         const totalStr = (() => {
-          try { return String(invoiceTotal(inv) || ""); } catch (e) { return ""; }
+          try {
+            const n = Number(invoiceTotal(inv)) || 0;
+            return [String(n), n.toFixed(2), fmtMoney(n), fmtMoney(n).replace(/,/g, "")].join(" ");
+          } catch (e) { return ""; }
         })();
         const hay = [
           inv.number,
