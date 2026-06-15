@@ -9177,34 +9177,46 @@ function renderInvoicesList() {
       }
       // Free-text search runs against every visible/searchable field on the invoice.
       if (qAll) {
-        const lineHay = (inv.lineItems || []).map(l => {
-          const priceN = Number(l.price);
-          const priceVariants = isNaN(priceN) ? "" :
-            [String(priceN), priceN.toFixed(2), fmtMoney(priceN)].join(" ");
-          return [l.item, l.description, l.qty, l.price, priceVariants]
-            .filter(Boolean).join(" ");
-        }).join(" ");
-        // Build several money representations so the user can search by any of:
-        // "125", "125.00", "$125.00", "$1,250.00", etc.
-        const totalStr = (() => {
-          try {
-            const n = Number(invoiceTotal(inv)) || 0;
-            return [String(n), n.toFixed(2), fmtMoney(n), fmtMoney(n).replace(/,/g, "")].join(" ");
-          } catch (e) { return ""; }
-        })();
-        const hay = [
-          inv.number,
-          inv.date,
-          fmtDate(inv.date || ""),
-          inv.billTo,
-          inv.job,
-          inv.jobNo,
-          inv.paid ? "paid" : "unpaid",
-          inv.paidDate || "",
-          totalStr,
-          lineHay,
-        ].map(x => String(x == null ? "" : x)).join(" ").toLowerCase();
-        if (!fuzzyMatch(qAll, hay)) return false;
+        // Pull "paid" / "unpaid" out of the query and apply them as exact
+        // status filters — fuzzy subsequence matching against the word "paid"
+        // would otherwise match arbitrary text (any string with p, a, i, d
+        // in order somewhere). Each token is checked exactly.
+        const tokens = qAll.split(/\s+/).filter(Boolean);
+        const fuzzyTokens = [];
+        for (const tok of tokens) {
+          if (tok === "paid")        { if (!inv.paid) return false; }
+          else if (tok === "unpaid") { if (inv.paid)  return false; }
+          else { fuzzyTokens.push(tok); }
+        }
+        if (fuzzyTokens.length) {
+          const lineHay = (inv.lineItems || []).map(l => {
+            const priceN = Number(l.price);
+            const priceVariants = isNaN(priceN) ? "" :
+              [String(priceN), priceN.toFixed(2), fmtMoney(priceN)].join(" ");
+            return [l.item, l.description, l.qty, l.price, priceVariants]
+              .filter(Boolean).join(" ");
+          }).join(" ");
+          // Build several money representations so the user can search by any of:
+          // "125", "125.00", "$125.00", "$1,250.00", etc.
+          const totalStr = (() => {
+            try {
+              const n = Number(invoiceTotal(inv)) || 0;
+              return [String(n), n.toFixed(2), fmtMoney(n), fmtMoney(n).replace(/,/g, "")].join(" ");
+            } catch (e) { return ""; }
+          })();
+          const hay = [
+            inv.number,
+            inv.date,
+            fmtDate(inv.date || ""),
+            inv.billTo,
+            inv.job,
+            inv.jobNo,
+            inv.paidDate || "",
+            totalStr,
+            lineHay,
+          ].map(x => String(x == null ? "" : x)).join(" ").toLowerCase();
+          if (!fuzzyMatch(fuzzyTokens.join(" "), hay)) return false;
+        }
       }
       return true;
     })
