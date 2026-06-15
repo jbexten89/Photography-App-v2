@@ -12571,23 +12571,19 @@ function wireDashboardDrillThrough() {
   });
 }
 
-// fuzzyMatch: every token in `query` must subsequence-match `hay` (lowercased).
-// "mtnplr sftbl" → matches "Montpelier Softball"; "softball" → still matches
-// (substring is just a tighter subsequence). Each space-separated token is
-// matched independently so word order doesn't matter.
+// fuzzyMatch: every space-separated token in `query` must appear as a
+// contiguous substring of `hay` (case-insensitive). Order across tokens
+// doesn't matter — "ball mont" matches "Montpelier Softball" just like
+// "mont ball" does. Substring beats subsequence in practice: subsequence
+// matches "unpaid" inside any text that happens to contain u, n, p, a, i, d
+// in order; substring rejects those ghost matches.
 function fuzzyMatch(query, hay) {
   const q = (query || "").toLowerCase().trim();
   if (!q) return true;
   const tokens = q.split(/\s+/).filter(Boolean);
   const h = (hay || "").toLowerCase();
   for (const tok of tokens) {
-    let hi = 0, ok = true;
-    for (const ch of tok) {
-      const idx = h.indexOf(ch, hi);
-      if (idx < 0) { ok = false; break; }
-      hi = idx + 1;
-    }
-    if (!ok) return false;
+    if (h.indexOf(tok) === -1) return false;
   }
   return true;
 }
