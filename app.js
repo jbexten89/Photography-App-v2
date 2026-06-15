@@ -9164,10 +9164,16 @@ function renderInvoicesList() {
   }
   const sorted = state.invoices
     .filter(inv => {
-      if (fYear && !(inv.date || "").startsWith(fYear)) return false;
-      if (fCustomer) {
-        const c = (inv.billTo || "").split("\n")[0].trim();
-        if (c !== fCustomer) return false;
+      // When a search query is present, bypass the year + customer dropdowns.
+      // The year filter defaults to the current calendar year, which would
+      // otherwise silently hide invoices from other years that the user is
+      // searching for. Search is "global" — looks at every invoice.
+      if (!qAll) {
+        if (fYear && !(inv.date || "").startsWith(fYear)) return false;
+        if (fCustomer) {
+          const c = (inv.billTo || "").split("\n")[0].trim();
+          if (c !== fCustomer) return false;
+        }
       }
       // Free-text search runs against every visible/searchable field on the invoice.
       if (qAll) {
