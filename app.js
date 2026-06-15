@@ -9208,6 +9208,12 @@ function renderInvoicesList() {
             try { return moneyVariants(invoiceTotal(inv)); }
             catch (e) { return ""; }
           })();
+          // JSON fallback — covers any field we forget to enumerate above and
+          // any legacy field name (older invoices may have inv.total, inv.amount,
+          // inv.invoiceNumber, etc.). Strip commas so "$2,791.00" stored anywhere
+          // matches "2791".
+          let jsonHay = "";
+          try { jsonHay = JSON.stringify(inv).replace(/,/g, " "); } catch (e) {}
           const hay = [
             inv.number,
             inv.date,
@@ -9218,6 +9224,7 @@ function renderInvoicesList() {
             inv.paidDate || "",
             totalStr,
             lineHay,
+            jsonHay,
           ].map(x => String(x == null ? "" : x)).join(" ").toLowerCase();
           if (!fuzzyMatch(fuzzyTokens.join(" "), hay)) return false;
         }
