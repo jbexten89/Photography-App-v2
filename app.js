@@ -9189,20 +9189,24 @@ function renderInvoicesList() {
           else { fuzzyTokens.push(tok); }
         }
         if (fuzzyTokens.length) {
-          const lineHay = (inv.lineItems || []).map(l => {
-            const priceN = Number(l.price);
-            const priceVariants = isNaN(priceN) ? "" :
-              [String(priceN), priceN.toFixed(2), fmtMoney(priceN)].join(" ");
-            return [l.item, l.description, l.qty, l.price, priceVariants]
-              .filter(Boolean).join(" ");
-          }).join(" ");
-          // Build several money representations so the user can search by any of:
-          // "125", "125.00", "$125.00", "$1,250.00", etc.
+          // Build many money representations of every stored amount so a
+          // substring search like "2791" matches whether the data is
+          // stored as 2791, "2791.00", "$2,791.00", "$2791.00", etc.
+          const moneyVariants = (raw) => {
+            const n = parseMoneyInput(raw);
+            if (isNaN(n)) return String(raw || "").replace(/,/g, "");
+            return [
+              String(n), n.toFixed(2), fmtMoney(n), fmtMoney(n).replace(/,/g, ""),
+              String(raw || "").replace(/,/g, ""),
+            ].join(" ");
+          };
+          const lineHay = (inv.lineItems || []).map(l =>
+            [l.item, l.description, l.qty, moneyVariants(l.price)]
+              .filter(Boolean).join(" ")
+          ).join(" ");
           const totalStr = (() => {
-            try {
-              const n = Number(invoiceTotal(inv)) || 0;
-              return [String(n), n.toFixed(2), fmtMoney(n), fmtMoney(n).replace(/,/g, "")].join(" ");
-            } catch (e) { return ""; }
+            try { return moneyVariants(invoiceTotal(inv)); }
+            catch (e) { return ""; }
           })();
           const hay = [
             inv.number,
