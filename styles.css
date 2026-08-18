@@ -6164,6 +6164,52 @@ body.tx-hide-tags     #tx-table th[data-col="tags"],     body.tx-hide-tags     #
     width: auto !important;
     min-width: 100px;
   }
+  /* Chrome's print preview reports a viewport narrow enough to trigger the
+     @media (max-width: 768px) rules that stack the invoice header, bill-to
+     row, footer, and reflow the items table into cards. In print we want the
+     editor's desktop layout — force it back. */
+  .invoice-sheet .invoice-header {
+    flex-direction: row !important;
+    gap: 0 !important;
+    align-items: flex-start !important;
+  }
+  .invoice-sheet .invoice-meta {
+    text-align: right !important;
+    align-self: auto !important;
+  }
+  .invoice-sheet .invoice-meta-table { width: auto !important; }
+  .invoice-sheet .invoice-billto-row {
+    flex-direction: row !important;
+    gap: 32px !important;
+    align-items: flex-start !important;
+  }
+  .invoice-sheet .invoice-billto {
+    max-width: 340px !important;
+    flex: 0 0 340px !important;
+  }
+  .invoice-sheet .invoice-footer {
+    flex-direction: row !important;
+    gap: 16px !important;
+    text-align: initial !important;
+    padding-top: 0 !important;
+  }
+  /* Restore the items table (mobile turns it into stacked cards). */
+  .invoice-sheet .invoice-items { display: table !important; width: 100% !important; }
+  .invoice-sheet .invoice-items colgroup { display: table-column-group !important; }
+  .invoice-sheet .invoice-items thead { display: table-header-group !important; }
+  .invoice-sheet .invoice-items tbody { display: table-row-group !important; }
+  .invoice-sheet .invoice-items tbody tr {
+    display: table-row !important;
+    grid-template-areas: none !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  .invoice-sheet .invoice-items tbody td {
+    display: table-cell !important;
+    padding: 6px 8px !important;
+  }
+  .invoice-sheet .invoice-items tbody td::before { content: none !important; }
+
   .invoice-billto textarea {
     border: 1px solid #333 !important;
     background: #fff !important;
