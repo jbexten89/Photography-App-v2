@@ -12140,26 +12140,36 @@ function renderIncomeByYearChart(years, opts = {}) {
     const y = yFor(d.income);
     const h = Math.max(1, yFor(0) - y);
 
+    let yGoal = null;
+    if (i === currentIdx && goal > 0) yGoal = yFor(goal);
+
+    // If the goal line sits close above the bar top, the label stack above the
+    // bar (delta% at y-38, income value at y-12) collides with the goal amount
+    // at yGoal-10. Detect that and move the income+delta labels inside the bar.
+    const labelsInside = yGoal !== null && yGoal < y && (y - yGoal) < 50 && h > 60;
+
     // Year-over-year % change vs the previous (calendar-wise earlier) year.
     // In descending-by-year order that earlier year is at index i + 1.
     let deltaSvg = "";
     if (i < totals.length - 1) {
       const prev = totals[i + 1].income;
+      const deltaY = labelsInside ? y + 46 : y - 38;
       if (prev > 0) {
         const pct = ((d.income - prev) / prev) * 100;
         const up = pct >= 0;
-        const color = up ? "var(--income)" : "var(--expense)";
+        const color = labelsInside
+          ? (up ? "#0b3d1f" : "#5a0e0e")
+          : (up ? "var(--income)" : "var(--expense)");
         const label = `${up ? "+" : ""}${pct.toFixed(1)}%`;
-        deltaSvg = `<text class="trend-delta" x="${cx}" y="${y - 38}" style="text-anchor:middle;fill:${color};font-size:22px;font-weight:700">${escapeHtml(label)}</text>`;
+        deltaSvg = `<text class="trend-delta" x="${cx}" y="${deltaY}" style="text-anchor:middle;fill:${color};font-size:22px;font-weight:700">${escapeHtml(label)}</text>`;
       } else if (d.income > 0) {
-        deltaSvg = `<text class="trend-delta" x="${cx}" y="${y - 38}" style="text-anchor:middle;fill:var(--income);font-size:22px;font-weight:700">new</text>`;
+        const color = labelsInside ? "#0b3d1f" : "var(--income)";
+        deltaSvg = `<text class="trend-delta" x="${cx}" y="${deltaY}" style="text-anchor:middle;fill:${color};font-size:22px;font-weight:700">new</text>`;
       }
     }
 
-    // Goal overlay — only for the current calendar year if we have a valid goal
     let goalSvg = "";
-    if (i === currentIdx && goal > 0) {
-      const yGoal = yFor(goal);
+    if (yGoal !== null) {
       goalSvg = `
         <line x1="${x - 4}" y1="${yGoal}" x2="${x + barW + 4}" y2="${yGoal}"
           stroke="var(--accent)" stroke-width="2">
@@ -12170,13 +12180,16 @@ function renderIncomeByYearChart(years, opts = {}) {
       `;
     }
 
+    const incomeY = labelsInside ? y + 22 : y - 12;
+    const incomeFill = labelsInside ? "#0b0f14" : "var(--income)";
+
     return `
       ${goalSvg}
       <rect class="trend-bar" x="${x}" y="${y}" width="${barW}" height="${h}" fill="var(--income)" rx="3">
         <title>${escapeHtml(d.year)}: ${fmtMoney(d.income)}</title>
       </rect>
       ${deltaSvg}
-      <text class="trend-value" x="${cx}" y="${y - 12}" style="text-anchor:middle;fill:var(--income);font-size:22px;font-weight:700">${fmtMoney(d.income)}</text>
+      <text class="trend-value" x="${cx}" y="${incomeY}" style="text-anchor:middle;fill:${incomeFill};font-size:22px;font-weight:700">${fmtMoney(d.income)}</text>
       <text class="trend-year-label" x="${cx}" y="${H - padB + 22}" style="text-anchor:middle;font-size:22px;font-weight:600">${escapeHtml(d.year)}</text>
     `;
   }).join("");
