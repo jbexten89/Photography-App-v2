@@ -12143,28 +12143,27 @@ function renderIncomeByYearChart(years, opts = {}) {
     let yGoal = null;
     if (i === currentIdx && goal > 0) yGoal = yFor(goal);
 
-    // If the goal line sits close above the bar top, the label stack above the
-    // bar (delta% at y-38, income value at y-12) collides with the goal amount
-    // at yGoal-10. Detect that and move the income+delta labels inside the bar.
-    const labelsInside = yGoal !== null && yGoal < y && (y - yGoal) < 50 && h > 60;
+    // When the goal line sits close above the bar top, the label stack above
+    // the bar collides with the Goal amount (at yGoal - 10):
+    //   dropDelta: delta% at y-38 would overlap the Goal amount → skip delta
+    //   moveIncome: income at y-12 would also overlap → move it inside the bar
+    const gapAbove = yGoal !== null && yGoal < y ? (y - yGoal) : Infinity;
+    const dropDelta = gapAbove < 50;
+    const moveIncome = gapAbove < 24 && h > 40;
 
     // Year-over-year % change vs the previous (calendar-wise earlier) year.
     // In descending-by-year order that earlier year is at index i + 1.
     let deltaSvg = "";
-    if (i < totals.length - 1) {
+    if (!dropDelta && i < totals.length - 1) {
       const prev = totals[i + 1].income;
-      const deltaY = labelsInside ? y + 46 : y - 38;
       if (prev > 0) {
         const pct = ((d.income - prev) / prev) * 100;
         const up = pct >= 0;
-        const color = labelsInside
-          ? (up ? "#0b3d1f" : "#5a0e0e")
-          : (up ? "var(--income)" : "var(--expense)");
+        const color = up ? "var(--income)" : "var(--expense)";
         const label = `${up ? "+" : ""}${pct.toFixed(1)}%`;
-        deltaSvg = `<text class="trend-delta" x="${cx}" y="${deltaY}" style="text-anchor:middle;fill:${color};font-size:22px;font-weight:700">${escapeHtml(label)}</text>`;
+        deltaSvg = `<text class="trend-delta" x="${cx}" y="${y - 38}" style="text-anchor:middle;fill:${color};font-size:22px;font-weight:700">${escapeHtml(label)}</text>`;
       } else if (d.income > 0) {
-        const color = labelsInside ? "#0b3d1f" : "var(--income)";
-        deltaSvg = `<text class="trend-delta" x="${cx}" y="${deltaY}" style="text-anchor:middle;fill:${color};font-size:22px;font-weight:700">new</text>`;
+        deltaSvg = `<text class="trend-delta" x="${cx}" y="${y - 38}" style="text-anchor:middle;fill:var(--income);font-size:22px;font-weight:700">new</text>`;
       }
     }
 
@@ -12180,8 +12179,10 @@ function renderIncomeByYearChart(years, opts = {}) {
       `;
     }
 
-    const incomeY = labelsInside ? y + 22 : y - 12;
-    const incomeFill = labelsInside ? "#0b0f14" : "var(--income)";
+    // If the income value would sit right on top of the Goal amount, drop it
+    // into the bar with white text for legibility on the green fill.
+    const incomeY = moveIncome ? y + 26 : y - 12;
+    const incomeFill = moveIncome ? "#ffffff" : "var(--income)";
 
     return `
       ${goalSvg}
