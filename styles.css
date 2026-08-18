@@ -6152,6 +6152,18 @@ body.tx-hide-tags     #tx-table th[data-col="tags"],     body.tx-hide-tags     #
     background: transparent !important;
     color: #111 !important;
   }
+  /* Native date/time picker icons take ~16px inside the input; on desktop
+     that's fine, but in print the icon isn't useful and its reserved space
+     was truncating "MM/DD/YYYY" to "MM/DD/YYY". Hide it and let the date
+     input claim the full cell width. */
+  .invoice-sheet input[type="date"]::-webkit-calendar-picker-indicator,
+  .invoice-sheet input[type="time"]::-webkit-calendar-picker-indicator {
+    display: none !important;
+  }
+  .invoice-meta-table input[type="date"] {
+    width: auto !important;
+    min-width: 100px;
+  }
   .invoice-billto textarea {
     border: 1px solid #333 !important;
     background: #fff !important;
