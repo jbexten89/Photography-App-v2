@@ -702,6 +702,7 @@ function syncTabActive(tab) {
   });
 }
 
+let transactionsYearInitialized = false;
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     const tab = btn.dataset.tab;
@@ -714,6 +715,20 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     window.__txBackToAnalyticsView = null;
     const backBtn = document.getElementById("btn-tx-back");
     if (backBtn) backBtn.hidden = true;
+    // First time the user opens the Transactions tab in this session, default
+    // the year filter to the current calendar year (if any transactions
+    // exist for it). Later visits respect whatever the user last chose.
+    if (tab === "transactions" && !transactionsYearInitialized) {
+      transactionsYearInitialized = true;
+      const yearSel = document.getElementById("tx-filter-year");
+      if (yearSel && !yearSel.value) {
+        const currentYear = String(new Date().getFullYear());
+        renderFilters();
+        if ([...yearSel.options].some(o => o.value === currentYear)) {
+          yearSel.value = currentYear;
+        }
+      }
+    }
     render();
     // Scroll to the top whenever a tab is opened so the user always sees
     // the heading first instead of landing wherever the previous page ended.
