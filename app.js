@@ -12230,6 +12230,7 @@ function renderDashboardJobsDonut(yearFilter) {
     let yearIncome = 0;
     state.transactions.forEach(t => {
       if (t.category !== c) return;
+      if (isNonJobTx(t)) return;
       net += (t.type === "income" ? 1 : -1) * t.amount;
       if (yearFilter && t.type === "income" && (t.date || "").startsWith(yearFilter)) {
         yearIncome += t.amount;
@@ -12250,6 +12251,7 @@ function renderDashboardJobsDonut(yearFilter) {
     state.transactions.forEach(t => {
       if (t.category !== job) return;
       if (t.type !== "income") return;
+      if (isNonJobTx(t)) return;
       if (yearFilter && !(t.date || "").startsWith(yearFilter)) return;
       inc += t.amount;
     });
