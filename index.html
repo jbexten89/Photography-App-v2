@@ -2336,6 +2336,20 @@
       <!-- OWNERS EQUITY REPORT -->
       <div id="oe-report-container" hidden>
         <div class="toolbar no-print">
+          <label class="date-range">
+            From
+            <input type="date" id="oe-report-from" />
+          </label>
+          <label class="date-range">
+            To
+            <input type="date" id="oe-report-to" />
+          </label>
+          <select id="oe-report-preset" class="btn">
+            <option value="lifetime">Lifetime</option>
+            <option value="ytd">Year to Date</option>
+            <option value="last-year">Last Year</option>
+            <option value="custom">Custom</option>
+          </select>
           <span style="flex:1"></span>
           <button id="btn-oe-report-print" class="btn" type="button">Print / PDF</button>
           <div class="toolbar-row-break" aria-hidden="true"></div>

@@ -17025,7 +17025,54 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 // derives a running equity balance. Equity movements are capital
 // contributions/withdrawals — tracked separately from revenue/expense.
 // ============================================================
+function applyOEReportPreset(value) {
+  const today = new Date();
+  const y = today.getFullYear();
+  const iso = d => d.toISOString().slice(0, 10);
+  const fromEl = document.getElementById("oe-report-from");
+  const toEl   = document.getElementById("oe-report-to");
+  if (!fromEl || !toEl) return;
+  if (/^\d{4}$/.test(value)) {
+    const yr = parseInt(value, 10);
+    fromEl.value = iso(new Date(yr, 0, 1));
+    toEl.value   = iso(new Date(yr, 11, 31));
+    return;
+  }
+  switch (value) {
+    case "lifetime":  fromEl.value = ""; toEl.value = ""; break;
+    case "ytd":       fromEl.value = iso(new Date(y, 0, 1));     toEl.value = iso(today); break;
+    case "last-year": fromEl.value = iso(new Date(y - 1, 0, 1)); toEl.value = iso(new Date(y - 1, 11, 31)); break;
+    // "custom" leaves inputs as-is
+  }
+}
+
+function populateOEReportPresetYears() {
+  const sel = document.getElementById("oe-report-preset");
+  if (!sel) return;
+  // Insert year options once, between "last-year" and "custom"
+  if (sel.dataset.yearsPopulated === "1") return;
+  const equityAccts = (state.chartAccounts || [])
+    .filter(a => EQUITY_ACCOUNT_TYPES.includes(a.type))
+    .map(a => a.name);
+  const equitySet = new Set(equityAccts);
+  const years = [...new Set((state.transactions || [])
+    .filter(t => t.chartAccount && equitySet.has(t.chartAccount))
+    .map(t => (t.date || "").slice(0, 4))
+    .filter(y => /^\d{4}$/.test(y))
+  )].sort((a, b) => b.localeCompare(a));
+  if (!years.length) { sel.dataset.yearsPopulated = "1"; return; }
+  const customOpt = sel.querySelector('option[value="custom"]');
+  years.forEach(y => {
+    const o = document.createElement("option");
+    o.value = y;
+    o.textContent = y;
+    sel.insertBefore(o, customOpt);
+  });
+  sel.dataset.yearsPopulated = "1";
+}
+
 function renderOwnersEquityReport() {
+  populateOEReportPresetYears();
   // All equity-type COA names (incl. any user-added ones)
   const equityAccts = (state.chartAccounts || [])
     .filter(a => EQUITY_ACCOUNT_TYPES.includes(a.type))
@@ -17033,37 +17080,54 @@ function renderOwnersEquityReport() {
   const equitySet = new Set(equityAccts);
 
   // Every equity transaction, chronological
-  const txs = (state.transactions || [])
+  const allTxs = (state.transactions || [])
     .filter(t => t.chartAccount && equitySet.has(t.chartAccount))
     .slice()
     .sort((a, b) => (a.date || "").localeCompare(b.date || ""));
 
+  const from = document.getElementById("oe-report-from")?.value || "";
+  const to   = document.getElementById("oe-report-to")?.value   || "";
+  const inRange = t => {
+    const d = t.date || "";
+    if (from && d < from) return false;
+    if (to   && d > to)   return false;
+    return true;
+  };
+  const txs = allTxs.filter(inRange);
+
   // Sign convention: income-type on an Equity account = contribution (+),
-  // expense-type on an Equity account = draw (−). An "Opening Balance
-  // Equity" entry recorded as income counts as a contribution too.
+  // expense-type on an Equity account = draw (−).
   const signed = t => (t.type === "income" ? 1 : -1) * (+t.amount || 0);
 
-  // Lifetime totals
-  let totalContrib = 0, totalDraws = 0, opening = 0;
+  // Opening balance = net equity BEFORE the From date (0 when no From)
+  let opening = 0;
+  if (from) {
+    allTxs.forEach(t => { if ((t.date || "") < from) opening += signed(t); });
+  }
+
+  // In-range totals
+  let totalContrib = 0, totalDraws = 0;
   txs.forEach(t => {
     const amt = +t.amount || 0;
     if (t.type === "income") totalContrib += amt;
     else                     totalDraws   += amt;
-    if ((t.chartAccount || "").toLowerCase() === "opening balance equity") {
-      opening += signed(t);
-    }
   });
-  const currentBalance = totalContrib - totalDraws;
+  const netChange = totalContrib - totalDraws;
+  const currentBalance = opening + netChange;
 
-  // Date-range label
-  const firstDate = txs.length ? txs[0].date : "";
-  const lastDate  = txs.length ? txs[txs.length - 1].date : "";
+  // Range label
   const fmt = iso => iso
     ? new Date(iso + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
     : "—";
   const rangeEl = document.getElementById("oe-report-range");
   if (rangeEl) {
-    rangeEl.textContent = txs.length ? `${fmt(firstDate)} — ${fmt(lastDate)}` : "No equity transactions recorded";
+    if (!from && !to) {
+      rangeEl.textContent = allTxs.length
+        ? `Lifetime · ${fmt(allTxs[0].date)} — ${fmt(allTxs[allTxs.length - 1].date)}`
+        : "No equity transactions recorded";
+    } else {
+      rangeEl.textContent = `${fmt(from)} — ${fmt(to)}`;
+    }
   }
 
   // Tiles
@@ -17073,7 +17137,7 @@ function renderOwnersEquityReport() {
   setText("oe-tile-opening", fmtMoney(opening));
   setText("oe-tile-current", fmtMoney(currentBalance));
 
-  // Year-by-year
+  // Year-by-year (only years present in the filtered set)
   const yearBuckets = new Map(); // year → { contrib, draws }
   txs.forEach(t => {
     const y = (t.date || "").slice(0, 4);
@@ -17087,7 +17151,7 @@ function renderOwnersEquityReport() {
   const years = [...yearBuckets.keys()].sort();
   const yearlyBody = document.getElementById("oe-yearly-body");
   if (yearlyBody) {
-    let running = 0;
+    let running = opening;
     yearlyBody.innerHTML = years.map(y => {
       const b = yearBuckets.get(y);
       const openBal = running;
@@ -17103,21 +17167,21 @@ function renderOwnersEquityReport() {
           <td class="num"><strong>${fmtMoney(running)}</strong></td>
         </tr>
       `;
-    }).join("") || `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No equity transactions recorded.</td></tr>`;
+    }).join("") || `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No equity transactions in this range.</td></tr>`;
   }
   setText("oe-yearly-contrib", fmtMoney(totalContrib));
   setText("oe-yearly-draws",   fmtMoney(totalDraws));
-  setText("oe-yearly-opening", fmtMoney(0));
-  setText("oe-yearly-net",     fmtMoney(totalContrib - totalDraws));
+  setText("oe-yearly-opening", fmtMoney(opening));
+  setText("oe-yearly-net",     fmtMoney(netChange));
   setText("oe-yearly-running", fmtMoney(currentBalance));
 
   // Transaction detail (chronological, with running balance)
   const detailBody = document.getElementById("oe-detail-body");
   if (detailBody) {
     if (!txs.length) {
-      detailBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No equity transactions recorded.</td></tr>`;
+      detailBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No equity transactions in this range.</td></tr>`;
     } else {
-      let bal = 0;
+      let bal = opening;
       detailBody.innerHTML = txs.map(t => {
         const amt = signed(t);
         bal += amt;
@@ -17137,6 +17201,20 @@ function renderOwnersEquityReport() {
 }
 
 document.getElementById("btn-oe-report-print")?.addEventListener("click", () => window.print());
+document.getElementById("oe-report-from")?.addEventListener("change", () => {
+  document.getElementById("oe-report-preset").value = "custom";
+  renderOwnersEquityReport();
+});
+document.getElementById("oe-report-to")?.addEventListener("change", () => {
+  document.getElementById("oe-report-preset").value = "custom";
+  renderOwnersEquityReport();
+});
+document.getElementById("oe-report-preset")?.addEventListener("change", e => {
+  if (e.target.value !== "custom") {
+    applyOEReportPreset(e.target.value);
+    renderOwnersEquityReport();
+  }
+});
 
 // ============================================================
 // GLOBAL FUZZY SEARCH
