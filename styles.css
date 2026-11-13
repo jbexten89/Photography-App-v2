@@ -5498,6 +5498,15 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   .lt-report-sheet .lt-yearly-table td { padding: 3px 4px; }
 }
 
+/* Owners Equity report: 4 tiles, not 7 — override the lt default. */
+.oe-report-sheet .lt-tile-row { grid-template-columns: repeat(4, 1fr); }
+.oe-report-sheet .lt-tile-label { min-height: 0; margin-bottom: 2px; }
+@media (max-width: 768px) {
+  .oe-report-sheet .lt-tile-row { grid-template-columns: repeat(2, 1fr); gap: 6px; margin: 12px 0 10px; }
+  .oe-report-sheet .lt-tile { padding: 8px 10px; }
+  .oe-report-sheet .lt-tile-value { font-size: 14px; }
+}
+
 /* Inline checkbox-pill used in the Mileage Report toolbar */
 .check-pill {
   display: inline-flex;
