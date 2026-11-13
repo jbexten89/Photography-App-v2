@@ -1740,7 +1740,7 @@ function renderVsExpense() {
   const monthKeySet = new Set(months.map(m => m.key));
 
   const txs = state.transactions.filter(t => {
-    if (isNonJobCategory(t.category)) return false;
+    if (isNonJobTx(t)) return false;
     const ymKey = (t.date || "").slice(0, 7);
     if (!monthKeySet.has(ymKey)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
@@ -2000,7 +2000,7 @@ function renderSavingsRate() {
   const savByCat = new Map();
   const deductTxs = []; // every tx that contributes to JOB EXP + COGS
   state.transactions.forEach(t => {
-    if (isNonJobCategory(t.category)) return;
+    if (isNonJobTx(t)) return;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
     if (!filterPasses("customer", t.customer || "")) return;
     if (!filterPassesCategory(t.category)) return;
@@ -2503,7 +2503,7 @@ function renderYearMatrix() {
 
   const passes = t => {
     if (t.type !== wantType) return false;
-    if (isNonJobCategory(t.category)) return false;
+    if (isNonJobTx(t)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer", t.customer || "")) return false;
@@ -2631,7 +2631,7 @@ document.getElementById("ym-table")?.addEventListener("click", (e) => {
 
   __txDrillFilter = (t) => {
     if (t.type !== wantType) return false;
-    if (isNonJobCategory(t.category)) return false;
+    if (isNonJobTx(t)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (cat && (t.category || "").trim() !== cat) return false;
     if (year && (t.date || "").slice(0, 4) !== year) return false;
@@ -2700,7 +2700,7 @@ function renderByCustomer() {
   };
 
   const passes = (t) => {
-    if (isNonJobCategory(t.category)) return false;
+    if (isNonJobTx(t)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPassesCategory(t.category)) return false;
@@ -2851,7 +2851,7 @@ function bcDrillIntoCustomer(custName) {
   if (!name) return;
   const jobCustomerOf = new Map((state.jobs || []).map(j => [j.jobNo, (j.customer || "").trim()]));
   __txDrillFilter = (t) => {
-    if (isNonJobCategory(t.category)) return false;
+    if (isNonJobTx(t)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     const direct = (t.customer || "").trim();
     const viaJob = t.jobNo ? (jobCustomerOf.get(t.jobNo) || "") : "";
@@ -2941,7 +2941,7 @@ function renderSpendingTrends() {
   const catByMonth = new Map();         // category -> [perMonth amounts]
   state.transactions.forEach(t => {
     if (t.type !== "expense") return;
-    if (isNonJobCategory(t.category)) return;
+    if (isNonJobTx(t)) return;
     const ymKey = (t.date || "").slice(0, 7);
     const mi = monthIdx.get(ymKey);
     if (mi === undefined) return;
@@ -3246,7 +3246,7 @@ function renderBreakdown() {
 
   const txs = state.transactions.filter(t => {
     if (t.type !== wantType) return false;
-    if (isNonJobCategory(t.category)) return false;
+    if (isNonJobTx(t)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer",   t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
@@ -3639,7 +3639,7 @@ function renderCashFlow() {
   const dataMap = new Map(data.map(d => [d.key, d]));
 
   state.transactions.forEach(t => {
-    if (isNonJobCategory(t.category)) return;
+    if (isNonJobTx(t)) return;
     if (!filterPasses("customer", t.customer || "")) return;
     if (!filterPassesCategory(t.category)) return;
     if (!filterPasses("payees", t.payee || "")) return;
@@ -7075,7 +7075,7 @@ function renderPLReport() {
     if (!t.date) return false;
     if (from && t.date < from) return false;
     if (to && t.date > to) return false;
-    if (isNonJobCategory(t.category)) return false;
+    if (isNonJobTx(t)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (SAVINGS_CATEGORIES.includes(t.expenseIncome || "")) return false;
     return true;
@@ -7545,7 +7545,7 @@ function renderIEReport() {
                             SAVINGS_CATEGORIES.includes(t.expenseIncome || "");
   const txs = state.transactions
     .filter(inRange)
-    .filter(t => !isNonJobCategory(t.category))
+    .filter(t => !isNonJobTx(t))
     .filter(t => !isSavingsTx(t));
 
   // Aggregate per category — track each transaction so the drill can show
@@ -7910,7 +7910,7 @@ function renderHGBReport() {
 
   const catAgg = new Map(); // category -> { inc, exp }
   txs.forEach(t => {
-    if (isNonJobCategory(t.category)) return;
+    if (isNonJobTx(t)) return;
     const c = t.category || "Uncategorized";
     if (!catAgg.has(c)) catAgg.set(c, { inc: 0, exp: 0 });
     const a = catAgg.get(c);
@@ -8225,7 +8225,7 @@ function renderJobsReport() {
     const buckets = new Map();
     txs.forEach(t => {
       if (t.type !== "expense") return;
-      if (isNonJobCategory(t.category)) return;
+      if (isNonJobTx(t)) return;
       if (SAVINGS_CATEGORIES.includes(t.category)) return;
       const key = (t.expenseIncome || "").trim() || "Uncategorized";
       const cur = buckets.get(key) || { cat: key, label: key, count: 0, inc: 0, exp: 0 };
@@ -8255,7 +8255,7 @@ function renderJobsReport() {
     }).filter(r => r.count > 0).sort((a, b) => b.net - a.net);
     // Plus an "Unlinked" row for income txs that have no jobNo (so legacy data still shows somewhere)
     const jobNos = new Set((state.jobs || []).map(j => j.jobNo));
-    const unlinkedTxs = txs.filter(t => (!t.jobNo || !jobNos.has(t.jobNo)) && !SAVINGS_CATEGORIES.includes(t.category) && !isNonJobCategory(t.category) && t.type === "income");
+    const unlinkedTxs = txs.filter(t => (!t.jobNo || !jobNos.has(t.jobNo)) && !SAVINGS_CATEGORIES.includes(t.category) && !isNonJobTx(t) && t.type === "income");
     if (unlinkedTxs.length) {
       let inc = 0, exp = 0;
       unlinkedTxs.forEach(t => { if (t.type === "income") inc += t.amount; });
@@ -8284,7 +8284,7 @@ function renderJobsReport() {
         if (groupMode === "job") {
           if (r.jobNo === "__unlinked") {
             const jobNos = new Set((state.jobs || []).map(j => j.jobNo));
-            return (!t.jobNo || !jobNos.has(t.jobNo)) && !SAVINGS_CATEGORIES.includes(t.category) && !isNonJobCategory(t.category);
+            return (!t.jobNo || !jobNos.has(t.jobNo)) && !SAVINGS_CATEGORIES.includes(t.category) && !isNonJobTx(t);
           }
           return t.jobNo === r.jobNo;
         }
@@ -8363,7 +8363,7 @@ function renderJobsReport() {
         const _rowFilter = (t) => {
           if (_groupModeForCat === "job") {
             if (t.type !== "expense") return false;
-            if (isNonJobCategory(t.category)) return false;
+            if (isNonJobTx(t)) return false;
             if (SAVINGS_CATEGORIES.includes(t.category)) return false;
             const k = (t.expenseIncome || "").trim() || "Uncategorized";
             return k === r.cat;
@@ -8431,7 +8431,7 @@ function renderJobsReport() {
     const byAcct = {};
     (state.accounts || []).forEach(a => { byAcct[a] = { income: 0, expense: 0 }; });
     txs.forEach(t => {
-      if (isNonJobCategory(t.category)) return;
+      if (isNonJobTx(t)) return;
       if (!byAcct[t.account]) byAcct[t.account] = { income: 0, expense: 0 };
       byAcct[t.account][t.type] += t.amount;
     });
@@ -10253,7 +10253,7 @@ let trendsIncomeMode = "full"; // "full" or "ytd"
 function renderTrendsIncomeChart() {
   const years = Array.from(new Set(
     state.transactions
-      .filter(t => t.type === "income" && !isNonJobCategory(t.category))
+      .filter(t => t.type === "income" && !isNonJobTx(t))
       .map(t => (t.date || "").slice(0, 4))
       .filter(y => /^\d{4}$/.test(y))
   ));
@@ -11075,7 +11075,7 @@ function renderTrends() {
   const monthsSet = new Set();
   state.transactions.forEach(t => {
     if (t.type !== "income") return;
-    if (isNonJobCategory(t.category)) return;
+    if (isNonJobTx(t)) return;
     const yr = (t.date || "").slice(0, 4);
     if (!years.includes(yr)) return;
     monthsSet.add((t.date || "").slice(0, 7));
@@ -11575,7 +11575,7 @@ function renderByCategory() {
   const isNetMode = byCatAmountMode === "net";
 
   const passesFilters = t => {
-    if (isNonJobCategory(t.category)) return false;
+    if (isNonJobTx(t)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer", t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
@@ -11895,7 +11895,7 @@ function renderTreemap() {
   // Income types only (expenses + savings excluded).
   const incomeTxs = state.transactions.filter(t =>
     t.type === "income" &&
-    !isNonJobCategory(t.category) &&
+    !isNonJobTx(t) &&
     !SAVINGS_CATEGORIES.includes(t.category)
   );
 
@@ -12088,7 +12088,7 @@ function renderIncomeByYearChart(years, opts = {}) {
     let inc = 0;
     state.transactions.forEach(t => {
       if (t.type !== "income") return;
-      if (isNonJobCategory(t.category)) return;
+      if (isNonJobTx(t)) return;
       if (!(t.date || "").startsWith(y)) return;
       if (!inRangeForYear(t.date)) return;
       inc += t.amount;
@@ -12339,7 +12339,7 @@ function renderDashboard() {
   let savIn = 0, savOut = 0;
   txs.forEach(t => {
     // Roll Over / Correction-style categories are carry-forward entries, not real income/expense
-    if (isNonJobCategory(t.category)) return;
+    if (isNonJobTx(t)) return;
     // Detect savings via Category OR Expense field — matches Year-End report,
     // Savings Rate view, etc. Savings flows are tracked separately and never
     // count toward Total Income / Total Expenses.
@@ -12421,7 +12421,7 @@ function renderDashboard() {
       };
       let curInc = 0, curExp = 0, prevInc = 0, prevExp = 0;
       state.transactions.forEach(t => {
-        if (isNonJobCategory(t.category)) return;
+        if (isNonJobTx(t)) return;
         const isSav = SAVINGS_CATEGORIES.includes(t.category);
         if (isSav) return; // skip savings transfers — they're not income or expense for YoY purposes
         if (inWindow(t, yearFilter)) {
@@ -12467,7 +12467,7 @@ function renderDashboard() {
     byCat[c] = { income: 0, expense: 0, count: 0 };
   });
   txs.forEach(t => {
-    if (isNonJobCategory(t.category)) return;
+    if (isNonJobTx(t)) return;
     if (!byCat[t.category]) byCat[t.category] = { income: 0, expense: 0, count: 0 };
     byCat[t.category][t.type] += t.amount;
     byCat[t.category].count++;
@@ -12518,7 +12518,7 @@ function renderDashboard() {
   const byAcct = {};
   state.accounts.forEach(a => byAcct[a] = { income: 0, expense: 0 });
   txs.forEach(t => {
-    if (isNonJobCategory(t.category)) return;
+    if (isNonJobTx(t)) return;
     if (!byAcct[t.account]) byAcct[t.account] = { income: 0, expense: 0 };
     byAcct[t.account][t.type] += t.amount;
   });
@@ -12810,7 +12810,7 @@ function renderTransactions() {
     const rClass = rState === "R" ? "reconciled" : "";
     const rTitle = rState === "R" ? "Reconciled (click to unmark)" : "Uncleared (click to mark Reconciled)";
     const checkboxCell = `<td class="tx-select-col"><input type="checkbox" class="tx-select-box" ${txSelectedIds.has(t.id) ? "checked" : ""} /></td>`;
-    const isNonJob = isNonJobCategory(t.category);
+    const isNonJob = isNonJobTx(t);
     const expincMatchesCat = !!(t.expenseIncome && t.category &&
       t.expenseIncome.trim().toLowerCase() === t.category.trim().toLowerCase());
     const isSalesChart = !!(t.chartAccount && /(^|:)\s*sales\s*$/i.test(t.chartAccount));
@@ -13015,6 +13015,12 @@ function isEquityCategory(catName) {
 }
 function isNonJobCategory(cat) {
   return NON_JOB_CATEGORIES.indexOf(cat) !== -1 || isEquityCategory(cat);
+}
+// Transaction-level check: category OR chart-of-account can mark a tx as
+// non-revenue (Equity contributions tag the chart-of-account, not category).
+function isNonJobTx(t) {
+  if (!t) return false;
+  return isNonJobCategory(t.category) || isEquityCategory(t.chartAccount);
 }
 
 // Chart of accounts types (the standard accounting bucket categories)
@@ -13419,7 +13425,7 @@ function renderJobs() {
   // Roll Over / Correction entries are carry-forward adjustments, not real income, so they're
   // excluded from the denominator for a more meaningful percentage.
   const totalIncome = filteredTxs
-    .filter(t => t.type === "income" && !isNonJobCategory(t.category))
+    .filter(t => t.type === "income" && !isNonJobTx(t))
     .reduce((sum, t) => sum + t.amount, 0);
 
   // Build the (cat, txs) pairs for each section. Each section can group
@@ -13445,7 +13451,7 @@ function renderJobs() {
       const buckets = new Map();
       filteredTxs.forEach(t => {
         if (t.type !== "expense") return;
-        if (isNonJobCategory(t.category)) return;
+        if (isNonJobTx(t)) return;
         if (SAVINGS_CATEGORIES.includes(t.category)) return;
         const key = (t.expenseIncome || "").trim() || "Uncategorized";
         if (!buckets.has(key)) buckets.set(key, []);
@@ -13456,7 +13462,7 @@ function renderJobs() {
     if (mode === "customer" && scope === "jobs") {
       const buckets = new Map();
       filteredTxs.forEach(t => {
-        if (isNonJobCategory(t.category)) return;
+        if (isNonJobTx(t)) return;
         if (SAVINGS_CATEGORIES.includes(t.category)) return;
         const key = (t.customer || "").trim();
         if (!key) return;
@@ -13663,18 +13669,18 @@ function renderJobs() {
       if (!filterPasses("payees",     t.payee || "")) return false;
       if (drillJobNo) return t.jobNo === drillJobNo;
       if (drillUnlinked) {
-        if (isNonJobCategory(t.category)) return false;
+        if (isNonJobTx(t)) return false;
         return !t.jobNo;
       }
       if (drillExpense) {
         if (t.type !== "expense") return false;
-        if (isNonJobCategory(t.category)) return false;
+        if (isNonJobTx(t)) return false;
         if (SAVINGS_CATEGORIES.includes(t.category)) return false;
         const ei = (t.expenseIncome || "").trim() || "Uncategorized";
         return ei === drillExpense;
       }
       if (drillCustomer) {
-        if (isNonJobCategory(t.category)) return false;
+        if (isNonJobTx(t)) return false;
         if (SAVINGS_CATEGORIES.includes(t.category)) return false;
         const c = (t.customer || "").trim() || "(no customer)";
         return c === drillCustomer;
