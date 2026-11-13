@@ -7352,6 +7352,8 @@ function showReport(which) {
   if (yeEl) yeEl.hidden = which !== "ye";
   const ltEl = document.getElementById("lt-report-container");
   if (ltEl) ltEl.hidden = which !== "lt";
+  const oeEl = document.getElementById("oe-report-container");
+  if (oeEl) oeEl.hidden = which !== "oe";
 
   document.querySelectorAll(".report-picker-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.report === which);
@@ -7378,6 +7380,10 @@ function showReport(which) {
   }
   if (which === "lt") {
     if (typeof renderLifetimeReport === "function") renderLifetimeReport();
+    return;
+  }
+  if (which === "oe") {
+    if (typeof renderOwnersEquityReport === "function") renderOwnersEquityReport();
     return;
   }
 
@@ -17011,6 +17017,126 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   window.renderNjJobsTable = renderNjJobsTable;
   window.renderNjAnalytics = renderNjAnalytics;
 })();
+
+// ============================================================
+// OWNERS EQUITY REPORT
+// Lists every transaction whose chart-of-account is an Equity-type
+// account (Owners Equity, Owners Draw, Opening Balance Equity, …) and
+// derives a running equity balance. Equity movements are capital
+// contributions/withdrawals — tracked separately from revenue/expense.
+// ============================================================
+function renderOwnersEquityReport() {
+  // All equity-type COA names (incl. any user-added ones)
+  const equityAccts = (state.chartAccounts || [])
+    .filter(a => EQUITY_ACCOUNT_TYPES.includes(a.type))
+    .map(a => a.name);
+  const equitySet = new Set(equityAccts);
+
+  // Every equity transaction, chronological
+  const txs = (state.transactions || [])
+    .filter(t => t.chartAccount && equitySet.has(t.chartAccount))
+    .slice()
+    .sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+
+  // Sign convention: income-type on an Equity account = contribution (+),
+  // expense-type on an Equity account = draw (−). An "Opening Balance
+  // Equity" entry recorded as income counts as a contribution too.
+  const signed = t => (t.type === "income" ? 1 : -1) * (+t.amount || 0);
+
+  // Lifetime totals
+  let totalContrib = 0, totalDraws = 0, opening = 0;
+  txs.forEach(t => {
+    const amt = +t.amount || 0;
+    if (t.type === "income") totalContrib += amt;
+    else                     totalDraws   += amt;
+    if ((t.chartAccount || "").toLowerCase() === "opening balance equity") {
+      opening += signed(t);
+    }
+  });
+  const currentBalance = totalContrib - totalDraws;
+
+  // Date-range label
+  const firstDate = txs.length ? txs[0].date : "";
+  const lastDate  = txs.length ? txs[txs.length - 1].date : "";
+  const fmt = iso => iso
+    ? new Date(iso + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
+    : "—";
+  const rangeEl = document.getElementById("oe-report-range");
+  if (rangeEl) {
+    rangeEl.textContent = txs.length ? `${fmt(firstDate)} — ${fmt(lastDate)}` : "No equity transactions recorded";
+  }
+
+  // Tiles
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setText("oe-tile-contrib", fmtMoney(totalContrib));
+  setText("oe-tile-draws",   fmtMoney(totalDraws));
+  setText("oe-tile-opening", fmtMoney(opening));
+  setText("oe-tile-current", fmtMoney(currentBalance));
+
+  // Year-by-year
+  const yearBuckets = new Map(); // year → { contrib, draws }
+  txs.forEach(t => {
+    const y = (t.date || "").slice(0, 4);
+    if (!/^\d{4}$/.test(y)) return;
+    const b = yearBuckets.get(y) || { contrib: 0, draws: 0 };
+    const amt = +t.amount || 0;
+    if (t.type === "income") b.contrib += amt;
+    else                     b.draws   += amt;
+    yearBuckets.set(y, b);
+  });
+  const years = [...yearBuckets.keys()].sort();
+  const yearlyBody = document.getElementById("oe-yearly-body");
+  if (yearlyBody) {
+    let running = 0;
+    yearlyBody.innerHTML = years.map(y => {
+      const b = yearBuckets.get(y);
+      const openBal = running;
+      const net = b.contrib - b.draws;
+      running += net;
+      return `
+        <tr>
+          <td>${escapeHtml(y)}</td>
+          <td class="num" style="color:var(--income)">${fmtMoney(b.contrib)}</td>
+          <td class="num" style="color:var(--expense)">${fmtMoney(b.draws)}</td>
+          <td class="num">${fmtMoney(openBal)}</td>
+          <td class="num" style="color:${net >= 0 ? "var(--income)" : "var(--expense)"}">${fmtMoney(net)}</td>
+          <td class="num"><strong>${fmtMoney(running)}</strong></td>
+        </tr>
+      `;
+    }).join("") || `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No equity transactions recorded.</td></tr>`;
+  }
+  setText("oe-yearly-contrib", fmtMoney(totalContrib));
+  setText("oe-yearly-draws",   fmtMoney(totalDraws));
+  setText("oe-yearly-opening", fmtMoney(0));
+  setText("oe-yearly-net",     fmtMoney(totalContrib - totalDraws));
+  setText("oe-yearly-running", fmtMoney(currentBalance));
+
+  // Transaction detail (chronological, with running balance)
+  const detailBody = document.getElementById("oe-detail-body");
+  if (detailBody) {
+    if (!txs.length) {
+      detailBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No equity transactions recorded.</td></tr>`;
+    } else {
+      let bal = 0;
+      detailBody.innerHTML = txs.map(t => {
+        const amt = signed(t);
+        bal += amt;
+        const color = amt >= 0 ? "var(--income)" : "var(--expense)";
+        return `
+          <tr>
+            <td>${escapeHtml(t.date || "")}</td>
+            <td>${escapeHtml(t.chartAccount || "")}</td>
+            <td>${escapeHtml(t.memo || "")}</td>
+            <td class="num" style="color:${color}">${amt >= 0 ? "" : "−"}${fmtMoney(Math.abs(amt))}</td>
+            <td class="num">${fmtMoney(bal)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+  }
+}
+
+document.getElementById("btn-oe-report-print")?.addEventListener("click", () => window.print());
 
 // ============================================================
 // GLOBAL FUZZY SEARCH

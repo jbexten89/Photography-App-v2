@@ -1304,6 +1304,7 @@
         <button type="button" class="report-picker-btn" data-report="sc">Schedule C</button>
         <button type="button" class="report-picker-btn" data-report="ye">Year-End Summary</button>
         <button type="button" class="report-picker-btn" data-report="lt">Lifetime Summary</button>
+        <button type="button" class="report-picker-btn" data-report="oe">Owners Equity</button>
       </div>
       <!-- Mobile pull-down (richer than native <select>, same look as Analytics amvp) -->
       <div class="rmvp-row no-print">
@@ -1326,6 +1327,7 @@
             <button type="button" class="amvp-item"        data-report="sc"      role="option"><span>Schedule C</span></button>
             <button type="button" class="amvp-item"        data-report="ye"      role="option"><span>Year-End Summary</span></button>
             <button type="button" class="amvp-item"        data-report="lt"      role="option"><span>Lifetime Summary</span></button>
+            <button type="button" class="amvp-item"        data-report="oe"      role="option"><span>Owners Equity</span></button>
           </div>
         </div>
         <button type="button" id="rmvp-print-btn" class="btn">Print / PDF</button>
@@ -2328,6 +2330,88 @@
             <div>www.jbextenphotography.com</div>
           </div>
           <div class="muted ye-footer-note" id="lt-report-genstamp"></div>
+        </div>
+      </div>
+
+      <!-- OWNERS EQUITY REPORT -->
+      <div id="oe-report-container" hidden>
+        <div class="toolbar no-print">
+          <span style="flex:1"></span>
+          <button id="btn-oe-report-print" class="btn" type="button">Print / PDF</button>
+          <div class="toolbar-row-break" aria-hidden="true"></div>
+        </div>
+        <div class="invoice-sheet tax-report-sheet" id="oe-report-sheet">
+          <div class="invoice-header">
+            <div class="invoice-brand">
+              <img src="logo.png" alt="Jamie Bexten Photography" class="invoice-logo" onerror="this.style.display='none'" />
+              <div class="invoice-brand-text">
+                <div class="invoice-brand-name">Jamie Bexten Photography</div>
+                <div>114 Hogan Ln</div>
+                <div>Bryan, OH 43506</div>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <div class="invoice-title">Owners Equity Report</div>
+              <div class="tax-report-range" id="oe-report-range">—</div>
+              <div class="muted" style="font-size:11px;margin-top:4px">Capital contributions, draws, and running equity balance — tracked separately from income and expense.</div>
+            </div>
+          </div>
+
+          <div class="lt-tile-row">
+            <div class="lt-tile"><div class="lt-tile-label">Contributions</div><div class="lt-tile-value income" id="oe-tile-contrib">$0.00</div></div>
+            <div class="lt-tile"><div class="lt-tile-label">Draws</div><div class="lt-tile-value expense" id="oe-tile-draws">$0.00</div></div>
+            <div class="lt-tile"><div class="lt-tile-label">Opening Balance</div><div class="lt-tile-value" id="oe-tile-opening">$0.00</div></div>
+            <div class="lt-tile primary"><div class="lt-tile-label">Current Balance</div><div class="lt-tile-value" id="oe-tile-current">$0.00</div></div>
+          </div>
+
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Year-by-Year</h3>
+            <table class="tax-report-table">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th class="num">Contributions</th>
+                  <th class="num">Draws</th>
+                  <th class="num">Opening Balance</th>
+                  <th class="num">Net Change</th>
+                  <th class="num">Running Balance</th>
+                </tr>
+              </thead>
+              <tbody id="oe-yearly-body"></tbody>
+              <tfoot>
+                <tr>
+                  <td><strong>Lifetime</strong></td>
+                  <td class="num" id="oe-yearly-contrib"><strong>$0.00</strong></td>
+                  <td class="num" id="oe-yearly-draws"><strong>$0.00</strong></td>
+                  <td class="num" id="oe-yearly-opening"><strong>$0.00</strong></td>
+                  <td class="num" id="oe-yearly-net"><strong>$0.00</strong></td>
+                  <td class="num" id="oe-yearly-running"><strong>$0.00</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="tax-report-section">
+            <h3 class="tax-report-section-title">Transaction Detail</h3>
+            <table class="tax-report-detail">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Chart of Account</th>
+                  <th>Memo</th>
+                  <th style="text-align:right">Amount</th>
+                  <th style="text-align:right">Balance</th>
+                </tr>
+              </thead>
+              <tbody id="oe-detail-body"></tbody>
+            </table>
+          </div>
+
+          <div class="invoice-footer">
+            <div>419-551-2103</div>
+            <div>jbexten89@gmail.com</div>
+            <div>www.jbextenphotography.com</div>
+          </div>
         </div>
       </div>
     </section>
