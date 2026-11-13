@@ -1740,7 +1740,7 @@ function renderVsExpense() {
   const monthKeySet = new Set(months.map(m => m.key));
 
   const txs = state.transactions.filter(t => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (isNonJobCategory(t.category)) return false;
     const ymKey = (t.date || "").slice(0, 7);
     if (!monthKeySet.has(ymKey)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
@@ -2000,7 +2000,7 @@ function renderSavingsRate() {
   const savByCat = new Map();
   const deductTxs = []; // every tx that contributes to JOB EXP + COGS
   state.transactions.forEach(t => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return;
+    if (isNonJobCategory(t.category)) return;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
     if (!filterPasses("customer", t.customer || "")) return;
     if (!filterPassesCategory(t.category)) return;
@@ -2503,7 +2503,7 @@ function renderYearMatrix() {
 
   const passes = t => {
     if (t.type !== wantType) return false;
-    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (isNonJobCategory(t.category)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer", t.customer || "")) return false;
@@ -2631,7 +2631,7 @@ document.getElementById("ym-table")?.addEventListener("click", (e) => {
 
   __txDrillFilter = (t) => {
     if (t.type !== wantType) return false;
-    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (isNonJobCategory(t.category)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (cat && (t.category || "").trim() !== cat) return false;
     if (year && (t.date || "").slice(0, 4) !== year) return false;
@@ -2700,7 +2700,7 @@ function renderByCustomer() {
   };
 
   const passes = (t) => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (isNonJobCategory(t.category)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPassesCategory(t.category)) return false;
@@ -2851,7 +2851,7 @@ function bcDrillIntoCustomer(custName) {
   if (!name) return;
   const jobCustomerOf = new Map((state.jobs || []).map(j => [j.jobNo, (j.customer || "").trim()]));
   __txDrillFilter = (t) => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (isNonJobCategory(t.category)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     const direct = (t.customer || "").trim();
     const viaJob = t.jobNo ? (jobCustomerOf.get(t.jobNo) || "") : "";
@@ -2941,7 +2941,7 @@ function renderSpendingTrends() {
   const catByMonth = new Map();         // category -> [perMonth amounts]
   state.transactions.forEach(t => {
     if (t.type !== "expense") return;
-    if (NON_JOB_CATEGORIES.includes(t.category)) return;
+    if (isNonJobCategory(t.category)) return;
     const ymKey = (t.date || "").slice(0, 7);
     const mi = monthIdx.get(ymKey);
     if (mi === undefined) return;
@@ -3246,7 +3246,7 @@ function renderBreakdown() {
 
   const txs = state.transactions.filter(t => {
     if (t.type !== wantType) return false;
-    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (isNonJobCategory(t.category)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer",   t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
@@ -3639,7 +3639,7 @@ function renderCashFlow() {
   const dataMap = new Map(data.map(d => [d.key, d]));
 
   state.transactions.forEach(t => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return;
+    if (isNonJobCategory(t.category)) return;
     if (!filterPasses("customer", t.customer || "")) return;
     if (!filterPassesCategory(t.category)) return;
     if (!filterPasses("payees", t.payee || "")) return;
@@ -6900,7 +6900,7 @@ function openSchedModal(ev, defaultDate) {
   JOB_ORDER.forEach(j => cats.add(j));
   (state.categories || []).forEach(c => {
     if (SAVINGS_CATEGORIES.includes(c)) return;
-    if (NON_JOB_CATEGORIES.includes(c)) return;
+    if (isNonJobCategory(c)) return;
     cats.add(c);
   });
   const sorted = Array.from(cats).sort((a, b) => {
@@ -7075,7 +7075,7 @@ function renderPLReport() {
     if (!t.date) return false;
     if (from && t.date < from) return false;
     if (to && t.date > to) return false;
-    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (isNonJobCategory(t.category)) return false;
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (SAVINGS_CATEGORIES.includes(t.expenseIncome || "")) return false;
     return true;
@@ -7545,7 +7545,7 @@ function renderIEReport() {
                             SAVINGS_CATEGORIES.includes(t.expenseIncome || "");
   const txs = state.transactions
     .filter(inRange)
-    .filter(t => !NON_JOB_CATEGORIES.includes(t.category))
+    .filter(t => !isNonJobCategory(t.category))
     .filter(t => !isSavingsTx(t));
 
   // Aggregate per category — track each transaction so the drill can show
@@ -7910,7 +7910,7 @@ function renderHGBReport() {
 
   const catAgg = new Map(); // category -> { inc, exp }
   txs.forEach(t => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return;
+    if (isNonJobCategory(t.category)) return;
     const c = t.category || "Uncategorized";
     if (!catAgg.has(c)) catAgg.set(c, { inc: 0, exp: 0 });
     const a = catAgg.get(c);
@@ -8206,7 +8206,7 @@ function renderJobsReport() {
   // category doesn't show up as a job line with zero job context — matches
   // the same treatment IE / P&L / Schedule C use.
   const jobCats = state.categories.filter(c =>
-    !NON_JOB_CATEGORIES.includes(c) && !SAVINGS_CATEGORIES.includes(c)
+    !isNonJobCategory(c) && !SAVINGS_CATEGORIES.includes(c)
   );
 
   const allRows = jobCats.map(cat => {
@@ -8225,7 +8225,7 @@ function renderJobsReport() {
     const buckets = new Map();
     txs.forEach(t => {
       if (t.type !== "expense") return;
-      if (NON_JOB_CATEGORIES.includes(t.category)) return;
+      if (isNonJobCategory(t.category)) return;
       if (SAVINGS_CATEGORIES.includes(t.category)) return;
       const key = (t.expenseIncome || "").trim() || "Uncategorized";
       const cur = buckets.get(key) || { cat: key, label: key, count: 0, inc: 0, exp: 0 };
@@ -8255,7 +8255,7 @@ function renderJobsReport() {
     }).filter(r => r.count > 0).sort((a, b) => b.net - a.net);
     // Plus an "Unlinked" row for income txs that have no jobNo (so legacy data still shows somewhere)
     const jobNos = new Set((state.jobs || []).map(j => j.jobNo));
-    const unlinkedTxs = txs.filter(t => (!t.jobNo || !jobNos.has(t.jobNo)) && !SAVINGS_CATEGORIES.includes(t.category) && !NON_JOB_CATEGORIES.includes(t.category) && t.type === "income");
+    const unlinkedTxs = txs.filter(t => (!t.jobNo || !jobNos.has(t.jobNo)) && !SAVINGS_CATEGORIES.includes(t.category) && !isNonJobCategory(t.category) && t.type === "income");
     if (unlinkedTxs.length) {
       let inc = 0, exp = 0;
       unlinkedTxs.forEach(t => { if (t.type === "income") inc += t.amount; });
@@ -8284,7 +8284,7 @@ function renderJobsReport() {
         if (groupMode === "job") {
           if (r.jobNo === "__unlinked") {
             const jobNos = new Set((state.jobs || []).map(j => j.jobNo));
-            return (!t.jobNo || !jobNos.has(t.jobNo)) && !SAVINGS_CATEGORIES.includes(t.category) && !NON_JOB_CATEGORIES.includes(t.category);
+            return (!t.jobNo || !jobNos.has(t.jobNo)) && !SAVINGS_CATEGORIES.includes(t.category) && !isNonJobCategory(t.category);
           }
           return t.jobNo === r.jobNo;
         }
@@ -8363,7 +8363,7 @@ function renderJobsReport() {
         const _rowFilter = (t) => {
           if (_groupModeForCat === "job") {
             if (t.type !== "expense") return false;
-            if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+            if (isNonJobCategory(t.category)) return false;
             if (SAVINGS_CATEGORIES.includes(t.category)) return false;
             const k = (t.expenseIncome || "").trim() || "Uncategorized";
             return k === r.cat;
@@ -8431,7 +8431,7 @@ function renderJobsReport() {
     const byAcct = {};
     (state.accounts || []).forEach(a => { byAcct[a] = { income: 0, expense: 0 }; });
     txs.forEach(t => {
-      if (NON_JOB_CATEGORIES.includes(t.category)) return;
+      if (isNonJobCategory(t.category)) return;
       if (!byAcct[t.account]) byAcct[t.account] = { income: 0, expense: 0 };
       byAcct[t.account][t.type] += t.amount;
     });
@@ -9386,7 +9386,7 @@ function openInvoiceEditor(inv) {
   const ordered = [];
   JOB_ORDER.forEach(j => { if (knownCats.includes(j)) { ordered.push(j); knownCats.splice(knownCats.indexOf(j), 1); } });
   const otherCats = knownCats
-    .filter(c => !SAVINGS_CATEGORIES.includes(c) && !NON_JOB_CATEGORIES.includes(c))
+    .filter(c => !SAVINGS_CATEGORIES.includes(c) && !isNonJobCategory(c))
     .sort((a, b) => a.localeCompare(b));
   const options = [...ordered, ...otherCats];
   const jobSel = document.getElementById("invoice-job");
@@ -10253,7 +10253,7 @@ let trendsIncomeMode = "full"; // "full" or "ytd"
 function renderTrendsIncomeChart() {
   const years = Array.from(new Set(
     state.transactions
-      .filter(t => t.type === "income" && !NON_JOB_CATEGORIES.includes(t.category))
+      .filter(t => t.type === "income" && !isNonJobCategory(t.category))
       .map(t => (t.date || "").slice(0, 4))
       .filter(y => /^\d{4}$/.test(y))
   ));
@@ -10443,7 +10443,7 @@ function renderTrends() {
   const jobsOnly = [...jobUniverse].filter(c => {
     if (!c) return false;
     if (SAVINGS_CATEGORIES.includes(c)) return false;
-    if (NON_JOB_CATEGORIES.includes(c)) return false;
+    if (isNonJobCategory(c)) return false;
     // Must have at least one income transaction to be considered a Job.
     if (!incomeCats.has(c)) return false;
     return true;
@@ -11075,7 +11075,7 @@ function renderTrends() {
   const monthsSet = new Set();
   state.transactions.forEach(t => {
     if (t.type !== "income") return;
-    if (NON_JOB_CATEGORIES.includes(t.category)) return;
+    if (isNonJobCategory(t.category)) return;
     const yr = (t.date || "").slice(0, 4);
     if (!years.includes(yr)) return;
     monthsSet.add((t.date || "").slice(0, 7));
@@ -11575,7 +11575,7 @@ function renderByCategory() {
   const isNetMode = byCatAmountMode === "net";
 
   const passesFilters = t => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+    if (isNonJobCategory(t.category)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer", t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
@@ -11895,7 +11895,7 @@ function renderTreemap() {
   // Income types only (expenses + savings excluded).
   const incomeTxs = state.transactions.filter(t =>
     t.type === "income" &&
-    !NON_JOB_CATEGORIES.includes(t.category) &&
+    !isNonJobCategory(t.category) &&
     !SAVINGS_CATEGORIES.includes(t.category)
   );
 
@@ -12088,7 +12088,7 @@ function renderIncomeByYearChart(years, opts = {}) {
     let inc = 0;
     state.transactions.forEach(t => {
       if (t.type !== "income") return;
-      if (NON_JOB_CATEGORIES.includes(t.category)) return;
+      if (isNonJobCategory(t.category)) return;
       if (!(t.date || "").startsWith(y)) return;
       if (!inRangeForYear(t.date)) return;
       inc += t.amount;
@@ -12225,7 +12225,7 @@ function renderDashboardJobsDonut(yearFilter) {
   // whose lifetime net is negative but whose income still belongs on the chart.
   const jobsOnly = state.categories.filter(c => {
     if (SAVINGS_CATEGORIES.includes(c)) return false;
-    if (NON_JOB_CATEGORIES.includes(c)) return false;
+    if (isNonJobCategory(c)) return false;
     let net = 0;
     let yearIncome = 0;
     state.transactions.forEach(t => {
@@ -12339,7 +12339,7 @@ function renderDashboard() {
   let savIn = 0, savOut = 0;
   txs.forEach(t => {
     // Roll Over / Correction-style categories are carry-forward entries, not real income/expense
-    if (NON_JOB_CATEGORIES.includes(t.category)) return;
+    if (isNonJobCategory(t.category)) return;
     // Detect savings via Category OR Expense field — matches Year-End report,
     // Savings Rate view, etc. Savings flows are tracked separately and never
     // count toward Total Income / Total Expenses.
@@ -12421,7 +12421,7 @@ function renderDashboard() {
       };
       let curInc = 0, curExp = 0, prevInc = 0, prevExp = 0;
       state.transactions.forEach(t => {
-        if (NON_JOB_CATEGORIES.includes(t.category)) return;
+        if (isNonJobCategory(t.category)) return;
         const isSav = SAVINGS_CATEGORIES.includes(t.category);
         if (isSav) return; // skip savings transfers — they're not income or expense for YoY purposes
         if (inWindow(t, yearFilter)) {
@@ -12463,11 +12463,11 @@ function renderDashboard() {
   // By category — skip Roll Over / Correction entries
   const byCat = {};
   state.categories.forEach(c => {
-    if (NON_JOB_CATEGORIES.includes(c)) return;
+    if (isNonJobCategory(c)) return;
     byCat[c] = { income: 0, expense: 0, count: 0 };
   });
   txs.forEach(t => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return;
+    if (isNonJobCategory(t.category)) return;
     if (!byCat[t.category]) byCat[t.category] = { income: 0, expense: 0, count: 0 };
     byCat[t.category][t.type] += t.amount;
     byCat[t.category].count++;
@@ -12518,7 +12518,7 @@ function renderDashboard() {
   const byAcct = {};
   state.accounts.forEach(a => byAcct[a] = { income: 0, expense: 0 });
   txs.forEach(t => {
-    if (NON_JOB_CATEGORIES.includes(t.category)) return;
+    if (isNonJobCategory(t.category)) return;
     if (!byAcct[t.account]) byAcct[t.account] = { income: 0, expense: 0 };
     byAcct[t.account][t.type] += t.amount;
   });
@@ -12810,7 +12810,7 @@ function renderTransactions() {
     const rClass = rState === "R" ? "reconciled" : "";
     const rTitle = rState === "R" ? "Reconciled (click to unmark)" : "Uncleared (click to mark Reconciled)";
     const checkboxCell = `<td class="tx-select-col"><input type="checkbox" class="tx-select-box" ${txSelectedIds.has(t.id) ? "checked" : ""} /></td>`;
-    const isNonJob = NON_JOB_CATEGORIES.includes(t.category);
+    const isNonJob = isNonJobCategory(t.category);
     const expincMatchesCat = !!(t.expenseIncome && t.category &&
       t.expenseIncome.trim().toLowerCase() === t.category.trim().toLowerCase());
     const isSalesChart = !!(t.chartAccount && /(^|:)\s*sales\s*$/i.test(t.chartAccount));
@@ -13001,6 +13001,21 @@ function renderTransactions() {
 
 const SAVINGS_CATEGORIES = ["Wealthfront", "CiT Bank", "Huntington", "Savings"];
 const NON_JOB_CATEGORIES = ["Roll Over", "Correction"];
+const EQUITY_ACCOUNT_TYPES = ["Equity", "Other Equity"];
+
+// Equity-type accounts (Owners Equity, Owners Draw, Opening Balance Equity, …)
+// are capital contributions/withdrawals, not revenue or expense. They should be
+// treated like Roll Over / Correction — excluded from income totals, job
+// aggregations, and the Income by Year chart. isNonJobCategory() is the single
+// gate used across the app so this stays consistent everywhere.
+function isEquityCategory(catName) {
+  if (!catName) return false;
+  const acct = (state.chartAccounts || []).find(a => a.name === catName);
+  return !!acct && EQUITY_ACCOUNT_TYPES.includes(acct.type);
+}
+function isNonJobCategory(cat) {
+  return NON_JOB_CATEGORIES.indexOf(cat) !== -1 || isEquityCategory(cat);
+}
 
 // Chart of accounts types (the standard accounting bucket categories)
 const CHART_ACCOUNT_TYPES = [
@@ -13404,7 +13419,7 @@ function renderJobs() {
   // Roll Over / Correction entries are carry-forward adjustments, not real income, so they're
   // excluded from the denominator for a more meaningful percentage.
   const totalIncome = filteredTxs
-    .filter(t => t.type === "income" && !NON_JOB_CATEGORIES.includes(t.category))
+    .filter(t => t.type === "income" && !isNonJobCategory(t.category))
     .reduce((sum, t) => sum + t.amount, 0);
 
   // Build the (cat, txs) pairs for each section. Each section can group
@@ -13430,7 +13445,7 @@ function renderJobs() {
       const buckets = new Map();
       filteredTxs.forEach(t => {
         if (t.type !== "expense") return;
-        if (NON_JOB_CATEGORIES.includes(t.category)) return;
+        if (isNonJobCategory(t.category)) return;
         if (SAVINGS_CATEGORIES.includes(t.category)) return;
         const key = (t.expenseIncome || "").trim() || "Uncategorized";
         if (!buckets.has(key)) buckets.set(key, []);
@@ -13441,7 +13456,7 @@ function renderJobs() {
     if (mode === "customer" && scope === "jobs") {
       const buckets = new Map();
       filteredTxs.forEach(t => {
-        if (NON_JOB_CATEGORIES.includes(t.category)) return;
+        if (isNonJobCategory(t.category)) return;
         if (SAVINGS_CATEGORIES.includes(t.category)) return;
         const key = (t.customer || "").trim();
         if (!key) return;
@@ -13453,12 +13468,12 @@ function renderJobs() {
     if (mode === "customer" && scope === "expenses") {
       // Per request: in Customer mode, the Expenses section stays grouped by category.
       return state.categories
-        .filter(cat => !NON_JOB_CATEGORIES.includes(cat))
+        .filter(cat => !isNonJobCategory(cat))
         .map(cat => ({ cat, txs: filteredTxs.filter(t => t.category === cat && t.type === "expense") }));
     }
     // "category" → legacy
     return state.categories
-      .filter(cat => !NON_JOB_CATEGORIES.includes(cat))
+      .filter(cat => !isNonJobCategory(cat))
       .map(cat => ({ cat, txs: filteredTxs.filter(t => t.category === cat) }));
   }
 
@@ -13648,18 +13663,18 @@ function renderJobs() {
       if (!filterPasses("payees",     t.payee || "")) return false;
       if (drillJobNo) return t.jobNo === drillJobNo;
       if (drillUnlinked) {
-        if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+        if (isNonJobCategory(t.category)) return false;
         return !t.jobNo;
       }
       if (drillExpense) {
         if (t.type !== "expense") return false;
-        if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+        if (isNonJobCategory(t.category)) return false;
         if (SAVINGS_CATEGORIES.includes(t.category)) return false;
         const ei = (t.expenseIncome || "").trim() || "Uncategorized";
         return ei === drillExpense;
       }
       if (drillCustomer) {
-        if (NON_JOB_CATEGORIES.includes(t.category)) return false;
+        if (isNonJobCategory(t.category)) return false;
         if (SAVINGS_CATEGORIES.includes(t.category)) return false;
         const c = (t.customer || "").trim() || "(no customer)";
         return c === drillCustomer;
@@ -16173,7 +16188,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 
     (state.transactions || []).filter(inRange).forEach(t => {
       const cat = (t.category || "").trim() || "(uncategorized)";
-      if (NON_JOB_CATEGORIES.includes(cat)) return;
+      if (isNonJobCategory(cat)) return;
       if (SAVINGS_CATEGORIES.includes(cat)) return;
       // Also exclude savings tagged via the new-spec expenseIncome field —
       // matches the same rule the Savings Rate / Year-End reports use.
@@ -16297,7 +16312,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       ...(state.categories || []),
       ...Object.keys(state.scheduleCMap || {}),
     ]))
-      .filter(c => c && !NON_JOB_CATEGORIES.includes(c) && !SAVINGS_CATEGORIES.includes(c))
+      .filter(c => c && !isNonJobCategory(c) && !SAVINGS_CATEGORIES.includes(c))
       .sort((a, b) => a.localeCompare(b));
     if (!cats.length) {
       tbody.innerHTML = `<tr><td colspan="2" class="muted" style="text-align:center;padding:14px">No categories yet.</td></tr>`;
@@ -16405,7 +16420,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     txs.forEach(t => {
       const cat = (t.category || "Uncategorized").trim();
       const amt = +t.amount || 0;
-      if (NON_JOB_CATEGORIES.includes(cat)) {
+      if (isNonJobCategory(cat)) {
         // Tally separately for the bottom-of-report adjustments row.
         // Signed: income transactions add, expenses subtract — so the value
         // shown reflects net carry-over / reconciliation impact.
@@ -16723,7 +16738,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       const amt = +t.amount || 0;
       const y   = (t.date || "").slice(0, 4);
       if (!/^\d{4}$/.test(y)) return;
-      if (NON_JOB_CATEGORIES.includes(cat)) return;
+      if (isNonJobCategory(cat)) return;
       const yAgg = ensureYear(y);
 
       const ei  = (t.expenseIncome || "").trim();
