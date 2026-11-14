@@ -12222,10 +12222,10 @@ function renderIncomeByYearChart(years, opts = {}) {
     const incomeFill = moveIncome ? "#ffffff" : "var(--income)";
 
     return `
-      ${goalSvg}
       <rect class="trend-bar" x="${x}" y="${y}" width="${barW}" height="${h}" fill="var(--income)" rx="3">
         <title>${escapeHtml(d.year)}: ${fmtMoney(d.income)}</title>
       </rect>
+      ${goalSvg}
       ${deltaSvg}
       <text class="trend-value" x="${cx}" y="${incomeY}" style="text-anchor:middle;fill:${incomeFill};font-size:22px;font-weight:700">${fmtMoney(d.income)}</text>
       <text class="trend-year-label" x="${cx}" y="${H - padB + 22}" style="text-anchor:middle;font-size:22px;font-weight:600">${escapeHtml(d.year)}</text>
