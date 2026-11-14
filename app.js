@@ -12195,13 +12195,19 @@ function renderIncomeByYearChart(years, opts = {}) {
 
     let goalSvg = "";
     if (yGoal !== null) {
+      // When actual ≥ goal, the goal line sits INSIDE the bar. Flipping the
+      // Goal label stack below the line keeps it clear of the income/delta
+      // stack above the bar top and lands it on the green bar fill.
+      const goalBelow = y <= yGoal;
+      const goalLabelY = goalBelow ? (yGoal + 24) : (yGoal - 36);
+      const goalValueY = goalBelow ? (yGoal + 50) : (yGoal - 10);
       goalSvg = `
         <line x1="${x - 4}" y1="${yGoal}" x2="${x + barW + 4}" y2="${yGoal}"
           stroke="var(--accent)" stroke-width="2">
           <title>Goal (avg of previous 3 years): ${fmtMoney(goal)}</title>
         </line>
-        <text class="trend-goal-label" x="${cx}" y="${yGoal - 36}" style="text-anchor:middle;fill:var(--accent);font-size:22px;font-weight:700">Goal</text>
-        <text class="trend-goal-value" x="${cx}" y="${yGoal - 10}" style="text-anchor:middle;fill:var(--accent);font-size:22px;font-weight:700">${fmtMoney(goal)}</text>
+        <text class="trend-goal-label" x="${cx}" y="${goalLabelY}" style="text-anchor:middle;fill:var(--accent);font-size:22px;font-weight:700">Goal</text>
+        <text class="trend-goal-value" x="${cx}" y="${goalValueY}" style="text-anchor:middle;fill:var(--accent);font-size:22px;font-weight:700">${fmtMoney(goal)}</text>
       `;
     }
 
