@@ -12118,6 +12118,11 @@ function renderIncomeByYearChart(years, opts = {}) {
   const isMobile = window.matchMedia("(max-width: 768px)").matches;
   const W = 900;
   const H = (isDashboard && !isMobile) ? 500 : 360;
+  // Keep the SVG's viewBox in sync with the H we actually draw against.
+  // HTML hardcodes viewBox 900×360, but desktop uses H=500. With overflow:visible
+  // the extra ~140 SVG units render BELOW the SVG box; on wider cards (post the
+  // 1700px main cap) the SVG is scaled larger, so the overflow is more obvious.
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   // Tightened padding so the plot area uses more of the SVG (chart looks
   // larger inside the same card). padL fits the 20px y-axis money labels.
   const padL = 90, padR = 10, padT = 10, padB = 32;
