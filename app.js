@@ -12195,12 +12195,17 @@ function renderIncomeByYearChart(years, opts = {}) {
 
     let goalSvg = "";
     if (yGoal !== null) {
-      // When actual ≥ goal, the goal line sits INSIDE the bar. Flipping the
-      // Goal label stack below the line keeps it clear of the income/delta
-      // stack above the bar top and lands it on the green bar fill.
+      // When actual ≥ goal, the goal line sits INSIDE the bar. Flip the Goal
+      // label stack below the line to clear the income/delta stack above the
+      // bar top. When actual is only slightly above goal, the flipped stack
+      // can still crowd the income value at (y - 12); enforce a minimum
+      // 50-unit gap below the income value's baseline.
       const goalBelow = y <= yGoal;
-      const goalLabelY = goalBelow ? (yGoal + 24) : (yGoal - 36);
-      const goalValueY = goalBelow ? (yGoal + 50) : (yGoal - 10);
+      const incomeValueBaseline = y - 12;
+      const goalLabelY = goalBelow
+        ? Math.max(yGoal + 28, incomeValueBaseline + 50)
+        : (yGoal - 36);
+      const goalValueY = goalBelow ? (goalLabelY + 28) : (yGoal - 10);
       goalSvg = `
         <line x1="${x - 4}" y1="${yGoal}" x2="${x + barW + 4}" y2="${yGoal}"
           stroke="var(--accent)" stroke-width="2">
