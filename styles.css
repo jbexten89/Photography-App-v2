@@ -5978,10 +5978,10 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 .ym-table-wrap {
   overflow: auto;
   /* Give the wrap its own vertical scroll so sticky header + totals + first
-     column stay pinned within the card. Cap at the remaining viewport
-     height so the scrollable area always fits above the bottom nav. */
-  max-height: calc(100vh - 260px);
-  overscroll-behavior: contain;
+     column stay pinned within the card. Use dvh (dynamic viewport height)
+     so iOS Safari's collapsing address bar doesn't fight the layout. */
+  max-height: 65vh;
+  max-height: 65dvh;
   /* Pull the table left so it uses the card's left padding for the first
      column gutter, leaving more horizontal room for the year columns. */
   margin-left: -12px;
@@ -6063,10 +6063,12 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   border-top: 2px solid var(--border);
   border-bottom: 2px solid var(--border);
   background: var(--bg);
-  /* Sit directly under the sticky year header so both stay pinned together
-     as the user scrolls. 28px matches the thead's rendered row height. */
+  /* Sit directly under the sticky year header. --ym-header-h is set from JS
+     after render based on the header row's actual measured height, so there
+     is never a gap for data rows to bleed through. Fallback matches the
+     computed height when the var isn't set yet. */
   position: sticky;
-  top: 28px;
+  top: var(--ym-header-h, 25px);
   z-index: 2;
 }
 .ym-table .ym-empty { text-align: center; color: var(--muted); padding: 24px; font-style: italic; }
