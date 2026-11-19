@@ -10470,7 +10470,9 @@ function renderTrends() {
   // "Cost of Goods Sold" or "Office Supplies".
   const incomeCats = new Set();
   (state.transactions || []).forEach(t => {
-    if (t.type === "income" && t.category) incomeCats.add(t.category);
+    // Skip owner-equity-tagged txs (e.g. Equipment / Office Supplies with an
+    // Equity chart account) so they don't turn into pseudo-jobs on the chart.
+    if (t.type === "income" && t.category && !isNonJobTx(t)) incomeCats.add(t.category);
   });
   const jobUniverse = new Set([...(state.categories || []), ...incomeCats]);
   const jobsOnly = [...jobUniverse].filter(c => {
@@ -10760,6 +10762,7 @@ function renderTrends() {
   state.transactions
     .filter(t => activeJobs.includes(t.category))
     .forEach(t => {
+      if (isNonJobTx(t)) return;
       const y = (t.date || "").slice(0, 4);
       if (!/^\d{4}$/.test(y)) return;
       if (!isYearSelected(y)) return;
