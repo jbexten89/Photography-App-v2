@@ -192,6 +192,33 @@ if (!Array.isArray(state.lockedYears)) state.lockedYears = [];
   }
 })();
 
+// 2026-11: Payee field retired. Backfill empty Customer/Vendor from the
+// legacy Payee so no counterparty attribution is lost. Direction decides
+// which field receives the value: income → customer, expense → vendor.
+(function migratePayeeToCustomerVendor() {
+  if (!Array.isArray(state.transactions)) return;
+  let migrated = 0;
+  state.transactions.forEach(t => {
+    const p = (t.payee || "").trim();
+    if (!p) return;
+    if (t.type === "income"  && !(t.customer || "").trim()) { t.customer = p; migrated++; }
+    if (t.type === "expense" && !(t.vendor   || "").trim()) { t.vendor   = p; migrated++; }
+  });
+  if (migrated > 0 && typeof saveState === "function") {
+    queueMicrotask(() => saveState());
+  }
+})();
+
+// Unified counterparty accessor. Returns Customer for income, Vendor for
+// expense, falling back to the legacy Payee for any tx that predates the
+// migration above (e.g. type===undefined or stored differently).
+function txParty(t) {
+  if (!t) return "";
+  if (t.type === "income")  return (t.customer || t.payee || "").trim();
+  if (t.type === "expense") return (t.vendor   || t.payee || "").trim();
+  return (t.customer || t.vendor || t.payee || "").trim();
+}
+
 function isLockedDate(dateStr) {
   if (!dateStr) return false;
   const m = String(dateStr).match(/^(\d{4})/);
@@ -997,9 +1024,16 @@ const FILTER_DEFS = {
       .filter(c => c && !JOB_ORDER.includes(c))
       .sort((a, b) => a.localeCompare(b)),
   },
+  // The Payees filter now reads the unified counterparty (Customer for income,
+  // Vendor for expense) so it still works for any user that saved a selection
+  // when Payee was a separate field. Legacy state.payees names that no longer
+  // match a Customer or Vendor silently drop out of the options list.
   "payees": {
     label: "Payee",
-    getOptions: () => [...new Set((state.payees || []).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
+    getOptions: () => [...new Set([
+      ...((state.customers || []).filter(Boolean)),
+      ...((state.vendors   || []).filter(Boolean)),
+    ])].sort((a, b) => a.localeCompare(b)),
   },
 };
 
@@ -1762,7 +1796,7 @@ function renderVsExpense() {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer",   t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
-    if (!filterPasses("payees",     t.payee || "")) return false;
+    if (!filterPasses("payees",     txParty(t))) return false;
     return true;
   });
 
@@ -2020,7 +2054,7 @@ function renderSavingsRate() {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
     if (!filterPasses("customer", t.customer || "")) return;
     if (!filterPassesCategory(t.category)) return;
-    if (!filterPasses("payees", t.payee || "")) return;
+    if (!filterPasses("payees", txParty(t))) return;
     const ymKey = (t.date || "").slice(0, 7);
     const mi = monthIdx.get(ymKey);
     if (mi === undefined) return;
@@ -2285,7 +2319,7 @@ function renderSavings() {
   state.transactions.forEach(t => {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
     if (!filterPasses("customer",   t.customer || "")) return;
-    if (!filterPasses("payees",     t.payee || "")) return;
+    if (!filterPasses("payees",     txParty(t))) return;
     const y = (t.date || "").slice(0, 4);
     if (y !== svYear) return;
     const cat = (t.category || "").trim();
@@ -2524,7 +2558,7 @@ function renderYearMatrix() {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer", t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
-    if (!filterPasses("payees", t.payee || "")) return false;
+    if (!filterPasses("payees", txParty(t))) return false;
     return true;
   };
 
@@ -2720,7 +2754,7 @@ function renderByCustomer() {
     if (SAVINGS_CATEGORIES.includes(t.category)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPassesCategory(t.category)) return false;
-    if (!filterPasses("payees", t.payee || "")) return false;
+    if (!filterPasses("payees", txParty(t))) return false;
     return true;
   };
 
@@ -2964,7 +2998,7 @@ function renderSpendingTrends() {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
     if (!filterPasses("customer",   t.customer || "")) return;
     if (!filterPassesCategory(t.category)) return;
-    if (!filterPasses("payees",     t.payee || "")) return;
+    if (!filterPasses("payees",     txParty(t))) return;
     const cat = t.category || "Uncategorized";
     if (!catByMonth.has(cat)) catByMonth.set(cat, new Array(monthKeys.length).fill(0));
     catByMonth.get(cat)[mi] += Math.abs(t.amount || 0);
@@ -3266,7 +3300,7 @@ function renderBreakdown() {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer",   t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
-    if (!filterPasses("payees",     t.payee || "")) return false;
+    if (!filterPasses("payees",     txParty(t))) return false;
     return true;
   });
 
@@ -3658,7 +3692,7 @@ function renderCashFlow() {
     if (isNonJobTx(t)) return;
     if (!filterPasses("customer", t.customer || "")) return;
     if (!filterPassesCategory(t.category)) return;
-    if (!filterPasses("payees", t.payee || "")) return;
+    if (!filterPasses("payees", txParty(t))) return;
     const ymKey = (t.date || "").slice(0, 7);
     const d = dataMap.get(ymKey);
     if (!d) return;
@@ -3830,7 +3864,6 @@ document.addEventListener("DOMContentLoaded", () => {
 window.syncTxLockedBanner = syncTxLockedBanner;
 
 function openTxModal(tx) {
-  populateDatalist("payee-datalist", state.payees);
   populateDatalist("category-datalist", state.categories);
   populateDatalist("account-datalist", state.accounts);
   populateDatalist("vendor-datalist", state.vendors);
@@ -3857,7 +3890,6 @@ function openTxModal(tx) {
   document.getElementById("tx-date").value = tx?.date || new Date().toISOString().slice(0, 10);
   // Sync the locked-year banner + Save button state for the initial date.
   if (typeof syncTxLockedBanner === "function") syncTxLockedBanner();
-  document.getElementById("tx-payee").value = tx?.payee || "";
   document.getElementById("tx-vendor").value = tx?.vendor || "";
   // Set customer select; if saved value isn't in the list, add it so it stays selected.
   const custSelEl = document.getElementById("tx-customer");
@@ -3936,7 +3968,6 @@ document.getElementById("btn-duplicate-tx").addEventListener("click", () => {
   const dup = {
     // intentionally no id → modal treats as a duplicate / new
     date: document.getElementById("tx-date").value || new Date().toISOString().slice(0, 10),
-    payee: document.getElementById("tx-payee").value,
     vendor: document.getElementById("tx-vendor").value,
     customer: document.getElementById("tx-customer").value,
     type,
@@ -4169,7 +4200,6 @@ document.getElementById("btn-swap-flow").addEventListener("click", () => {
 txForm.addEventListener("submit", e => {
   e.preventDefault();
   const id = document.getElementById("tx-id").value;
-  const payee = document.getElementById("tx-payee").value.trim();
   const vendor = document.getElementById("tx-vendor").value.trim();
   const customer = document.getElementById("tx-customer").value.trim();
   const tagsRaw = document.getElementById("tx-tags").value.trim();
@@ -4184,13 +4214,6 @@ txForm.addEventListener("submit", e => {
   const lockedYearNew = isLockedDate(newDateRaw) ? newDateRaw.slice(0, 4) : null;
   if (lockedYearOld) { blockedToast(lockedYearOld); return; }
   if (lockedYearNew) { blockedToast(lockedYearNew); return; }
-
-  // Customer is required only when Payee is "Job"
-  if (payee.toLowerCase() === "job" && !customer) {
-    alert("Customer is required when Payee is \"Job\".");
-    document.getElementById("tx-customer").focus();
-    return;
-  }
   // Detect "field has a value" (including 0) by checking the raw string,
   // so the user can record a $0 transaction in either column.
   const outflowRaw = document.getElementById("tx-outflow").value.trim();
@@ -4218,6 +4241,11 @@ txForm.addEventListener("submit", e => {
 
   const existing = id ? state.transactions.find(t => t.id === id) : null;
 
+  // Mirror the chosen Customer/Vendor into the legacy Payee field so any
+  // consumer that still reads t.payee (CSV export, old backups, search
+  // haystacks) continues to show the counterparty.
+  const payee = type === "income" ? customer : vendor;
+
   const tx = {
     id: id || uid(),
     type,
@@ -4241,12 +4269,6 @@ txForm.addEventListener("submit", e => {
     if (idx >= 0) state.transactions[idx] = tx;
   } else {
     state.transactions.push(tx);
-  }
-
-  // Auto-track payees
-  if (payee && !state.payees.includes(payee)) {
-    state.payees.push(payee);
-    state.payees.sort();
   }
 
   // Auto-track vendors
@@ -5947,7 +5969,6 @@ function bindListEditor(listKey, listElId, inputId, addBtnId) {
 
 bindListEditor("categories", "cat-list", "new-cat", "btn-add-cat");
 bindListEditor("accounts", "acct-list", "new-acct", "btn-add-acct");
-bindListEditor("payees", "payee-list", "new-payee", "btn-add-payee");
 bindListEditor("customers", "customer-list", "new-customer", "btn-add-customer");
 bindListEditor("invoiceItems", "invoice-items-list", "new-invoice-item", "btn-add-invoice-item");
 bindListEditor("invoiceDescs", "invoice-descs-list", "new-invoice-desc", "btn-add-invoice-desc");
@@ -8049,7 +8070,13 @@ function populateTxReportFilters() {
   };
   fill("tx-report-category", state.categories || [], "All Categories");
   fill("tx-report-customer", state.customers || [], "All Customers");
-  fill("tx-report-payee",    state.payees    || [], "All Payees");
+  // Payee options now come from the unified counterparty pool (customers +
+  // vendors). Falls back to any still-populated legacy state.payees names.
+  fill("tx-report-payee",    [
+    ...((state.customers || []).filter(Boolean)),
+    ...((state.vendors   || []).filter(Boolean)),
+    ...((state.payees    || []).filter(Boolean)),
+  ], "All Payees");
 
   // Job No. dropdown — newest first, labeled "JOBNO — Customer / Category"
   const jobsSel = document.getElementById("tx-report-jobno");
@@ -10787,10 +10814,7 @@ function renderTrends() {
       // activeJobs, isYearSelected, and trendSelectedPayees respectively).
       if (!filterPasses("customer", t.customer || "")) return;
       if (!filterPassesCategory(t.category)) return;
-      // Invoice-payment income txs often leave Payee blank and put the
-      // paying entity in Customer. Fall back to Customer so those bars don't
-      // vanish when "(no payee)" isn't in the selected payee filter.
-      const payee = t.payee || t.customer || "(no payee)";
+      const payee = txParty(t) || "(none)";
       const signed = (t.type === "income" ? 1 : -1) * t.amount;
       if (!byYearJob[y]) byYearJob[y] = {};
       if (!byYearJob[y][t.category]) byYearJob[y][t.category] = {};
@@ -11634,7 +11658,7 @@ function renderByCategory() {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer", t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
-    if (!filterPasses("payees", t.payee || "")) return false;
+    if (!filterPasses("payees", txParty(t))) return false;
     return true;
   };
 
@@ -12919,7 +12943,6 @@ function renderTransactions() {
           : ""
       }</td>
       <td data-col="customer">${escapeHtml(t.customer || txCustomerMap.get(t.id) || "")}</td>
-      <td data-col="payee">${escapeHtml(t.payee)}</td>
       <td data-col="category">${escapeHtml(t.category)}</td>
       <td data-col="expinc">${escapeHtml(t.expenseIncome || "")}</td>
       <td data-col="chart">${escapeHtml(t.chartAccount || "")}</td>
@@ -13490,7 +13513,7 @@ function renderJobs() {
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer", t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
-    if (!filterPasses("payees",   t.payee || "")) return false;
+    if (!filterPasses("payees",   txParty(t))) return false;
     return true;
   });
 
@@ -13739,7 +13762,7 @@ function renderJobs() {
     __txDrillFilter = (t) => {
       if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
       if (!filterPasses("customer",   t.customer || "")) return false;
-      if (!filterPasses("payees",     t.payee || "")) return false;
+      if (!filterPasses("payees",     txParty(t))) return false;
       if (drillJobNo) return t.jobNo === drillJobNo;
       if (drillUnlinked) {
         if (isNonJobTx(t)) return false;
@@ -13891,7 +13914,6 @@ function renderJobs() {
 function renderSettings() {
   renderEditableList("cat-list", "categories");
   renderEditableList("acct-list", "accounts");
-  renderEditableList("payee-list", "payees");
   renderEditableList("customer-list", "customers");
   renderEditableList("invoice-items-list", "invoiceItems");
   renderEditableList("invoice-descs-list", "invoiceDescs");
@@ -14497,7 +14519,6 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       { id: "tx-category",       value: ref.category },
       { id: "tx-expense-income", value: ref.expenseIncome },
       { id: "tx-chart-account",  value: ref.chartAccount },
-      { id: "tx-payee",          value: ref.payee },
       { id: "tx-account",        value: ref.account },
     ];
     const filled = [];

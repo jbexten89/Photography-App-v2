@@ -431,7 +431,6 @@
               <th data-col="vendor">Vendor</th>
               <th data-col="jobno">Job No.</th>
               <th data-col="customer">Customer</th>
-              <th data-col="payee">Payee</th>
               <th data-col="category">Category</th>
               <th data-col="expinc">Expense</th>
               <th data-col="chart">Chart of Accounts</th>
@@ -2850,16 +2849,6 @@
         </div>
 
         <div class="settings-col">
-          <h2>Payees</h2>
-          <p class="muted">Common payees for faster entry.</p>
-          <ul id="payee-list" class="editable-list"></ul>
-          <div class="inline-add">
-            <input type="text" id="new-payee" placeholder="New payee" />
-            <button id="btn-add-payee" class="btn">Add</button>
-          </div>
-        </div>
-
-        <div class="settings-col">
           <h2>Invoice Items</h2>
           <p class="muted">Line-item options for the invoice editor.</p>
           <ul id="invoice-items-list" class="editable-list"></ul>
@@ -3004,7 +2993,6 @@
               <label class="check-pill"><input type="checkbox" data-tx-col="date"     checked /> Date</label>
               <label class="check-pill"><input type="checkbox" data-tx-col="vendor"   checked /> Vendor</label>
               <label class="check-pill"><input type="checkbox" data-tx-col="customer" checked /> Customer</label>
-              <label class="check-pill"><input type="checkbox" data-tx-col="payee"    checked /> Payee</label>
               <label class="check-pill"><input type="checkbox" data-tx-col="category" checked /> Category</label>
               <label class="check-pill"><input type="checkbox" data-tx-col="chart"    checked /> Chart of Accounts</label>
               <label class="check-pill"><input type="checkbox" data-tx-col="amount"   checked /> Amount</label>
@@ -3448,10 +3436,6 @@
         </div>
 
         <div class="tx-mark-clear-row">
-          <label class="tx-payee-inline">Payee *
-            <input type="text" id="tx-payee" list="payee-datalist" />
-            <datalist id="payee-datalist"></datalist>
-          </label>
           <button type="button" id="btn-tx-clear" class="year-pill">Clear</button>
         </div>
 
