@@ -16403,9 +16403,14 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
   function renderSCMappingTable() {
     const tbody = document.querySelector("#sc-map-table tbody");
     if (!tbody) return;
-    // Show every category that's in state.categories OR currently has a mapping.
+    // Show every Category and every Expense entry (t.expenseIncome values from
+    // state.expensesTable) that's live OR currently has a mapping. The SC
+    // aggregator now matches by expenseIncome first, so refund-style entries
+    // like "Refund" / "Give Back" need their own rows here so the user can
+    // actually map them to Line 2 or wherever they belong.
     const cats = Array.from(new Set([
       ...(state.categories || []),
+      ...((state.expensesTable || []).map(e => e.entry).filter(Boolean)),
       ...Object.keys(state.scheduleCMap || {}),
     ]))
       .filter(c => c && !isNonJobCategory(c) && !SAVINGS_CATEGORIES.includes(c))
