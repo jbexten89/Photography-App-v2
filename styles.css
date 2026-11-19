@@ -5978,6 +5978,12 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 .ym-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  /* overflow-x:auto implicitly makes overflow-y auto too, which on iOS can
+     capture vertical drags and rubber-band the page back down. Tell the
+     browser this element only pans horizontally so vertical gestures scroll
+     the page instead. */
+  touch-action: pan-x;
+  overscroll-behavior: contain;
   /* Pull the table left so it uses the card's left padding for the first
      column gutter, leaving more horizontal room for the year columns. */
   margin-left: -12px;
