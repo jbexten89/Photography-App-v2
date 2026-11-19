@@ -9087,12 +9087,7 @@ function invoiceTaxAmount(inv) {
 }
 
 function invoiceTotal(inv) {
-  const sub = invoiceSubtotal(inv);
-  if (sub > 0) return sub + invoiceTaxAmount(inv);
-  // Legacy invoices (imported before lineItems existed) store a flat total
-  // in inv.total or inv.amount. Fall back so summaries aren't under-counted.
-  const legacy = (+inv.total) || (+inv.amount) || 0;
-  return legacy > 0 ? legacy : (sub + invoiceTaxAmount(inv));
+  return invoiceSubtotal(inv) + invoiceTaxAmount(inv);
 }
 
 let invoicesYearInitialized = false;
