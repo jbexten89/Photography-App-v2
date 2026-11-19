@@ -1789,6 +1789,7 @@ function renderVsExpense() {
   const monthKeySet = new Set(months.map(m => m.key));
 
   const txs = state.transactions.filter(t => {
+    if (t.unpaid) return false;
     if (isNonJobTx(t)) return false;
     const ymKey = (t.date || "").slice(0, 7);
     if (!monthKeySet.has(ymKey)) return false;
@@ -2049,6 +2050,7 @@ function renderSavingsRate() {
   const savByCat = new Map();
   const deductTxs = []; // every tx that contributes to JOB EXP + COGS
   state.transactions.forEach(t => {
+    if (t.unpaid) return;
     if (isNonJobTx(t)) return;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
     if (!filterPasses("customer", t.customer || "")) return;
@@ -2316,6 +2318,7 @@ function renderSavings() {
   const months = new Array(12).fill(0);
   const savingsTxs = []; // every contributing tx — used by the breakdown list
   state.transactions.forEach(t => {
+    if (t.unpaid) return;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return;
     if (!filterPasses("customer",   t.customer || "")) return;
     if (!filterPasses("payees",     txParty(t))) return;
@@ -2347,6 +2350,7 @@ function renderSavings() {
   let prevYearTotal = 0;
   const prevYear = String(Number(svYear) - 1);
   state.transactions.forEach(t => {
+    if (t.unpaid) return;
     const y = (t.date || "").slice(0, 4);
     if (y !== prevYear) return;
     const cat = (t.category || "").trim();
@@ -2565,6 +2569,7 @@ function renderYearMatrix() {
   const grid = new Map();
   const years = new Set();
   state.transactions.forEach(t => {
+    if (t.unpaid) return;
     if (!passes(t)) return;
     const cat = (t.category || "Uncategorized").trim();
     const yr  = (t.date || "").slice(0, 4);
@@ -2771,6 +2776,7 @@ function renderByCustomer() {
 
   // Income & expenses from transactions
   state.transactions.forEach(t => {
+    if (t.unpaid) return;
     if (!passes(t)) return;
     const cust = customerFor(t);
     if (!cust) return;
@@ -2994,6 +3000,7 @@ function renderSpendingTrends() {
   const catTotals = new Map();          // category -> total
   const catByMonth = new Map();         // category -> [perMonth amounts]
   state.transactions.forEach(t => {
+    if (t.unpaid) return;
     if (t.type !== "expense") return;
     if (isNonJobTx(t)) return;
     const ymKey = (t.date || "").slice(0, 7);
@@ -3299,6 +3306,7 @@ function renderBreakdown() {
   const wantType = breakdownTypeMode === "spending" ? "expense" : "income";
 
   const txs = state.transactions.filter(t => {
+    if (t.unpaid) return false;
     if (t.type !== wantType) return false;
     if (isNonJobTx(t)) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
@@ -3693,6 +3701,7 @@ function renderCashFlow() {
   const dataMap = new Map(data.map(d => [d.key, d]));
 
   state.transactions.forEach(t => {
+    if (t.unpaid) return;
     if (isNonJobTx(t)) return;
     if (!filterPasses("customer", t.customer || "")) return;
     if (!filterPassesCategory(t.category)) return;
@@ -3916,13 +3925,24 @@ function openTxModal(tx) {
   // Hours only matters for Income — hide the row when Outflow has a value.
   if (typeof updateTxHoursVisibility === "function") updateTxHoursVisibility();
 
+  // Reflect the unpaid flag on the toggle button. The button is only useful
+  // once a tx exists, so hide it for brand-new entries.
+  const unpaidBtn = document.getElementById("btn-tx-unpaid");
+  if (unpaidBtn) {
+    unpaidBtn.style.display = hasId ? "" : "none";
+    const isUnpaid = !!tx?.unpaid;
+    unpaidBtn.dataset.unpaid = isUnpaid ? "1" : "0";
+    unpaidBtn.textContent = isUnpaid ? "Mark as Paid" : "Mark as Unpaid";
+    unpaidBtn.classList.toggle("is-unpaid", isUnpaid);
+  }
+
   modal.classList.remove("hidden");
   // Only auto-focus on desktop. On mobile, focusing an input pops the keyboard
   // and scrolls the form around — users prefer to tap the field they want.
   const isMobile = window.matchMedia("(max-width: 768px)").matches
     || ("ontouchstart" in window && window.innerWidth < 1024);
   if (!isMobile) {
-    document.getElementById("tx-payee").focus();
+    document.getElementById("tx-date").focus();
   } else {
     // Aggressively clear focus so iOS keyboard stays down
     const killFocus = () => {
@@ -4265,6 +4285,8 @@ txForm.addEventListener("submit", e => {
     reconciled: existing?.reconciled || "",
     chartAccount: document.getElementById("tx-chart-account").value,
   };
+  // Preserve the unpaid flag — toggled from its own button, not the form fields.
+  if (existing?.unpaid) tx.unpaid = true;
   // Preserve any pre-existing hours value on edit so legacy data isn't dropped.
   if (existing?.hours != null) tx.hours = existing.hours;
 
@@ -5161,6 +5183,7 @@ function closeReconcile() {
 }
 
 function signedAmount(t) {
+  if (t.unpaid) return 0;
   return (t.type === "income" ? 1 : -1) * t.amount;
 }
 
@@ -5177,7 +5200,9 @@ function renderReconcileList() {
   });
 
   // Candidates: not yet reconciled (empty or "C") for this account, on/before statement date
+  // Unpaid tx don't belong on a bank statement — hide them from reconcile.
   const candidates = state.transactions.filter(t => {
+    if (t.unpaid) return false;
     if (account && t.account !== account) return false;
     if (t.reconciled === "R") return false;
     if (statementDate && (t.date || "") > statementDate) return false;
@@ -7113,6 +7138,7 @@ function renderPLReport() {
   // Savings transfers aren't operational P&L activity — they're balance-
   // sheet movements between personal accounts.
   const txs = state.transactions.filter(t => {
+    if (t.unpaid) return false;
     if (!t.date) return false;
     if (from && t.date < from) return false;
     if (to && t.date > to) return false;
@@ -7821,6 +7847,7 @@ function renderHGBReport() {
   }
 
   const inRange = t => {
+    if (t.unpaid) return false;
     const d = t.date || "";
     if (from && d < from) return false;
     if (to && d > to) return false;
@@ -8275,6 +8302,7 @@ function renderJobsReport() {
   }
 
   const inRange = t => {
+    if (t.unpaid) return false;
     const d = t.date || "";
     if (from && d < from) return false;
     if (to && d > to) return false;
@@ -11668,6 +11696,7 @@ function renderByCategory() {
 
   const totals = new Map();
   state.transactions.forEach(t => {
+    if (t.unpaid) return;
     if (!passesFilters(t)) return;
     if (t.type === wantType) {
       const cat = t.category || "Uncategorized";
@@ -11978,6 +12007,7 @@ function renderTreemap() {
   // Income types only (expenses + savings excluded).
   const incomeTxs = state.transactions.filter(t =>
     t.type === "income" &&
+    !t.unpaid &&
     !isNonJobTx(t) &&
     !SAVINGS_CATEGORIES.includes(t.category)
   );
@@ -12170,6 +12200,7 @@ function renderIncomeByYearChart(years, opts = {}) {
   const totals = yearAsc.map(y => {
     let inc = 0;
     state.transactions.forEach(t => {
+      if (t.unpaid) return;
       if (t.type !== "income") return;
       if (isNonJobTx(t)) return;
       if (!(t.date || "").startsWith(y)) return;
@@ -12328,6 +12359,7 @@ function renderDashboardJobsDonut(yearFilter) {
     let net = 0;
     let yearIncome = 0;
     state.transactions.forEach(t => {
+      if (t.unpaid) return;
       if (t.category !== c) return;
       if (isNonJobTx(t)) return;
       net += (t.type === "income" ? 1 : -1) * t.amount;
@@ -12348,6 +12380,7 @@ function renderDashboardJobsDonut(yearFilter) {
   const items = jobsOnly.map((job, idx) => {
     let inc = 0;
     state.transactions.forEach(t => {
+      if (t.unpaid) return;
       if (t.category !== job) return;
       if (t.type !== "income") return;
       if (isNonJobTx(t)) return;
@@ -12439,6 +12472,7 @@ function renderDashboard() {
   let inc = 0, exp = 0;
   let savIn = 0, savOut = 0;
   txs.forEach(t => {
+    if (t.unpaid) return;
     // Roll Over / Correction-style categories are carry-forward entries, not real income/expense
     if (isNonJobTx(t)) return;
     // Detect savings via Category OR Expense field — matches Year-End report,
@@ -12522,6 +12556,7 @@ function renderDashboard() {
       };
       let curInc = 0, curExp = 0, prevInc = 0, prevExp = 0;
       state.transactions.forEach(t => {
+        if (t.unpaid) return;
         if (isNonJobTx(t)) return;
         const isSav = SAVINGS_CATEGORIES.includes(t.category);
         if (isSav) return; // skip savings transfers — they're not income or expense for YoY purposes
@@ -12814,9 +12849,11 @@ function renderTransactions() {
       return b.date.localeCompare(a.date);
     });
 
-  // Running balance — respects current filters
+  // Running balance — respects current filters. Unpaid tx stay visible in
+  // the list but don't count toward the balance.
   let rbIn = 0, rbOut = 0;
   list.forEach(t => {
+    if (t.unpaid) return;
     if (t.type === "income") rbIn += t.amount;
     else rbOut += t.amount;
   });
@@ -12837,6 +12874,7 @@ function renderTransactions() {
   if (txSelectMode && txSelectedIds.size > 0) {
     let selTotal = 0;
     state.transactions.forEach(t => {
+      if (t.unpaid) return;
       if (!txSelectedIds.has(t.id)) return;
       selTotal += (t.type === "income" ? 1 : -1) * t.amount;
     });
@@ -12927,7 +12965,8 @@ function renderTransactions() {
       (expincMatchesCat ? " expinc-cat-match" : "") +
       (isSalesChart ? " chart-sales" : "") +
       (isLocked ? " locked-year" : "") +
-      (isSavingsRow ? " tx-savings" : "");
+      (isSavingsRow ? " tx-savings" : "") +
+      (t.unpaid ? " tx-unpaid" : "");
     const tintColor = (t.jobNo && txJobColorMap.get(t.jobNo)) || "";
     const rowStyle = tintColor ? ` style="--row-tint: ${hexToRowTint(tintColor)}"` : "";
     // Padlock — universal "locked" icon. The recon column moved from
@@ -12950,7 +12989,7 @@ function renderTransactions() {
       <td data-col="category">${escapeHtml(t.category)}</td>
       <td data-col="expinc">${escapeHtml(t.expenseIncome || "")}</td>
       <td data-col="chart">${escapeHtml(t.chartAccount || "")}</td>
-      <td data-col="amount" class="amount ${t.type}">${t.type === "expense" ? "-" : ""}${fmtMoney(t.amount)}</td>
+      <td data-col="amount" class="amount ${t.type}">${t.type === "expense" ? "-" : ""}${fmtMoney(t.amount)}${t.unpaid ? ` <span class="status-pill unpaid" title="Excluded from totals until marked paid">Unpaid</span>` : ""}</td>
       <td data-col="memo">${escapeHtml(t.memo || "")}</td>
       <td data-col="recon" class="recon-cell" title="${rTitle}">
         <span class="recon-lock ${rClass}">
@@ -13514,6 +13553,7 @@ function renderJobs() {
   const yearFilter = yearSel ? yearSel.value : "";
 
   const filteredTxs = state.transactions.filter(t => {
+    if (t.unpaid) return false;
     if (!filterPasses("date-range", (t.date || "").slice(0, 4))) return false;
     if (!filterPasses("customer", t.customer || "")) return false;
     if (!filterPassesCategory(t.category)) return false;
@@ -15546,6 +15586,30 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
       // Re-apply conditional UI so disabled states update
       if (typeof applyTxConditionalUI === "function") applyTxConditionalUI();
+    });
+  }
+
+  // ============================================================
+  // MARK AS UNPAID — flips tx.unpaid on the row being edited.
+  // Unpaid transactions stay in the list (dimmed + badged) but are
+  // excluded from balances, income/expense totals, charts, and reports.
+  // ============================================================
+  const btnTxUnpaid = document.getElementById("btn-tx-unpaid");
+  if (btnTxUnpaid) {
+    btnTxUnpaid.addEventListener("click", () => {
+      const id = document.getElementById("tx-id").value;
+      if (!id) return;
+      const tx = state.transactions.find(t => t.id === id);
+      if (!tx) return;
+      if (tx.unpaid) delete tx.unpaid;
+      else tx.unpaid = true;
+      saveState();
+      const nowUnpaid = !!tx.unpaid;
+      btnTxUnpaid.dataset.unpaid = nowUnpaid ? "1" : "0";
+      btnTxUnpaid.textContent = nowUnpaid ? "Mark as Paid" : "Mark as Unpaid";
+      btnTxUnpaid.classList.toggle("is-unpaid", nowUnpaid);
+      if (typeof renderTransactions === "function") renderTransactions();
+      if (typeof renderDashboard === "function") renderDashboard();
     });
   }
 

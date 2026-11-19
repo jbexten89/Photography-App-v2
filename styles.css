@@ -4886,6 +4886,16 @@ select option {
 .status-pill.paid { background: rgba(31, 138, 76, 0.15); color: var(--income); }
 .status-pill.unpaid { background: rgba(192, 57, 43, 0.12); color: var(--expense); }
 
+/* Unpaid transaction rows — excluded from totals. Dimmed + strikethrough
+   on the amount so they read as "doesn't count yet" at a glance. */
+.tx-row.tx-unpaid td { opacity: 0.55; }
+.tx-row.tx-unpaid td[data-col="amount"] { text-decoration: line-through; text-decoration-color: currentColor; }
+.tx-row.tx-unpaid td[data-col="amount"] .status-pill { opacity: 1; text-decoration: none; margin-left: 6px; }
+
+/* Mark as Unpaid toggle in the tx modal — mirrors invoice paid-button style */
+#btn-tx-unpaid { margin-left: 8px; }
+#btn-tx-unpaid.is-unpaid { background: rgba(192, 57, 43, 0.15); color: var(--expense); border-color: rgba(192, 57, 43, 0.4); }
+
 /* Paid button toggles to a "paid" visual state when the invoice is paid */
 #btn-invoice-paid {
   min-width: 135px;
