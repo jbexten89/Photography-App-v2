@@ -1024,12 +1024,11 @@ const FILTER_DEFS = {
       .filter(c => c && !JOB_ORDER.includes(c))
       .sort((a, b) => a.localeCompare(b)),
   },
-  // The Payees filter now reads the unified counterparty (Customer for income,
-  // Vendor for expense) so it still works for any user that saved a selection
-  // when Payee was a separate field. Legacy state.payees names that no longer
-  // match a Customer or Vendor silently drop out of the options list.
+  // Unified counterparty filter — options are the union of customers +
+  // vendors. Legacy state.payees names that no longer match either silently
+  // drop out of the list. Filter id stays "payees" to preserve saved presets.
   "payees": {
-    label: "Payee",
+    label: "Customer / Vendor",
     getOptions: () => [...new Set([
       ...((state.customers || []).filter(Boolean)),
       ...((state.vendors   || []).filter(Boolean)),
@@ -2267,7 +2266,7 @@ function renderSavingsRate() {
       deductBody.innerHTML = `
         <table class="sr-deduct-table">
           <thead>
-            <tr><th>Date</th><th>Payee</th><th>Category</th><th class="amt">Amount</th></tr>
+            <tr><th>Date</th><th>Customer / Vendor</th><th>Category</th><th class="amt">Amount</th></tr>
           </thead>
           <tbody>
             ${renderBucket("Job Expenses", groups["Job Expense"], totalJobExp)}
@@ -2519,7 +2518,7 @@ function renderSavings() {
       txBody.innerHTML = `
         <table class="sr-deduct-table">
           <thead>
-            <tr><th>Date</th><th>Payee</th><th>Category</th><th class="amt">Amount</th></tr>
+            <tr><th>Date</th><th>Customer / Vendor</th><th>Category</th><th class="amt">Amount</th></tr>
           </thead>
           <tbody>
             ${[...groups.entries()].map(([name, arr]) => renderBucket(name, arr)).join("")}
@@ -3346,7 +3345,7 @@ function renderBreakdown() {
       const v = (t.category || "").trim() || "Uncategorized";
       return { id: "a:" + v, label: v };
     }},
-    payee: { label: "Payee", fn: (t) => {
+    payee: { label: "Customer / Vendor", fn: (t) => {
       const v = (t.payee || "").trim();
       return { id: "p:" + (v || "__none__"), label: v || "(no payee)" };
     }},
@@ -8076,7 +8075,7 @@ function populateTxReportFilters() {
     ...((state.customers || []).filter(Boolean)),
     ...((state.vendors   || []).filter(Boolean)),
     ...((state.payees    || []).filter(Boolean)),
-  ], "All Payees");
+  ], "All Customers / Vendors");
 
   // Job No. dropdown — newest first, labeled "JOBNO — Customer / Category"
   const jobsSel = document.getElementById("tx-report-jobno");
@@ -10888,8 +10887,8 @@ function renderTrends() {
   const summaryEl = document.getElementById("trend-payee-summary");
   if (summaryEl) {
     const selCount = trendSelectedPayees === null ? allPayees.length : [...trendSelectedPayees].filter(p => allPayees.includes(p)).length;
-    if (selCount === allPayees.length) summaryEl.textContent = `All payees (${allPayees.length})`;
-    else if (selCount === 0) summaryEl.textContent = "No payees selected";
+    if (selCount === allPayees.length) summaryEl.textContent = `All customers/vendors (${allPayees.length})`;
+    else if (selCount === 0) summaryEl.textContent = "None selected";
     else if (selCount === 1) {
       const only = [...trendSelectedPayees][0];
       summaryEl.textContent = only;
