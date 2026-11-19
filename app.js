@@ -16141,6 +16141,7 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     { id: "L26",  label: "Line 26 — Wages" },
     { id: "L27",  label: "Line 27a — Other expenses" },
     { id: "L4",   label: "Line 4 — Cost of goods sold" },
+    { id: "L2",   label: "Line 2 — Returns and allowances" },
     { id: "",     label: "— Skip / Not deductible —" },
   ];
   // Reasonable defaults seeded from common photography categories.
@@ -16214,6 +16215,9 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     const incomeBreakdown = {}; // { catName: { count, sum } }
     // Cost-of-goods breakdown for Line 4 expansion.
     const cogsBreakdown = {};   // { catName: { count, sum } }
+    // Returns & allowances breakdown for Line 2 expansion (customer refunds).
+    let returns = 0;
+    const returnsBreakdown = {}; // { catName: { count, sum } }
     SC_LINES.forEach(l => { if (l.id) { lineTotals[l.id] = 0; lineBreakdown[l.id] = {}; } });
 
     (state.transactions || []).filter(inRange).forEach(t => {
@@ -16224,12 +16228,22 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       // matches the same rule the Savings Rate / Year-End reports use.
       if (SAVINGS_CATEGORIES.includes((t.expenseIncome || "").trim())) return;
       const amt = +t.amount || 0;
+      // Line 2 (Returns and allowances) applies to refund txs regardless of
+      // direction — a customer refund is almost always typed as an expense
+      // (money out), but we honor an income-side entry too.
+      const mappedLine = state.scheduleCMap[cat];
+      if (mappedLine === "L2") {
+        returns += amt;
+        const b = returnsBreakdown[cat] || (returnsBreakdown[cat] = { count: 0, sum: 0 });
+        b.count++; b.sum += amt;
+        return;
+      }
       if (t.type === "income") {
         grossReceipts += amt;
         const b = incomeBreakdown[cat] || (incomeBreakdown[cat] = { count: 0, sum: 0 });
         b.count++; b.sum += amt;
       } else {
-        const line = state.scheduleCMap[cat] !== undefined ? state.scheduleCMap[cat] : "L27";
+        const line = mappedLine !== undefined ? mappedLine : "L27";
         if (!line) return;
         if (line === "L4") {
           cogs += amt;
@@ -16273,26 +16287,36 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
     // Render Income table
     const incBody = document.getElementById("sc-report-income-body");
     if (incBody) {
-      const grossIncome = grossReceipts - cogs;
+      const netReceipts = grossReceipts - returns; // Line 3
+      const grossIncome = netReceipts - cogs;      // Line 7 (no Line 6 "Other income" tracked)
+      const returnsRow = returns > 0 ? `
+        <tr class="sc-drillable" data-drill-target="sc-inc-l2" style="cursor:pointer">
+          <td>2</td><td><span class="sc-caret">▸</span> Returns and allowances</td>
+          <td style="text-align:right">${fmtMoney(returns)}</td>
+        </tr>
+        ${buildDrillRows("sc-inc-l2", returnsBreakdown)}
+        <tr><td>3</td><td>Line 1 − Line 2</td><td style="text-align:right">${fmtMoney(netReceipts)}</td></tr>
+      ` : "";
       incBody.innerHTML = `
         <tr class="sc-drillable" data-drill-target="sc-inc-l1" style="cursor:pointer">
           <td>1</td><td><span class="sc-caret">▸</span> Gross receipts or sales</td>
           <td style="text-align:right">${fmtMoney(grossReceipts)}</td>
         </tr>
         ${buildDrillRows("sc-inc-l1", incomeBreakdown)}
+        ${returnsRow}
         <tr class="sc-drillable" data-drill-target="sc-inc-l4" style="cursor:pointer">
           <td>4</td><td><span class="sc-caret">▸</span> Cost of goods sold</td>
           <td style="text-align:right">${fmtMoney(cogs)}</td>
         </tr>
         ${buildDrillRows("sc-inc-l4", cogsBreakdown)}
-        <tr><td>7</td><td style="font-weight:700">Gross income (Line 1 − Line 4)</td><td style="text-align:right;font-weight:700">${fmtMoney(grossIncome)}</td></tr>
+        <tr><td>7</td><td style="font-weight:700">Gross income${returns > 0 ? " (Line 3 − Line 4)" : " (Line 1 − Line 4)"}</td><td style="text-align:right;font-weight:700">${fmtMoney(grossIncome)}</td></tr>
       `;
     }
 
     // Render Expenses table — only show lines with non-zero values plus L27 always.
     const expBody = document.getElementById("sc-report-expense-body");
     if (expBody) {
-      const linesToShow = SC_LINES.filter(l => l.id && l.id !== "L4" && (lineTotals[l.id] || 0) > 0);
+      const linesToShow = SC_LINES.filter(l => l.id && l.id !== "L4" && l.id !== "L2" && (lineTotals[l.id] || 0) > 0);
       let totalExp = 0;
       expBody.innerHTML = linesToShow.map(l => {
         const v = lineTotals[l.id] || 0;
