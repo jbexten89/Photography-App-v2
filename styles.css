@@ -6042,6 +6042,11 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   font-weight: 700;
   border-top: 2px solid var(--border);
   background: var(--surface);
+  /* Pin the totals row to the bottom of the viewport so it stays visible
+     when the table has more rows than fit on screen (common on mobile). */
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
 }
 .ym-table .ym-empty { text-align: center; color: var(--muted); padding: 24px; font-style: italic; }
 
