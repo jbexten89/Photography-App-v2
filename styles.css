@@ -6006,9 +6006,6 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   position: sticky;
   top: 0;
   z-index: 3;
-  position: sticky;
-  top: 0;
-  z-index: 2;
 }
 .ym-table .ym-rowhead {
   text-align: left;
@@ -6016,7 +6013,8 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   color: var(--text);
 }
 .ym-table tbody td.ym-rowhead,
-.ym-table thead th:first-child {
+.ym-table thead th:first-child,
+.ym-table thead td.ym-rowhead {
   position: sticky;
   left: 0;
   background: var(--surface);
