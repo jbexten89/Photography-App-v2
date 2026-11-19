@@ -6022,9 +6022,6 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   position: sticky;
   left: 0;
   background: var(--surface);
-  /* Corner cells (first column inside the sticky thead) need to outrank the
-     year columns so they don't get covered when scrolling right. */
-  z-index: 4;
   /* Lock the category column width so toggling Income/Expense doesn't make
      it expand to fit the longest category name in that mode. */
   width: 155px;
@@ -6034,7 +6031,12 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.ym-table thead th:first-child { background: var(--bg); }
+/* Z-index hierarchy for the dual-sticky matrix:
+     body cells with only left-sticky stay BELOW the thead so they don't
+     bleed over the pinned header/totals row while vertically scrolling. */
+.ym-table tbody td.ym-rowhead     { z-index: 2; }
+.ym-table thead th:first-child    { background: var(--bg); z-index: 4; }
+.ym-table thead td.ym-rowhead     { z-index: 4; }
 .ym-table .ym-zero { color: var(--muted); }
 .ym-table .ym-drill { cursor: pointer; }
 .ym-table .ym-drill:hover { background: rgba(96, 165, 250, 0.12); }
