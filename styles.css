@@ -11488,7 +11488,8 @@ body.tx-mobile-3line.chart-sales-off.tx-job-color-rows:not(.tx-job-expense-highl
 .tx-mark-clear-row .tx-payee-inline {
   /* Hide the "Payee *" hint here — the input is self-explanatory inline. */
 }
-.tx-mark-clear-row #btn-tx-clear { height: 32px; padding: 0 14px; }
+.tx-mark-clear-row #btn-tx-clear,
+.tx-mark-clear-row #btn-tx-unpaid { height: 32px; padding: 0 14px; }
 
 #tx-form .form-row.tx-hours-jobno-row {
   grid-template-columns: 1fr 3fr;
