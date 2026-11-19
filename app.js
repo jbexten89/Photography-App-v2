@@ -7165,7 +7165,7 @@ function renderPLReport() {
   const mileageDeduction = mileageMiles * mileageRate;
   let mileageRowHtml = "";
   if (mileageDeduction > 0) {
-    const meta = `${mileageMiles.toFixed(1)} mi × $${mileageRate.toFixed(3)} · ${mileageTrips.length} trip${mileageTrips.length === 1 ? "" : "s"}`;
+    const meta = `${mileageMiles.toFixed(1)} mi × $${mileageRate.toFixed(3)}`;
     mileageRowHtml = `
       <tr class="pl-account">
         <td><span class="pl-caret-placeholder"></span>Mileage Deduction <span class="muted" style="font-size:11px">(${escapeHtml(meta)})</span></td>
