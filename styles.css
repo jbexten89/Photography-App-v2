@@ -6032,11 +6032,16 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   white-space: nowrap;
 }
 /* Z-index hierarchy for the dual-sticky matrix:
-     body cells with only left-sticky stay BELOW the thead so they don't
-     bleed over the pinned header/totals row while vertically scrolling. */
-.ym-table tbody td.ym-rowhead     { z-index: 2; }
-.ym-table thead th:first-child    { background: var(--bg); z-index: 4; }
-.ym-table thead td.ym-rowhead     { z-index: 4; }
+     tbody first-col (left-sticky)    : 1  — slides UNDER the pinned header
+                                              and totals row when scrolling
+                                              vertically or horizontally
+     thead year headers (top-sticky)  : 3  — covers tbody year cells
+     thead totals row (top-sticky)    : 3  — sits with year headers
+     thead corner cells (top + left)  : 4  — outrank everything */
+.ym-table tbody td.ym-rowhead       { z-index: 1; }
+.ym-table .ym-col-total-row td      { z-index: 3; }
+.ym-table thead th:first-child      { background: var(--bg); z-index: 4; }
+.ym-table thead td.ym-rowhead       { z-index: 4; }
 .ym-table .ym-zero { color: var(--muted); }
 .ym-table .ym-drill { cursor: pointer; }
 .ym-table .ym-drill:hover { background: rgba(96, 165, 250, 0.12); }
