@@ -1224,6 +1224,22 @@ document.addEventListener("click", e => {
   closeFilterPopover();
 });
 
+// The filter-summary chips live OUTSIDE the Filters panel, so tapping one
+// opens the popover while the panel stays hidden. The handler above bails
+// out when the panel is hidden, which left the popover stranded. This one
+// closes the popover on any outside tap regardless of panel state.
+document.addEventListener("click", e => {
+  const popover = document.getElementById("filter-popover");
+  if (!popover || popover.hidden) return;
+  if (popover.contains(e.target)) return;
+  // Don't fight the chip/add-row click handlers — they toggle the popover
+  // themselves and will re-open it on the same tap.
+  if (e.target.closest(".filter-chip")) return;
+  if (e.target.closest(".filter-add-row")) return;
+  if (e.target.closest("#analytics-filter-summary")) return;
+  closeFilterPopover();
+});
+
 document.getElementById("btn-analytics-clear-filters")?.addEventListener("click", () => {
   Object.keys(FILTER_DEFS).forEach(k => {
     filterStates[k] = { mode: "include", selected: null };
