@@ -8602,8 +8602,18 @@ body.sidebar-open .mobile-menu-btn span:nth-child(3) { transform: translateY(-6p
   #jobs.tab-panel.active {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 56px);
+    /* Use dvh so iOS Safari's collapsing address bar doesn't push the panel
+       past the actual viewport. Subtract the bottom nav height too (the top
+       header is ~56px, the mobile bottom nav is ~72px incl. safe-area) so
+       the inner .analytics-views scroller stops at the top of the nav
+       instead of running underneath it. */
+    height: calc(100dvh - 56px);
     overflow: hidden;
+  }
+  /* When the bottom nav is active, account for its height so the scrollable
+     content area doesn't extend behind it. */
+  body.mobile-nav-bottom #jobs.tab-panel.active {
+    height: calc(100dvh - 56px - 72px - env(safe-area-inset-bottom, 0px));
   }
   #jobs > .analytics-header {
     flex: 0 0 auto;
