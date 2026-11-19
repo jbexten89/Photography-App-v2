@@ -7287,7 +7287,11 @@ function renderPLSection(items, uncategorizedAmount, sectionName, uncategorizedT
       rows.push(accountRow(p.account.name, p.amount, 0, p.txs));
       total += p.amount;
     } else {
-      rows.push(accountRow(p.account.name, null, 0, p.txs));
+      // Show the parent's own direct amount next to its name (QuickBooks
+      // convention). If the parent has no direct txs of its own, leave the
+      // amount cell blank so it reads as a grouping header.
+      const parentDirect = p.amount !== 0 ? p.amount : null;
+      rows.push(accountRow(p.account.name, parentDirect, 0, p.txs));
       let parentSubTotal = p.amount;
       children.forEach(c => {
         rows.push(accountRow(c.account.name, c.amount, 1, c.txs));
