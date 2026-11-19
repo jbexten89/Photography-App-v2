@@ -5976,14 +5976,12 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 }
 .ym-mode-switch .mode-switch-option svg { width: 14px; height: 14px; margin-right: 4px; }
 .ym-table-wrap {
-  overflow-x: auto;
-  /* overflow-x:auto implicitly makes overflow-y auto too, which on iOS
-     captured vertical drags and rubber-banded the page back down. Allow
-     both-axis panning so vertical gestures reach the page, and disable
-     vertical rubber-band on the wrap itself. Dropping the legacy
-     -webkit-overflow-scrolling: touch avoids a second iOS bounce layer. */
-  touch-action: pan-x pan-y;
-  overscroll-behavior-y: none;
+  overflow: auto;
+  /* Give the wrap its own vertical scroll so sticky header + totals + first
+     column stay pinned within the card. Cap at the remaining viewport
+     height so the scrollable area always fits above the bottom nav. */
+  max-height: calc(100vh - 260px);
+  overscroll-behavior: contain;
   /* Pull the table left so it uses the card's left padding for the first
      column gutter, leaving more horizontal room for the year columns. */
   margin-left: -12px;
