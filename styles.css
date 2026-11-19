@@ -5978,11 +5978,11 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 .ym-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  /* overflow-x:auto implicitly makes overflow-y auto too, which on iOS can
-     capture vertical drags and rubber-band the page back down. Tell the
-     browser this element only pans horizontally so vertical gestures scroll
-     the page instead. */
-  touch-action: pan-x;
+  /* overflow-x:auto implicitly makes overflow-y auto too, which on iOS
+     captured vertical drags and rubber-banded the page back down. Allow
+     both axes (so page scroll works when the finger is over the table) but
+     keep scroll chaining contained so the wrap itself doesn't bounce. */
+  touch-action: pan-x pan-y;
   overscroll-behavior: contain;
   /* Pull the table left so it uses the card's left padding for the first
      column gutter, leaving more horizontal room for the year columns. */
@@ -6024,7 +6024,9 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   position: sticky;
   left: 0;
   background: var(--surface);
-  z-index: 3;
+  /* Corner cells (first column inside the sticky thead) need to outrank the
+     year columns so they don't get covered when scrolling right. */
+  z-index: 4;
   /* Lock the category column width so toggling Income/Expense doesn't make
      it expand to fit the longest category name in that mode. */
   width: 155px;
