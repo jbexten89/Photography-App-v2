@@ -16222,7 +16222,10 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
 
     (state.transactions || []).filter(inRange).forEach(t => {
       const cat = (t.category || "").trim() || "(uncategorized)";
-      if (isNonJobCategory(cat)) return;
+      // Equity contributions/draws (Owners Equity, Owners Draw, …) tag the
+      // chart-of-account, not the category — isNonJobTx catches those where
+      // isNonJobCategory misses them.
+      if (isNonJobTx(t)) return;
       if (SAVINGS_CATEGORIES.includes(cat)) return;
       // Also exclude savings tagged via the new-spec expenseIncome field —
       // matches the same rule the Savings Rate / Year-End reports use.
