@@ -5977,6 +5977,10 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 .ym-mode-switch .mode-switch-option svg { width: 14px; height: 14px; margin-right: 4px; }
 .ym-table-wrap {
   overflow-x: auto;
+  /* overflow-y: clip keeps the wrap out of the vertical scroll chain so
+     sticky cells inside anchor to .analytics-views (the real scroller) and
+     pin to the top of the card as the user scrolls categories. */
+  overflow-y: clip;
   /* Pull the table left so it uses the card's left padding for the first
      column gutter, leaving more horizontal room for the year columns. */
   margin-left: -12px;
@@ -6002,6 +6006,11 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   text-transform: uppercase;
   color: var(--muted);
   letter-spacing: 0.5px;
+  /* Stick year headers to the top of .analytics-views as the user scrolls
+     categories. The totals row (also in thead) pins just beneath. */
+  position: sticky;
+  top: 0;
+  z-index: 3;
 }
 .ym-table .ym-rowhead {
   text-align: left;
@@ -6016,7 +6025,6 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   position: sticky;
   left: 0;
   background: var(--surface);
-  z-index: 2;
   /* Lock the category column width so toggling Income/Expense doesn't make
      it expand to fit the longest category name in that mode. */
   width: 155px;
@@ -6026,7 +6034,15 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.ym-table thead th:first-child { background: var(--bg); }
+/* Z-index hierarchy for the dual-sticky matrix:
+     tbody first-col (sticky-left only)   : 1  — slides UNDER the pinned
+                                                  thead as rows scroll up
+     thead year header (sticky-top)       : 3  — covers tbody year cells
+     thead totals row (sticky-top)        : 3  — sits with year header
+     thead corner cells (sticky-top+left) : 4  — outrank everything */
+.ym-table tbody td.ym-rowhead    { z-index: 1; }
+.ym-table thead th:first-child   { background: var(--bg); z-index: 4; }
+.ym-table thead td.ym-rowhead    { z-index: 4; }
 .ym-table .ym-zero { color: var(--muted); }
 .ym-table .ym-drill { cursor: pointer; }
 .ym-table .ym-drill:hover { background: rgba(96, 165, 250, 0.12); }
@@ -6045,6 +6061,13 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   border-top: 2px solid var(--border);
   border-bottom: 2px solid var(--border);
   background: var(--bg);
+  /* Sit directly under the sticky year-header row. --ym-header-h is set
+     from JS after render so the offset matches the header's actual
+     rendered height exactly — no vertical gap for data rows to leak
+     through between the two sticky rows. */
+  position: sticky;
+  top: var(--ym-header-h, 25px);
+  z-index: 3;
 }
 .ym-table .ym-empty { text-align: center; color: var(--muted); padding: 24px; font-style: italic; }
 

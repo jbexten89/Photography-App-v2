@@ -2671,6 +2671,16 @@ function renderYearMatrix() {
   body += `</tbody>`;
 
   tbl.innerHTML = head + body;
+
+  // Measure the actual rendered height of the year-header row and expose it
+  // as --ym-header-h so the sticky totals row below sits flush with no
+  // vertical gap (otherwise scrolling data rows bleed through between them).
+  requestAnimationFrame(() => {
+    const headerRow = tbl.querySelector("thead tr:first-child");
+    if (!headerRow) return;
+    const h = headerRow.getBoundingClientRect().height;
+    if (h > 0) tbl.style.setProperty("--ym-header-h", h + "px");
+  });
 }
 
 // Year Matrix → drill into Transactions. Click any cell (or row/column
