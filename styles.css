@@ -6000,6 +6000,12 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   text-transform: uppercase;
   color: var(--muted);
   letter-spacing: 0.5px;
+  /* Stick the header row to the top of the page as the user scrolls through
+     categories. The totals row (also in thead) sits directly beneath and
+     sticks with it via its own top offset below. */
+  position: sticky;
+  top: 0;
+  z-index: 3;
   position: sticky;
   top: 0;
   z-index: 2;
@@ -6043,6 +6049,11 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   border-top: 2px solid var(--border);
   border-bottom: 2px solid var(--border);
   background: var(--bg);
+  /* Sit directly under the sticky year header so both stay pinned together
+     as the user scrolls. 28px matches the thead's rendered row height. */
+  position: sticky;
+  top: 28px;
+  z-index: 2;
 }
 .ym-table .ym-empty { text-align: center; color: var(--muted); padding: 24px; font-style: italic; }
 
