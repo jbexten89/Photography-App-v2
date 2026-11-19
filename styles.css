@@ -5977,10 +5977,6 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 .ym-mode-switch .mode-switch-option svg { width: 14px; height: 14px; margin-right: 4px; }
 .ym-table-wrap {
   overflow-x: auto;
-  /* overflow-y: clip keeps the wrap out of the vertical scroll chain so
-     sticky cells inside anchor to .analytics-views (the real scroller) and
-     pin to the top of the card as the user scrolls categories. */
-  overflow-y: clip;
   /* Pull the table left so it uses the card's left padding for the first
      column gutter, leaving more horizontal room for the year columns. */
   margin-left: -12px;
@@ -6006,11 +6002,6 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   text-transform: uppercase;
   color: var(--muted);
   letter-spacing: 0.5px;
-  /* Stick year headers to the top of .analytics-views as the user scrolls
-     categories. The totals row (also in thead) pins just beneath. */
-  position: sticky;
-  top: 0;
-  z-index: 3;
 }
 .ym-table .ym-rowhead {
   text-align: left;
@@ -6061,13 +6052,6 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   border-top: 2px solid var(--border);
   border-bottom: 2px solid var(--border);
   background: var(--bg);
-  /* Sit directly under the sticky year-header row. --ym-header-h is set
-     from JS after render so the offset matches the header's actual
-     rendered height exactly — no vertical gap for data rows to leak
-     through between the two sticky rows. */
-  position: sticky;
-  top: var(--ym-header-h, 25px);
-  z-index: 3;
 }
 .ym-table .ym-empty { text-align: center; color: var(--muted); padding: 24px; font-style: italic; }
 
