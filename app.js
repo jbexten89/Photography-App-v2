@@ -7152,12 +7152,35 @@ function renderPLReport() {
 
   // ---- EXPENSE ----
   const { total: expenseTotal, rowsHtml: expenseRows } = renderPLSection(byType["Expense"] || [], uncategorizedExpense, "Expense", uncategorizedExpenseTxs);
+  // Mileage deduction — mirrors Schedule C Line 9 (miles × rate). Trips are
+  // tracked separately from transactions, so they need to be rolled in here.
+  const mileageRate = +state.mileageRate || 0;
+  const mileageTrips = (state.trips || []).filter(tr => {
+    if (!tr.date) return false;
+    if (from && tr.date < from) return false;
+    if (to && tr.date > to) return false;
+    return true;
+  });
+  const mileageMiles = mileageTrips.reduce((s, tr) => s + (+tr.miles || 0), 0);
+  const mileageDeduction = mileageMiles * mileageRate;
+  let mileageRowHtml = "";
+  if (mileageDeduction > 0) {
+    const meta = `${mileageMiles.toFixed(1)} mi × $${mileageRate.toFixed(3)} · ${mileageTrips.length} trip${mileageTrips.length === 1 ? "" : "s"}`;
+    mileageRowHtml = `
+      <tr class="pl-account">
+        <td><span class="pl-caret-placeholder"></span>Mileage Deduction <span class="muted" style="font-size:11px">(${escapeHtml(meta)})</span></td>
+        <td>${money(mileageDeduction)}</td>
+      </tr>
+    `;
+  }
+  const expenseTotalWithMileage = expenseTotal + mileageDeduction;
   rows.push(`<tr class="pl-section-header"><td>Expense</td><td></td></tr>`);
   rows.push(expenseRows);
-  rows.push(`<tr class="pl-subtotal"><td>Total Expense</td><td>${money(expenseTotal)}</td></tr>`);
+  rows.push(mileageRowHtml);
+  rows.push(`<tr class="pl-subtotal"><td>Total Expense</td><td>${money(expenseTotalWithMileage)}</td></tr>`);
 
   // Net Ordinary Income
-  const netOrdinary = grossProfit - expenseTotal;
+  const netOrdinary = grossProfit - expenseTotalWithMileage;
   rows.push(`<tr class="pl-net-ordinary"><td>Net Ordinary Income</td><td>${money(netOrdinary)}</td></tr>`);
 
   // ---- OTHER INCOME / OTHER EXPENSE ----
