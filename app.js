@@ -2637,11 +2637,21 @@ function renderYearMatrix() {
     return;
   }
 
+  const valueClass = wantType === "expense" ? "ym-expense" : "ym-income";
+
+  // Render the yearly-total row INSIDE thead (as its own <tr>) so it stays
+  // pinned at the top of the table — the previous bottom-sticky approach
+  // couldn't work because the horizontally-scrolling wrap had no vertical
+  // scroll of its own. Keeping it at the top also saves a scroll on mobile.
   let head = `<thead><tr><th class="ym-rowhead">Category</th>`;
   yearList.forEach(y => { head += `<th>${escapeHtml(y)}</th>`; });
-  head += `<th class="ym-rowhead">Total</th></tr></thead>`;
+  head += `<th class="ym-rowhead">Total</th></tr>`;
+  head += `<tr class="ym-col-total-row"><td class="ym-rowhead">Total</td>`;
+  yearList.forEach(y => {
+    head += `<td class="${valueClass} ym-drill" data-year="${y}">${fmtMoney(colTotals.get(y))}</td>`;
+  });
+  head += `<td class="${valueClass}">${fmtMoney(grand)}</td></tr></thead>`;
 
-  const valueClass = wantType === "expense" ? "ym-expense" : "ym-income";
   let body = `<tbody>`;
   catList.forEach(c => {
     const cAttr = escapeHtml(c);
@@ -2658,12 +2668,7 @@ function renderYearMatrix() {
     });
     body += `<td class="ym-row-total ${wantType === "expense" ? "ym-row-total-expense" : ""} ym-drill" data-cat="${cAttr}">${fmtMoney(rowTotals.get(c))}</td></tr>`;
   });
-  // Column-total row: each year cell drills into ALL categories for that year.
-  body += `<tr class="ym-col-total-row"><td class="ym-rowhead">Total</td>`;
-  yearList.forEach(y => {
-    body += `<td class="${valueClass} ym-drill" data-year="${y}">${fmtMoney(colTotals.get(y))}</td>`;
-  });
-  body += `<td class="${valueClass}">${fmtMoney(grand)}</td></tr></tbody>`;
+  body += `</tbody>`;
 
   tbl.innerHTML = head + body;
 }
