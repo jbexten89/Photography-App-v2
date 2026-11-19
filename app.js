@@ -10768,7 +10768,10 @@ function renderTrends() {
       // activeJobs, isYearSelected, and trendSelectedPayees respectively).
       if (!filterPasses("customer", t.customer || "")) return;
       if (!filterPassesCategory(t.category)) return;
-      const payee = t.payee || "(no payee)";
+      // Invoice-payment income txs often leave Payee blank and put the
+      // paying entity in Customer. Fall back to Customer so those bars don't
+      // vanish when "(no payee)" isn't in the selected payee filter.
+      const payee = t.payee || t.customer || "(no payee)";
       const signed = (t.type === "income" ? 1 : -1) * t.amount;
       if (!byYearJob[y]) byYearJob[y] = {};
       if (!byYearJob[y][t.category]) byYearJob[y][t.category] = {};
