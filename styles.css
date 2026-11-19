@@ -5976,12 +5976,7 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 }
 .ym-mode-switch .mode-switch-option svg { width: 14px; height: 14px; margin-right: 4px; }
 .ym-table-wrap {
-  /* Horizontal scroll here, vertical handled by the page. overflow-y:clip
-     keeps the wrap OUT of the vertical scroll chain (unlike auto/scroll/
-     hidden), so sticky cells inside use the viewport as their scrollport
-     and pin to the top of the screen as the user scrolls the page. */
   overflow-x: auto;
-  overflow-y: clip;
   /* Pull the table left so it uses the card's left padding for the first
      column gutter, leaving more horizontal room for the year columns. */
   margin-left: -12px;
@@ -6007,12 +6002,6 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   text-transform: uppercase;
   color: var(--muted);
   letter-spacing: 0.5px;
-  /* Stick the header row to the top of the page as the user scrolls through
-     categories. The totals row (also in thead) sits directly beneath and
-     sticks with it via its own top offset below. */
-  position: sticky;
-  top: 0;
-  z-index: 3;
 }
 .ym-table .ym-rowhead {
   text-align: left;
@@ -6022,9 +6011,12 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 .ym-table tbody td.ym-rowhead,
 .ym-table thead th:first-child,
 .ym-table thead td.ym-rowhead {
+  /* First column stays pinned to the left edge as the user scrolls the
+     table horizontally within its wrap. */
   position: sticky;
   left: 0;
   background: var(--surface);
+  z-index: 2;
   /* Lock the category column width so toggling Income/Expense doesn't make
      it expand to fit the longest category name in that mode. */
   width: 155px;
@@ -6034,17 +6026,7 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* Z-index hierarchy for the dual-sticky matrix:
-     tbody first-col (left-sticky)    : 1  — slides UNDER the pinned header
-                                              and totals row when scrolling
-                                              vertically or horizontally
-     thead year headers (top-sticky)  : 3  — covers tbody year cells
-     thead totals row (top-sticky)    : 3  — sits with year headers
-     thead corner cells (top + left)  : 4  — outrank everything */
-.ym-table tbody td.ym-rowhead       { z-index: 1; }
-.ym-table .ym-col-total-row td      { z-index: 3; }
-.ym-table thead th:first-child      { background: var(--bg); z-index: 4; }
-.ym-table thead td.ym-rowhead       { z-index: 4; }
+.ym-table thead th:first-child { background: var(--bg); }
 .ym-table .ym-zero { color: var(--muted); }
 .ym-table .ym-drill { cursor: pointer; }
 .ym-table .ym-drill:hover { background: rgba(96, 165, 250, 0.12); }
@@ -6063,13 +6045,6 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
   border-top: 2px solid var(--border);
   border-bottom: 2px solid var(--border);
   background: var(--bg);
-  /* Sit directly under the sticky year header. --ym-header-h is set from JS
-     after render based on the header row's actual measured height, so there
-     is never a gap for data rows to bleed through. Fallback matches the
-     computed height when the var isn't set yet. */
-  position: sticky;
-  top: var(--ym-header-h, 25px);
-  z-index: 2;
 }
 .ym-table .ym-empty { text-align: center; color: var(--muted); padding: 24px; font-style: italic; }
 
