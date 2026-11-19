@@ -5988,7 +5988,10 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 }
 .ym-table th:first-child,
 .ym-table td:first-child { padding-left: 12px; }
-.ym-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+/* border-collapse: collapse breaks position:sticky on table cells in Safari
+   (sticky cells render transparent / don't layer). Separate + zero spacing
+   preserves the collapsed look without the sticky regression. */
+.ym-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
 .ym-table th,
 .ym-table td {
   padding: 6px 10px;
