@@ -16234,10 +16234,22 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
       // Line 2 (Returns and allowances) applies to refund txs regardless of
       // direction — a customer refund is almost always typed as an expense
       // (money out), but we honor an income-side entry too.
-      const mappedLine = state.scheduleCMap[cat];
+      // Mapping lookup checks the new-spec Expense field (t.expenseIncome)
+      // FIRST, then falls back to Category. This lets "Give Back" style txs
+      // (category = Soccer/Softball/… because they're linked to the job,
+      // expenseIncome = Give Back) be routed to L2 without re-tagging the
+      // category and losing the job linkage.
+      const ei = (t.expenseIncome || "").trim();
+      const mappedLine = (ei && state.scheduleCMap[ei] !== undefined)
+        ? state.scheduleCMap[ei]
+        : state.scheduleCMap[cat];
+      // Attribute drill-down rows to whichever key actually matched so the
+      // expand list reads naturally ("Give Back · 4 tx" instead of
+      // "Soccer · 1 tx + Softball · 1 tx + …").
+      const breakdownKey = (ei && state.scheduleCMap[ei] !== undefined) ? ei : cat;
       if (mappedLine === "L2") {
         returns += amt;
-        const b = returnsBreakdown[cat] || (returnsBreakdown[cat] = { count: 0, sum: 0 });
+        const b = returnsBreakdown[breakdownKey] || (returnsBreakdown[breakdownKey] = { count: 0, sum: 0 });
         b.count++; b.sum += amt;
         return;
       }
@@ -16250,11 +16262,11 @@ if (typeof populateAnalyticsFilters === "function") populateAnalyticsFilters();
         if (!line) return;
         if (line === "L4") {
           cogs += amt;
-          const b = cogsBreakdown[cat] || (cogsBreakdown[cat] = { count: 0, sum: 0 });
+          const b = cogsBreakdown[breakdownKey] || (cogsBreakdown[breakdownKey] = { count: 0, sum: 0 });
           b.count++; b.sum += amt;
         } else {
           lineTotals[line] = (lineTotals[line] || 0) + amt;
-          const b = lineBreakdown[line][cat] || (lineBreakdown[line][cat] = { count: 0, sum: 0 });
+          const b = lineBreakdown[line][breakdownKey] || (lineBreakdown[line][breakdownKey] = { count: 0, sum: 0 });
           b.count++; b.sum += amt;
         }
       }
