@@ -5976,12 +5976,12 @@ body.reports-inverted .invoice-sheet .lt-bar-track { background: #e0dbd4; }
 }
 .ym-mode-switch .mode-switch-option svg { width: 14px; height: 14px; margin-right: 4px; }
 .ym-table-wrap {
-  overflow: auto;
-  /* Give the wrap its own vertical scroll so sticky header + totals + first
-     column stay pinned within the card. Use dvh (dynamic viewport height)
-     so iOS Safari's collapsing address bar doesn't fight the layout. */
-  max-height: 65vh;
-  max-height: 65dvh;
+  /* Horizontal scroll here, vertical handled by the page. overflow-y:clip
+     keeps the wrap OUT of the vertical scroll chain (unlike auto/scroll/
+     hidden), so sticky cells inside use the viewport as their scrollport
+     and pin to the top of the screen as the user scrolls the page. */
+  overflow-x: auto;
+  overflow-y: clip;
   /* Pull the table left so it uses the card's left padding for the first
      column gutter, leaving more horizontal room for the year columns. */
   margin-left: -12px;
